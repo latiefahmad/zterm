@@ -1,0 +1,52 @@
+name: Zterm
+options:
+  bundleIdPrefix: com.latiefahmad
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+  developmentLanguage: id
+
+packages:
+  SwiftTerm:
+    url: https://github.com/migueldeicaza/SwiftTerm
+    exactVersion: 1.11.0
+
+targets:
+  Zterm:
+    type: application
+    platform: macOS
+    sources:
+      - Zterm
+      # Kamus bahasa Inggris (dibagi dengan Windows & Linux)
+      - path: ../../i18n/en.json
+        buildPhase: resources
+      # Ikon Nerd Font untuk prompt Oh My Posh / Starship (dibagi dengan Windows)
+      - path: ../../fonts/SymbolsNerdFontMono-Regular.ttf
+        buildPhase: resources
+    dependencies:
+      - framework: Frameworks/ZtermCoreFFI.xcframework
+        embed: false
+      - package: SwiftTerm
+      # Dibutuhkan driver database di zterm-core (reqwest, MongoDB, native-tls)
+      - sdk: SystemConfiguration.framework
+      - sdk: Security.framework
+      - sdk: libz.tbd
+    settings:
+      base:
+        PRODUCT_NAME: Zterm
+        PRODUCT_BUNDLE_IDENTIFIER: com.latiefahmad.zterm
+        MARKETING_VERSION: 1.0.0
+        CURRENT_PROJECT_VERSION: 6
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Zterm
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Latief Ahmad"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # Ditandatangani ad-hoc (tanpa Apple Developer). Distribusi lewat GitHub Releases.
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        DEVELOPMENT_TEAM: ""
+        ENABLE_HARDENED_RUNTIME: NO
+        # Tanpa sandbox: app perlu menjalankan /usr/bin/ssh
+        ENABLE_APP_SANDBOX: NO

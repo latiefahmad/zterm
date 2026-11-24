@@ -1,0 +1,172 @@
+name: Release
+
+# Push tag versi (mis. `git tag v1.0.0 && git push origin v1.0.0`) untuk
+# memvalidasi versi + changelog, membangun DMG macOS, installer Windows,
+# dan AppImage Linux, lalu menerbitkan GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Validasi versi dan changelog
+        run: bash scripts/check-release.sh "${GITHUB_REF_NAME}"
+
+  macos:
+    needs: validate
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: core -> target
+
+      - name: Build zterm-core (xcframework + binding Swift)
+        run: ./scripts/build-core-apple.sh
+
+      - name: Generate project & build app (universal)
+        working-directory: apps/macos
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          xcodebuild -project Zterm.xcodeproj -scheme Zterm -configuration Release \
+            -derivedDataPath build -destination 'generic/platform=macOS' \
+            ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
+            MARKETING_VERSION="${GITHUB_REF_NAME#v}" CURRENT_PROJECT_VERSION="${{ github.run_number }}" build
+
+      - name: Buat DMG
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p dist/dmg
+          cp -R "apps/macos/build/Build/Products/Release/Zterm.app" dist/dmg/
+          ln -s /Applications dist/dmg/Applications
+          hdiutil create -volname "Zterm" -srcfolder dist/dmg -ov -format UDZO \
+            "dist/Zterm-${VERSION}-macOS.dmg"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/*.dmg
+
+  windows:
+    needs: validate
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-pc-windows-msvc,x86_64-pc-windows-msvc
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: core -> target
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build zterm-core (DLL ARM64 + x64 + binding C#)
+        shell: pwsh
+        run: ./scripts/build-core-windows.ps1
+
+      - name: Pasang Inno Setup
+        shell: pwsh
+        run: if (-not (Get-ChildItem "${env:ProgramFiles(x86)}\Inno Setup *\ISCC.exe" -ErrorAction SilentlyContinue)) { choco install innosetup -y --no-progress }
+
+      - name: Build app & installer .exe
+        shell: pwsh
+        run: ./scripts/build-windows-installer.ps1 -Version $env:GITHUB_REF_NAME.TrimStart('v')
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/*-Setup.exe
+
+  linux:
+    needs: validate
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: aarch64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Pasang GTK4, libadwaita, VTE
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libssl-dev \
+            libgtk-4-dev libadwaita-1-dev libvte-2.91-gtk4-dev curl file
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/linux -> target
+
+      - name: Build AppImage
+        run: ./scripts/build-linux-appimage.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: dist/Zterm-Linux-*.AppImage
+
+  release:
+    needs: [validate, macos, windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Salinan nama tetap (link download langsung di website)
+        run: |
+          cd dist
+          cp *-macOS.dmg Zterm-macOS.dmg
+          cp *-Windows-x64-Setup.exe Zterm-Windows-x64-Setup.exe
+          cp *-Windows-arm64-Setup.exe Zterm-Windows-arm64-Setup.exe
+
+      - name: Siapkan body rilis dari CHANGELOG
+        run: |
+          bash scripts/changelog-section.sh "${GITHUB_REF_NAME#v}" > release-notes.md
+          cat >> release-notes.md <<'EOF'
+
+          ## Download
+
+          - **macOS** (Apple Silicon & Intel): `Zterm-macOS.dmg`
+          - **Windows 10/11**: `Zterm-Windows-x64-Setup.exe` untuk PC biasa, `Zterm-Windows-arm64-Setup.exe` untuk PC ARM (mis. Snapdragon)
+          - **Linux (beta)**: `Zterm-Linux-x86_64.AppImage` atau `Zterm-Linux-aarch64.AppImage` — `chmod +x` lalu jalankan (glibc 2.39+, mis. Ubuntu 24.04 / Fedora 40)
+
+          App belum ditandatangani sertifikat berbayar — lihat panduan "Install" di website untuk cara membukanya.
+          EOF
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          name: Zterm ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: |
+            dist/*.dmg
+            dist/*-Setup.exe
+            dist/*.AppImage

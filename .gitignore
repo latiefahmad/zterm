@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# Situs: salinan lokal dengan Google Picker key asli
+site/team.local.html
+
+# Rust
+core/target/
+
+# Xcode (project dibuat dari project.yml lewat XcodeGen)
+apps/macos/build/
+apps/macos/build-release/
+apps/macos/*.xcodeproj/
+apps/macos/Frameworks/
+apps/macos/Zterm/Core/Generated/
+xcuserdata/
+DerivedData/
+
+
+# Windows (dibuat dari scripts/build-core-windows.ps1)
+apps/windows/Zterm/Core/Generated/
+apps/windows/Zterm/Native/
+apps/windows/**/bin/
+apps/windows/**/obj/
+apps/windows/publish/
+dist/
+
+# Linux (GTK4)
+apps/linux/target/
+apps/linux/.flatpak-builder/
+apps/linux/build-flatpak/

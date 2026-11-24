@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://latiefahmad.github.io/zterm/sitemap.xml
