@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1517"/><stop offset=".5" stop-color="#090C12"/><stop offset="1" stop-color="#140F26"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#66E9D0"/><stop offset=".45" stop-color="#5B9CF5"/><stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#66E9D0"/><stop offset="1" stop-color="#8FD0FF"/>
+    </linearGradient>
+    <radialGradient id="g1" cx=".22" cy=".18" r=".55"><stop offset="0" stop-color="#2FC4A8" stop-opacity=".32"/><stop offset="1" stop-color="#2FC4A8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g2" cx=".9" cy=".9" r=".5"><stop offset="0" stop-color="#8F6EF0" stop-opacity=".30"/><stop offset="1" stop-color="#8F6EF0" stop-opacity="0"/></radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.5" fill="#FFFFFF" opacity=".055"/></pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#g1)"/>
+  <rect width="1200" height="630" fill="url(#g2)"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+  <g transform="translate(78 165)">
+    <rect width="300" height="300" rx="70" fill="url(#bg)" stroke="url(#mark)" stroke-width="2.4" stroke-opacity=".55"/>
+    <g transform="translate(-37.32 -37.32) scale(0.36585)">
+      <path d="M330 382 H640 L330 632 H565" fill="none" stroke="#05070B" stroke-opacity=".55" stroke-width="94" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M330 382 H640 L330 632 H565" fill="none" stroke="url(#mark)" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="607" y="586" width="136" height="92" rx="38" fill="#05070B" opacity=".55"/>
+      <rect x="615" y="594" width="120" height="76" rx="30" fill="url(#mark)"/>
+    </g>
+  </g>
+  <text x="438" y="256" font-family="Segoe UI, Arial, sans-serif" font-size="104" font-weight="800" letter-spacing="-3" fill="#F2F7F9">Zterm</text>
+  <text x="442" y="327" font-family="Segoe UI, Arial, sans-serif" font-size="36" font-weight="600" fill="url(#teal)">Semua servermu, satu terminal.</text>
+  <text x="444" y="386" font-family="Consolas, monospace" font-size="19" fill="#93A4B8">SSH client native · macOS · Windows · Linux</text>
+  <g transform="translate(442 454)">
+    <rect width="196" height="42" rx="21" fill="#FFFFFF" opacity=".045"/>
+    <text x="20" y="27" font-family="Consolas, monospace" font-size="16" fill="#66E9D0">gratis · open source</text>
+  </g>
+  <text x="80" y="570" font-family="Consolas, monospace" font-size="18" fill="#8B96A5">latief.id/zterm</text>
+  <text x="1120" y="570" text-anchor="end" font-family="Consolas, monospace" font-size="18" fill="#8B96A5">v1.0.0</text>
+</svg>

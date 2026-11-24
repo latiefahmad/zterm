@@ -1,0 +1,25 @@
+[package]
+name = "zterm"
+version = "1.0.0"
+edition = "2024"
+description = "Zterm untuk Linux (GTK4 + libadwaita + VTE)"
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "zterm"
+path = "src/main.rs"
+
+[dependencies]
+zterm-core = { path = "../../core" }
+gtk = { package = "gtk4", version = "0.10", features = ["v4_14"] }
+adw = { package = "libadwaita", version = "0.8", features = ["v1_5"] }
+vte = { package = "vte4", version = "0.9" }
+uuid = { version = "1", features = ["v4"] }
+libc = "0.2"
+serde_json = "1"
+
+[profile.release]
+lto = true
+opt-level = 3
+strip = true

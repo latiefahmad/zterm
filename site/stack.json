@@ -1,0 +1,146 @@
+[
+  {
+    "id": "nginx",
+    "platform": "macos-aarch64",
+    "version": "1.30.5",
+    "url": "https://jirutka.github.io/nginx-binaries/nginx-1.30.5-arm64-darwin",
+    "format": "bin",
+    "size_mb": 7,
+    "home": ""
+  },
+  {
+    "id": "nginx",
+    "platform": "macos-x86_64",
+    "version": "1.30.5",
+    "url": "https://jirutka.github.io/nginx-binaries/nginx-1.30.5-x86_64-darwin",
+    "format": "bin",
+    "size_mb": 7,
+    "home": ""
+  },
+  {
+    "id": "nginx",
+    "platform": "windows-x86_64",
+    "version": "1.28.0",
+    "url": "https://nginx.org/download/nginx-1.28.0.zip",
+    "format": "zip",
+    "size_mb": 2,
+    "home": ""
+  },
+  {
+    "id": "apache",
+    "platform": "windows-x86_64",
+    "version": "2.4.71",
+    "url": "https://www.apachelounge.com/download/VS18/binaries/httpd-2.4.71-261112-Win64-VS18.zip",
+    "format": "zip",
+    "size_mb": 14,
+    "home": "Apache24"
+  },
+  {
+    "id": "php",
+    "platform": "macos-aarch64",
+    "version": "8.4.8",
+    "url": "https://dl.static-php.dev/static-php-cli/common/php-8.4.8-fpm-macos-aarch64.tar.gz",
+    "format": "targz",
+    "size_mb": 10,
+    "home": ""
+  },
+  {
+    "id": "php",
+    "platform": "macos-x86_64",
+    "version": "8.4.8",
+    "url": "https://dl.static-php.dev/static-php-cli/common/php-8.4.8-fpm-macos-x86_64.tar.gz",
+    "format": "targz",
+    "size_mb": 10,
+    "home": ""
+  },
+  {
+    "id": "php",
+    "platform": "windows-x86_64",
+    "version": "8.4.8",
+    "url": "https://windows.php.net/downloads/releases/archives/php-8.4.8-nts-Win32-vs17-x64.zip",
+    "format": "zip",
+    "size_mb": 33,
+    "home": ""
+  },
+  {
+    "id": "mysql",
+    "platform": "macos-aarch64",
+    "version": "8.4.6",
+    "url": "https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.6-macos15-arm64.tar.gz",
+    "format": "targz",
+    "size_mb": 160,
+    "home": ""
+  },
+  {
+    "id": "mysql",
+    "platform": "macos-x86_64",
+    "version": "8.4.6",
+    "url": "https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.6-macos15-x86_64.tar.gz",
+    "format": "targz",
+    "size_mb": 165,
+    "home": ""
+  },
+  {
+    "id": "mysql",
+    "platform": "windows-x86_64",
+    "version": "8.4.6",
+    "url": "https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.6-winx64.zip",
+    "format": "zip",
+    "size_mb": 260,
+    "home": ""
+  },
+  {
+    "id": "postgres",
+    "platform": "macos-aarch64",
+    "version": "17.12",
+    "url": "https://repo1.maven.org/maven2/io/zonky/test/postgres/embedded-postgres-binaries-darwin-arm64v8/17.12.0/embedded-postgres-binaries-darwin-arm64v8-17.12.0.jar",
+    "format": "jar-txz",
+    "size_mb": 60,
+    "home": ""
+  },
+  {
+    "id": "postgres",
+    "platform": "macos-x86_64",
+    "version": "17.12",
+    "url": "https://repo1.maven.org/maven2/io/zonky/test/postgres/embedded-postgres-binaries-darwin-amd64/17.12.0/embedded-postgres-binaries-darwin-amd64-17.12.0.jar",
+    "format": "jar-txz",
+    "size_mb": 60,
+    "home": ""
+  },
+  {
+    "id": "postgres",
+    "platform": "windows-x86_64",
+    "version": "17.12",
+    "url": "https://repo1.maven.org/maven2/io/zonky/test/postgres/embedded-postgres-binaries-windows-amd64/17.12.0/embedded-postgres-binaries-windows-amd64-17.12.0.jar",
+    "format": "jar-txz",
+    "size_mb": 55,
+    "home": ""
+  },
+  {
+    "id": "mongodb",
+    "platform": "macos-aarch64",
+    "version": "8.0.4",
+    "url": "https://fastdl.mongodb.org/osx/mongodb-macos-arm64-8.0.4.tgz",
+    "format": "targz",
+    "size_mb": 80,
+    "home": ""
+  },
+  {
+    "id": "mongodb",
+    "platform": "macos-x86_64",
+    "version": "8.0.4",
+    "url": "https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-8.0.4.tgz",
+    "format": "targz",
+    "size_mb": 85,
+    "home": ""
+  },
+  {
+    "id": "mongodb",
+    "platform": "windows-x86_64",
+    "version": "8.0.4",
+    "url": "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-8.0.4.zip",
+    "format": "zip",
+    "size_mb": 75,
+    "home": ""
+  }
+]

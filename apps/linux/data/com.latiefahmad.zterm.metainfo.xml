@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.latiefahmad.zterm</id>
+  <name>Zterm</name>
+  <summary>SSH client native — semua servermu, satu terminal</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>Zterm untuk Linux (beta): vault terenkripsi, daftar host, terminal SSH dan lokal, Keychain SSH key, dan Snippets.</p>
+  </description>
+  <launchable type="desktop-id">com.latiefahmad.zterm.desktop</launchable>
+  <url type="homepage">https://github.com/latiefahmad/zterm</url>
+  <content_rating type="oars-1.1"/>
+</component>

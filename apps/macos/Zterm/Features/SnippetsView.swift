@@ -1,0 +1,187 @@
+import SwiftUI
+
+struct SnippetsView: View {
+    @Environment(AppModel.self) private var model
+    @State private var editing: Snippet?
+    @State private var runTarget: Snippet?
+    @State private var query = ""
+
+    private var filtered: [Snippet] {
+        let q = query.lowercased()
+        return q.isEmpty ? model.snippets
+            : model.snippets.filter { $0.label.lowercased().contains(q) || $0.command.lowercased().contains(q) }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                PageHeader(title: "Snippets", subtitle: L("Perintah favorit — jalankan ke satu atau banyak host sekaligus")) {
+                    SearchField(text: $query, prompt: L("Cari snippet…"))
+                    Button { editing = .blank() } label: { Label(L("Snippet Baru"), systemImage: "plus") }
+                        .buttonStyle(PrimaryButtonStyle())
+                }
+                if model.snippets.isEmpty {
+                    EmptyState(icon: "curlybraces", title: L("Belum ada snippet"),
+                               text: L("Simpan perintah yang sering dipakai, misalnya cek disk atau restart service."))
+                } else {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 12)], spacing: 12) {
+                        ForEach(Array(filtered.enumerated()), id: \.element.id) { i, s in
+                            SnippetCard(snippet: s, onEdit: { editing = s }, onRun: { runTarget = s })
+                                .staggerIn(i, base: 0)
+                        }
+                    }
+                }
+            }
+            .padding(28)
+        }
+        .sheet(item: $editing) { SnippetEditor(original: $0) }
+        .sheet(item: $runTarget) { RunSnippetSheet(snippet: $0) }
+    }
+}
+
+struct SnippetCard: View {
+    @Environment(AppModel.self) private var model
+    let snippet: Snippet
+    var onEdit: () -> Void
+    var onRun: () -> Void
+
+    var body: some View {
+        HoverCard {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 10) {
+                    Image(systemName: "curlybraces")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.black.opacity(0.7))
+                        .frame(width: 34, height: 34)
+                        .background(Theme.brandGradient, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                    Text(snippet.label).font(.system(size: 14, weight: .semibold)).lineLimit(1)
+                    Spacer()
+                    IconButton(symbol: "pencil", help: L("Edit"), action: onEdit)
+                    IconButton(symbol: "trash", help: L("Hapus"), tint: .red) { model.delete(snippet) }
+                }
+                Text(snippet.command)
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                    .background(Theme.field, in: RoundedRectangle(cornerRadius: 8))
+                HStack {
+                    Spacer()
+                    if model.activeSessionID != nil {
+                        Button { model.runInActiveSession(snippet); model.flash(L("Dikirim ke tab aktif")) } label: {
+                            Label(L("Tab aktif"), systemImage: "terminal")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                    }
+                    Button(action: onRun) { Label(L("Jalankan"), systemImage: "play.fill") }
+                        .buttonStyle(PrimaryButtonStyle())
+                }
+            }
+        }
+    }
+}
+
+struct SnippetEditor: View {
+    @Environment(AppModel.self) private var model
+    let original: Snippet
+    @State private var label = ""
+    @State private var command = ""
+
+    var body: some View {
+        FormSheet(title: original.id.isEmpty ? L("Snippet Baru") : L("Edit Snippet"),
+                  canSave: !command.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  onSave: {
+                      var s = original
+                      s.label = label.isEmpty ? String(command.prefix(30)) : label
+                      s.command = command
+                      model.save(s)
+                  }) {
+            TextField(L("Nama (mis. Cek disk)"), text: $label).ztermField()
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $command)
+                    .font(.system(size: 12, design: .monospaced))
+                    .scrollContentBackground(.hidden)
+                    .padding(6)
+                if command.isEmpty {
+                    Text(L("df -h && free -m")).font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(.tertiary).padding(11).allowsHitTesting(false)
+                }
+            }
+            .frame(height: 140)
+            .background(Theme.field, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.cardStroke))
+        }
+        .onAppear { label = original.label; command = original.command }
+    }
+}
+
+/// Pilih host lalu jalankan snippet: satu tab baru per host.
+struct RunSnippetSheet: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    let snippet: Snippet
+    @State private var picked: Set<String> = []
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(L("Jalankan “{}”", snippet.label)).font(.title3.bold())
+            Text(snippet.command).font(.system(size: 12, design: .monospaced)).foregroundStyle(.secondary).lineLimit(2)
+            ScrollView {
+                VStack(spacing: 6) {
+                    ForEach(model.hosts) { h in
+                        let on = picked.contains(h.id)
+                        HStack(spacing: 10) {
+                            Image(systemName: on ? "checkmark.circle.fill" : "circle")
+                                .foregroundStyle(on ? Theme.accent : .secondary)
+                                .contentTransition(.symbolEffect(.replace))
+                            Circle().fill(Color(hex: h.color)).frame(width: 8, height: 8)
+                            Text(h.title)
+                            Spacer()
+                            if let g = h.group { Text(g).font(.caption).foregroundStyle(.secondary) }
+                        }
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(on ? Theme.accent.opacity(0.1) : Theme.card, in: RoundedRectangle(cornerRadius: 8))
+                        .contentShape(Rectangle())
+                        .onTapGesture { withAnimation(.ztermSnappy) { if on { picked.remove(h.id) } else { picked.insert(h.id) } } }
+                    }
+                }
+            }
+            .frame(height: 240)
+            HStack {
+                Button(picked.count == model.hosts.count ? L("Batal pilih semua") : L("Pilih semua")) {
+                    withAnimation(.ztermSnappy) { picked = picked.count == model.hosts.count ? [] : Set(model.hosts.map(\.id)) }
+                }
+                .buttonStyle(.borderless)
+                Spacer()
+                Button(L("Batal")) { dismiss() }.buttonStyle(SecondaryButtonStyle())
+                Button {
+                    model.connect(model.hosts.map(\.id).filter(picked.contains), run: snippet.command)
+                    dismiss()
+                } label: { Label(L("Jalankan di {} host", picked.count), systemImage: "play.fill") }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(picked.isEmpty)
+            }
+        }
+        .padding(24)
+        .frame(width: 480)
+    }
+}
+
+/// Kolom cari kecil yang seragam di header halaman.
+struct SearchField: View {
+    @Binding var text: String
+    var prompt: String
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+            TextField(prompt, text: $text).textFieldStyle(.plain).frame(width: 170)
+        }
+        .padding(.horizontal, 10).frame(height: 30)
+        .background(Theme.ink.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+extension Snippet {
+    static func blank() -> Snippet { Snippet(id: "", label: "", command: "", updatedAt: 0, deleted: false) }
+}

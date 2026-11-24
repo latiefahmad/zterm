@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gabung tim: Zterm</title>
+  <meta name="description" content="Terima undangan tim Zterm: pilih file tim dari Google Drive agar host yang dibagikan admin muncul di Zterm." />
+  <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png" />
+  <meta name="robots" content="noindex" />
+  <style>
+    :root { --bg:#0e1116; --panel:#151a21; --line:#262e3a; --fg:#e6edf3; --muted:#8b96a5; --accent:#3fd0b4; --accent2:#9d7cf2; --bad:#f0616d; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background: radial-gradient(900px 500px at 15% -10%, rgba(63,208,180,.14), transparent 60%),
+           radial-gradient(800px 500px at 100% 0%, rgba(157,124,242,.14), transparent 60%), var(--bg);
+           color:var(--fg); font:16px/1.65 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .wrap { max-width: 640px; margin: 0 auto; padding: 28px 16px 64px; }
+    a { color: var(--accent); }
+    .back { font-size: 14px; text-decoration: none; }
+    .brand { display:flex; align-items:center; gap:12px; margin: 34px 0 8px; }
+    .brand img { width: 52px; height: 52px; border-radius: 14px; }
+    h1 { font-size: clamp(28px, 6vw, 36px); line-height:1.15; margin: 6px 0 8px; letter-spacing: -0.02em; }
+    .lead { color: var(--muted); margin: 0 0 26px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+    ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+    ol li { counter-increment: s; position: relative; padding: 0 0 18px 44px; }
+    ol li:last-child { padding-bottom: 0; }
+    ol li::before { content: counter(s); position:absolute; left:0; top:1px; width:28px; height:28px; border-radius:50%;
+                    display:grid; place-items:center; font-weight:700; font-size:13px; color:#0e1116;
+                    background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+    ol b { display:block; }
+    ol span { color: var(--muted); font-size: 14.5px; }
+    button { font: inherit; font-weight: 600; border: 0; cursor: pointer; border-radius: 12px; padding: 13px 20px; width: 100%;
+             color: #0e1116; background: linear-gradient(135deg, var(--accent), var(--accent2)); margin-top: 22px; transition: transform .15s, opacity .15s; }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .5; cursor: default; transform: none; }
+    .status { margin-top: 16px; font-size: 14.5px; color: var(--muted); min-height: 1.5em; }
+    .status.err { color: var(--bad); }
+    .done { display:none; margin-top: 18px; border:1px solid rgba(63,208,180,.4); background: rgba(63,208,180,.08); border-radius: 14px; padding: 16px; }
+    .done.show { display:block; animation: pop .35s ease; }
+    .done h2 { font-size: 18px; margin: 0 0 6px; }
+    .done p { margin: 0 0 10px; color: var(--muted); font-size: 14.5px; }
+    .code { display:flex; gap:8px; align-items:center; }
+    .code code { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background: var(--bg); border:1px solid var(--line);
+                 border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+    .code button { width:auto; margin:0; padding: 8px 14px; font-size: 13px; }
+    .note { margin-top: 26px; font-size: 13.5px; color: var(--muted); }
+    @keyframes pop { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← Zterm</a>
+  <div class="brand"><img src="assets/brand/icon-512.png" alt="" /></div>
+  <h1>Gabung tim Zterm</h1>
+  <p class="lead">Kamu diundang ke tim. Pilih file tim sekali di sini, lalu host yang dibagikan admin muncul di Zterm-mu.</p>
+
+  <div class="card">
+    <ol>
+      <li><b>Masuk dengan akun Google yang diundang</b><span>Akun yang menerima email undangan harus sama dengan akun Google di Zterm-mu.</span></li>
+      <li><b>Pilih file tim</b><span>Namanya berakhiran <code>.ztermteam</code>, ada di “Dibagikan kepada saya”.</span></li>
+      <li><b>Kembali ke Zterm milikmu</b><span>Di perangkatmu sendiri (bukan milik admin): Tim → Gabung tim → Cek undangan, lalu klik Gabung.</span></li>
+    </ol>
+    <button id="pick" disabled>Memuat Google…</button>
+    <div id="status" class="status" role="status"></div>
+    <div id="done" class="done">
+      <h2>✓ File tim terpilih</h2>
+      <p id="doneText">Kembali ke Zterm → Tim → Gabung tim → Cek undangan.</p>
+      <p>Kalau undangan belum muncul, tempel kode ini di kolom “link / ID file tim”:</p>
+      <div class="code"><code id="fileId"></code><button id="copy" type="button">Salin</button></div>
+    </div>
+  </div>
+
+  <p class="note">Halaman ini hanya meminta izin <code>drive.file</code>: Zterm hanya bisa membuka file yang kamu pilih, bukan seluruh Google Drive-mu. Isi file tim terenkripsi end-to-end, jadi Google dan pengembang tidak bisa membacanya. <a href="privacy.html">Kebijakan privasi</a>.</p>
+</div>
+
+<script>
+const CLIENT_ID = "903065765040-rh0pb3g4c4nglvnq0gvhbk94soiclj8b.apps.googleusercontent.com";
+// Diisi saat deploy oleh .github/workflows/pages.yml dari secret GOOGLE_PICKER_API_KEY.
+const API_KEY = "__GOOGLE_PICKER_API_KEY__";
+const APP_ID = "903065765040";
+const MIME = "application/vnd.zterm.team";
+
+const btn = document.getElementById("pick");
+const statusEl = document.getElementById("status");
+let tokenClient, token, pickerReady = false, gisReady = false;
+
+function setStatus(text, err) { statusEl.textContent = text || ""; statusEl.classList.toggle("err", !!err); }
+function ready() {
+  if (!pickerReady || !gisReady) return;
+  btn.disabled = false;
+  btn.textContent = "Masuk dengan Google & pilih file tim";
+}
+
+window.onGapiLoad = () => gapi.load("picker", () => { pickerReady = true; ready(); });
+window.onGisLoad = () => {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: "https://www.googleapis.com/auth/drive.file",
+    callback: (resp) => {
+      if (resp.error) { setStatus("Login dibatalkan atau gagal: " + resp.error, true); return; }
+      token = resp.access_token;
+      showPicker();
+    },
+  });
+  gisReady = true; ready();
+};
+
+function showPicker() {
+  setStatus("");
+  const shared = new google.picker.DocsView(google.picker.ViewId.DOCS)
+    .setMimeTypes(MIME).setOwnedByMe(false).setMode(google.picker.DocsViewMode.LIST);
+  const all = new google.picker.DocsView(google.picker.ViewId.DOCS).setMimeTypes(MIME).setMode(google.picker.DocsViewMode.LIST);
+  new google.picker.PickerBuilder()
+    .setTitle("Pilih file tim Zterm (.ztermteam)")
+    .addView(shared)
+    .addView(all)
+    .setOAuthToken(token)
+    .setDeveloperKey(API_KEY)
+    .setAppId(APP_ID)
+    .setLocale("id")
+    .setCallback(onPicked)
+    .build()
+    .setVisible(true);
+}
+
+function onPicked(data) {
+  if (data.action === google.picker.Action.CANCEL) { setStatus("Belum ada file yang dipilih."); return; }
+  if (data.action !== google.picker.Action.PICKED) return;
+  const doc = data.docs && data.docs[0];
+  if (!doc) return;
+  document.getElementById("fileId").textContent = doc.id;
+  const name = (doc.name || "Tim").replace(/\.ztermteam$/, "");
+  document.getElementById("doneText").textContent =
+    `Tim “${name}” siap. Kembali ke Zterm → Tim → Gabung tim → Cek undangan, lalu klik Gabung.`;
+  document.getElementById("done").classList.add("show");
+  btn.textContent = "Pilih file tim lain";
+}
+
+btn.addEventListener("click", () => {
+  if (token) showPicker(); else tokenClient.requestAccessToken({ prompt: "" });
+});
+document.getElementById("copy").addEventListener("click", async (e) => {
+  try { await navigator.clipboard.writeText(document.getElementById("fileId").textContent); e.target.textContent = "Tersalin"; }
+  catch { e.target.textContent = "Salin manual"; }
+  setTimeout(() => (e.target.textContent = "Salin"), 1800);
+});
+</script>
+<script async defer src="https://apis.google.com/js/api.js" onload="onGapiLoad()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="onGisLoad()"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://latief.id/zterm/sitemap.xml

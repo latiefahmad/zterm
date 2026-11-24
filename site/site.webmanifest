@@ -1,0 +1,14 @@
+{
+  "name": "Zterm",
+  "short_name": "Zterm",
+  "description": "SSH client & SFTP native untuk macOS, Windows & Linux",
+  "lang": "id",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f2ede3",
+  "theme_color": "#f2ede3",
+  "icons": [
+    { "src": "assets/brand/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "assets/brand/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

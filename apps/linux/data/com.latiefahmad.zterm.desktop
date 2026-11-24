@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Zterm
+GenericName=SSH Client
+Comment=Semua servermu, satu terminal
+Exec=zterm
+Icon=com.latiefahmad.zterm
+Terminal=false
+Categories=Network;System;TerminalEmulator;
+Keywords=ssh;terminal;server;sftp;
+StartupNotify=true
+StartupWMClass=com.latiefahmad.zterm
