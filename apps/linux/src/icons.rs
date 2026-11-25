@@ -55,9 +55,8 @@ pub fn install() {
 
 fn search_dirs() -> Vec<PathBuf> {
     let mut dirs = Vec::new();
-    if cfg!(debug_assertions) {
-        dirs.push(PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/icons")));
-    }
+    // `cargo run` dan `cargo build --release` langsung dari repo.
+    dirs.push(PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/icons")));
     if let Some(appdir) = std::env::var_os("APPDIR") {
         dirs.push(PathBuf::from(appdir).join("usr/share/icons"));
     }
