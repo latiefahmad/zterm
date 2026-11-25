@@ -22,7 +22,7 @@ Versi **Linux** masih beta — lihat [Linux (beta)](#linux-beta).
 [**⬇ Linux (AppImage, beta)**](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-Linux-x86_64.AppImage) &nbsp;·&nbsp;
 [Website](https://latief.id/zterm/)
 
-[Zterm 1.0.0](#zterm-100) · [Fitur](#fitur) · [Install](#install) · [Changelog](#changelog) · [Development](#development)
+[Zterm 1.0.1](#zterm-101) · [Fitur](#fitur) · [Install](#install) · [Changelog](#changelog) · [Development](#development)
 
 <br />
 
@@ -30,7 +30,7 @@ Versi **Linux** masih beta — lihat [Linux (beta)](#linux-beta).
 
 ---
 
-## Zterm 1.0.0
+## Zterm 1.0.1
 
 Rilis pertama Zterm untuk macOS, Windows, dan Linux (beta) — satu app native untuk seluruh pekerjaan server.
 
@@ -184,12 +184,13 @@ Butuh distro yang cukup baru (glibc 2.39+), mis. Ubuntu 24.04, Debian 13, Fedora
 Yang sudah ada: vault terenkripsi (buat / buka dengan master password), daftar host (grup, cari, warna), editor host (password / SSH key / agent, jump host, proxy SOCKS5/HTTP), tab terminal SSH & terminal lokal, Keychain (generate / import key), dan Snippets.<br />
 Menyusul: SFTP, Database, Docker, Dashboard, Tim, dan sync Google Drive.
 
-> **Zterm 1.0.0** — rilis pertama untuk macOS, Windows, dan Linux (beta). Zterm memberi tahu di app saat ada versi baru.
+> **Zterm 1.0.1** — tampilan baru dengan ikon Phosphor Duotone di macOS, Windows, dan Linux (beta). Zterm memberi tahu di app saat ada versi baru.
 
 ## Changelog
 
 | Versi | Tanggal | Sorotan |
 |---|---|---|
+| [**1.0.1**](CHANGELOG.md#101--2026-11-25) | 25 Nov 2026 | Tampilan baru dengan ikon Phosphor Duotone di macOS, Windows, dan Linux (beta), plus perbaikan Dashboard dan build Linux |
 | [**1.0.0**](CHANGELOG.md#100--2026-11-24) | 24 Nov 2026 | Rilis pertama: dashboard semua server, terminal SSH, SFTP, Docker, database & backup, Server Lokal, Tim, keychain, tunnel, Linux (beta), dan update dari dalam app |
 
 Detail lengkap tiap versi: **[CHANGELOG.md](CHANGELOG.md)** · Semua file installer: [Releases](https://github.com/latiefahmad/zterm/releases)
@@ -294,7 +295,7 @@ cd core && ZTERM_STACK_ROOT=/tmp/zterm-stack cargo test --test stack_live -- --i
 Naikkan versi (`core/Cargo.toml`, `apps/linux/Cargo.toml`, `apps/macos/project.yml`, `Zterm.csproj`, `Zterm.iss`, `site/index.html`), tambahkan section `## [versi]` di `CHANGELOG.md`, lalu push tag. GitHub Actions memvalidasi versi dan changelog, membangun DMG macOS + installer Windows + AppImage Linux, lalu menerbitkan release dengan isi changelog sebagai body.
 
 ```bash
-git tag v1.0.0 && git push origin v1.0.0
+git tag v1.0.1 && git push origin v1.0.1
 ```
 
 </details>

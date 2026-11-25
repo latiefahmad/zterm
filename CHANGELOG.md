@@ -6,6 +6,30 @@ Download versi terbaru: [Releases](https://github.com/latiefahmad/zterm/releases
 
 ---
 
+## [1.0.1] - 2026-11-25
+
+Pembaruan tampilan untuk macOS, Windows, dan Linux (beta). Seluruh ikon kini memakai Phosphor Duotone, dengan permukaan netral, border tipis, dan status berbentuk badge.
+
+### Diubah
+
+- **Antarmuka baru** — ikon Phosphor Duotone di seluruh halaman macOS, Windows, dan Linux, ukuran ikon diseragamkan, gradient dan glow berlebihan dihapus, aksen teal Zterm dipertahankan
+- **Dashboard & sidebar** — tata letak baru dengan kartu server, status titik/badge, dan navigasi yang lebih ringkas di macOS dan Windows
+- **Linux (beta)** — sidebar, onboarding, Hosts, Keychain, Snippets, editor, dan tab terminal memakai Phosphor Duotone; 174 ikon SVG simbolik ikut dipaketkan di AppImage dan Flatpak
+
+### Diperbaiki
+
+- macOS: halaman Akun gagal dibangun karena `PageHeader` tanpa aksi
+- macOS: Dashboard menyegarkan daftar host saat host ditambah, diubah, atau dihapus
+- Linux: ikon tetap ditemukan saat build release dijalankan langsung dari repo
+
+### Platform
+
+- **macOS 15+** — universal (Apple Silicon & Intel)
+- **Windows 10/11** — x64 dan ARM64
+- **Linux (beta)** — x86_64 dan ARM64
+
+[1.0.1]: https://github.com/latiefahmad/zterm/releases/tag/v1.0.1
+
 ## [1.0.0] - 2026-11-24
 
 Rilis pertama Zterm untuk macOS, Windows, dan Linux (beta). Satu aplikasi native untuk seluruh pekerjaan server: terminal SSH, SFTP, Docker, database, server lokal, dan kolaborasi tim.
