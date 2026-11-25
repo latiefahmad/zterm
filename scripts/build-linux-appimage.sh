@@ -21,6 +21,8 @@ rm -rf "$APPDIR"
 install -Dm755 "$APP/target/release/zterm" "$APPDIR/usr/bin/zterm"
 install -Dm644 "$APP/data/com.latiefahmad.zterm.desktop" "$APPDIR/usr/share/applications/com.latiefahmad.zterm.desktop"
 install -Dm644 "$APP/data/icons/com.latiefahmad.zterm.png" "$APPDIR/usr/share/icons/hicolor/512x512/apps/com.latiefahmad.zterm.png"
+mkdir -p "$APPDIR/usr/share/icons/hicolor/scalable/actions"
+cp -r "$APP/data/icons/hicolor/scalable/actions/." "$APPDIR/usr/share/icons/hicolor/scalable/actions/"
 install -Dm644 "$APP/data/com.latiefahmad.zterm.metainfo.xml" "$APPDIR/usr/share/metainfo/com.latiefahmad.zterm.metainfo.xml"
 
 echo "==> Mengunduh linuxdeploy"

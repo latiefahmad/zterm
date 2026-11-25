@@ -7,7 +7,7 @@ use zterm_core::{AuthMethod, Host};
 use gtk::gio;
 
 use crate::ctx::{self, Ctx};
-use crate::{editor, terminal, theme};
+use crate::{editor, icons, terminal, theme};
 
 pub fn build(ctx: &Ctx) -> gtk::Widget {
     let root = gtk::Box::new(gtk::Orientation::Vertical, 0);
@@ -31,12 +31,13 @@ pub fn build(ctx: &Ctx) -> gtk::Widget {
     let search = gtk::SearchEntry::builder().placeholder_text(tr!("Cari host, IP, tag…")).width_chars(22).valign(gtk::Align::Center).build();
     header.append(&search);
 
-    let hide = gtk::ToggleButton::builder().icon_name("view-reveal-symbolic").tooltip_text(tr!("Sembunyikan alamat host")).valign(gtk::Align::Center).build();
+    let hide = gtk::ToggleButton::builder().tooltip_text(tr!("Sembunyikan alamat host")).valign(gtk::Align::Center).build();
+    hide.set_child(Some(&icons::image("eye", 18)));
     hide.add_css_class("flat");
     header.append(&hide);
 
     let add = gtk::Button::builder().valign(gtk::Align::Center).build();
-    add.set_child(Some(&adw::ButtonContent::builder().icon_name("list-add-symbolic").label(tr!("Host Baru")).build()));
+    add.set_child(Some(&icons::content("plus", &tr!("Host Baru"))));
     add.add_css_class("suggested-action");
     add.set_tooltip_text(Some(&tr!("Host Baru (Ctrl+Shift+N)")));
     let c = ctx.clone();
@@ -61,7 +62,7 @@ pub fn build(ctx: &Ctx) -> gtk::Widget {
     let (r, c) = (refresh.clone(), ctx.clone());
     hide.connect_toggled(move |b| {
         c.hide_addresses.set(b.is_active());
-        b.set_icon_name(if b.is_active() { "view-conceal-symbolic" } else { "view-reveal-symbolic" });
+        b.set_child(Some(&icons::image(if b.is_active() { "eye-slash" } else { "eye" }, 18)));
         b.set_tooltip_text(Some(&if b.is_active() { tr!("Tampilkan alamat host") } else { tr!("Sembunyikan alamat host") }));
         r();
     });
@@ -93,7 +94,7 @@ fn render(ctx: &Ctx, body: &gtk::Box, subtitle: &gtk::Label, query: &str) {
 
     if all.is_empty() {
         let status = adw::StatusPage::builder()
-            .icon_name("network-server-symbolic")
+            .icon_name(&icons::themed("hard-drives"))
             .title(tr!("Belum ada host"))
             .description(tr!("Tambahkan server pertamamu, lalu connect dengan satu klik."))
             .vexpand(true)
@@ -112,7 +113,7 @@ fn render(ctx: &Ctx, body: &gtk::Box, subtitle: &gtk::Label, query: &str) {
     let hosts: Vec<Host> = all.into_iter().filter(|h| matches(h, query)).collect();
     if hosts.is_empty() {
         let status = adw::StatusPage::builder()
-            .icon_name("system-search-symbolic")
+            .icon_name(&icons::themed("magnifying-glass"))
             .title(tr!("Tidak ada host yang cocok dengan “{}”", query))
             .vexpand(true)
             .build();
@@ -162,7 +163,7 @@ fn card(ctx: &Ctx, h: &Host) -> gtk::Widget {
     card.set_width_request(250);
 
     let top = gtk::Box::new(gtk::Orientation::Horizontal, 12);
-    top.append(&theme::color_tile(&h.color, "network-server-symbolic", 40));
+    top.append(&theme::color_tile(&h.color, "hard-drives", 40));
     let names = gtk::Box::new(gtk::Orientation::Vertical, 2);
     names.set_hexpand(true);
     names.set_valign(gtk::Align::Center);
@@ -189,17 +190,19 @@ fn card(ctx: &Ctx, h: &Host) -> gtk::Widget {
     }
     let n = ctx.connected_count(&h.id);
     if n > 0 {
-        let c = gtk::Label::new(Some(if n > 1 { tr!("Terhubung ×{}", n) } else { tr!("Terhubung") }.as_str()));
-        c.add_css_class("zterm-chip");
-        c.add_css_class("online");
-        c.set_valign(gtk::Align::Center);
-        bottom.append(&c);
+        let online = gtk::Box::new(gtk::Orientation::Horizontal, 5);
+        online.add_css_class("zterm-chip");
+        online.add_css_class("online");
+        online.set_valign(gtk::Align::Center);
+        online.append(&theme::dot(theme::GREEN, 6));
+        online.append(&gtk::Label::new(Some(if n > 1 { tr!("Terhubung ×{}", n) } else { tr!("Terhubung") }.as_str())));
+        bottom.append(&online);
     }
     let spacer = gtk::Box::new(gtk::Orientation::Horizontal, 0);
     spacer.set_hexpand(true);
     bottom.append(&spacer);
     let connect = gtk::Button::builder().tooltip_text(tr!("Connect (klik dua kali kartu)")).build();
-    connect.set_child(Some(&adw::ButtonContent::builder().icon_name("media-playback-start-symbolic").label(tr!("Connect")).build()));
+    connect.set_child(Some(&icons::content("play", &tr!("Connect"))));
     connect.add_css_class("suggested-action");
     connect.add_css_class("pill");
     connect.add_css_class("small");
@@ -262,7 +265,11 @@ fn menu_button(ctx: &Ctx, h: &Host) -> gtk::MenuButton {
     s2.append(Some(&tr!("Hapus")), Some("host.delete"));
     menu.append_section(None, &s2);
 
-    let b = gtk::MenuButton::builder().icon_name("view-more-symbolic").menu_model(&menu).valign(gtk::Align::Start).build();
+    let b = gtk::MenuButton::builder()
+        .icon_name(&icons::themed("dots-three"))
+        .menu_model(&menu)
+        .valign(gtk::Align::Start)
+        .build();
     b.add_css_class("flat");
     b.add_css_class("circular");
     b.insert_action_group("host", Some(&group));

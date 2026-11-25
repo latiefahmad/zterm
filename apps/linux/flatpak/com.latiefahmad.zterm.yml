@@ -42,4 +42,6 @@ modules:
       - install -Dm755 apps/linux/target/release/zterm /app/bin/zterm
       - install -Dm644 apps/linux/data/com.latiefahmad.zterm.desktop /app/share/applications/com.latiefahmad.zterm.desktop
       - install -Dm644 apps/linux/data/icons/com.latiefahmad.zterm.png /app/share/icons/hicolor/512x512/apps/com.latiefahmad.zterm.png
+      - mkdir -p /app/share/icons/hicolor/scalable/actions
+      - cp -r apps/linux/data/icons/hicolor/scalable/actions/. /app/share/icons/hicolor/scalable/actions/
       - install -Dm644 apps/linux/data/com.latiefahmad.zterm.metainfo.xml /app/share/metainfo/com.latiefahmad.zterm.metainfo.xml

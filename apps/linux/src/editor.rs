@@ -8,7 +8,7 @@ use zterm_core::{AuthMethod, EnvVar, Host, HostProxy, ProxyKind, SshKey};
 use gtk::glib;
 
 use crate::ctx::{self, Ctx};
-use crate::{hosts, terminal, theme};
+use crate::{hosts, icons, terminal, theme};
 
 fn combo(title: &str, items: &[&str]) -> adw::ComboRow {
     let model = gtk::StringList::new(items);
@@ -113,8 +113,8 @@ pub fn open(ctx: &Ctx, existing: Option<Host>) {
     pass_hint.add_css_class("dim-label");
     let keys: Rc<RefCell<Vec<SshKey>>> = Rc::new(RefCell::new(ctx.keys()));
     let key_row = adw::ComboRow::builder().title(tr!("Pilih SSH key")).build();
-    let gen_key = gtk::Button::builder().icon_name("list-add-symbolic").tooltip_text(tr!("Generate key Ed25519 baru")).valign(gtk::Align::Center).build();
-    gen_key.add_css_class("flat");
+    let gen_key = icons::button("plus", &tr!("Generate key Ed25519 baru"));
+    gen_key.set_valign(gtk::Align::Center);
     key_row.add_suffix(&gen_key);
     let fill_keys = {
         let (keys, key_row) = (keys.clone(), key_row.clone());
@@ -364,7 +364,7 @@ pub fn open(ctx: &Ctx, existing: Option<Host>) {
     let s = save.clone();
     btn_save.connect_clicked(move |_| s(false));
     let btn_connect = gtk::Button::builder().tooltip_text(tr!("Simpan lalu connect (Ctrl+Enter)")).build();
-    btn_connect.set_child(Some(&adw::ButtonContent::builder().icon_name("media-playback-start-symbolic").label(tr!("Connect")).build()));
+    btn_connect.set_child(Some(&icons::content("play", &tr!("Connect"))));
     btn_connect.add_css_class("suggested-action");
     let s = save.clone();
     btn_connect.connect_clicked(move |_| s(true));

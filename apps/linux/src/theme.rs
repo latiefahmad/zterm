@@ -3,6 +3,10 @@
 use gtk::prelude::*;
 use gtk::{gdk, glib};
 
+use crate::icons;
+
+pub const GREEN: &str = "#4ADE80";
+
 pub const HOST_COLORS: [&str; 16] = [
     "#3FD0B4", "#22C55E", "#84CC16", "#EAB308", "#F2A65A", "#F97316", "#F0616D", "#E11D48", "#E879C6", "#C084FC",
     "#9D7CF2", "#6366F1", "#5B9CF5", "#06B6D4", "#14B8A6", "#94A3B8",
@@ -13,32 +17,34 @@ const CSS: &str = r#"
 @define-color accent_bg_color #3FD0B4;
 @define-color accent_fg_color #0B0E13;
 
-.zterm-hero { font-size: 28px; font-weight: 800; }
-.zterm-tagline { font-family: monospace; font-size: 15px; opacity: .7; }
-.zterm-title { font-size: 24px; font-weight: 800; }
-.zterm-muted { opacity: .65; }
-.zterm-hint { font-size: 12px; opacity: .55; }
+.zterm-hero { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; }
+.zterm-tagline { font-family: monospace; font-size: 14px; opacity: .62; }
+.zterm-title { font-size: 22px; font-weight: 700; letter-spacing: -0.2px; }
+.zterm-muted { opacity: .62; }
+.zterm-hint { font-size: 12px; opacity: .45; }
 .zterm-error { color: @error_color; font-size: 12px; }
-.zterm-brand { font-weight: 800; font-size: 16px; }
+.zterm-brand { font-weight: 800; font-size: 15px; letter-spacing: -0.2px; }
 
 .zterm-sidebar row { border-radius: 8px; margin: 1px 6px; padding: 6px 8px; }
+.zterm-sidebar row:selected { background: alpha(@accent_bg_color, .16); }
 
 .zterm-card {
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 14px;
-  background: alpha(@view_fg_color, .04);
-  border: 1px solid alpha(@view_fg_color, .08);
+  background: alpha(@view_fg_color, .03);
+  border: 1px solid alpha(@view_fg_color, .10);
   transition: background 120ms ease, border-color 120ms ease;
 }
-.zterm-card:hover { background: alpha(@view_fg_color, .07); border-color: alpha(#3FD0B4, .55); }
-.zterm-card-title { font-weight: 700; font-size: 14px; }
-.zterm-card-addr { font-family: monospace; font-size: 12px; opacity: .65; }
+.zterm-card:hover { background: alpha(@view_fg_color, .055); border-color: alpha(@view_fg_color, .18); }
+.zterm-card-title { font-weight: 600; font-size: 14px; }
+.zterm-card-addr { font-family: monospace; font-size: 11.5px; opacity: .62; }
+.zterm-tile-icon { color: alpha(@view_fg_color, .9); }
 .zterm-chip {
-  font-size: 11px; padding: 2px 8px; border-radius: 99px;
-  background: alpha(@view_fg_color, .07);
+  font-size: 10.5px; padding: 2px 7px; border-radius: 6px;
+  background: alpha(@view_fg_color, .06);
 }
-.zterm-chip.online { background: alpha(#4ADE80, .18); color: #22A85A; }
-.zterm-group { font-weight: 700; font-size: 12px; letter-spacing: 1px; opacity: .55; margin-top: 8px; }
+.zterm-chip.online { background: alpha(#4ADE80, .12); color: #22A85A; }
+.zterm-group { font-weight: 700; font-size: 11px; letter-spacing: 1.2px; opacity: .48; margin-top: 8px; }
 .zterm-mono { font-family: monospace; }
 .zterm-pubkey { font-family: monospace; font-size: 11px; padding: 10px; border-radius: 10px; background: alpha(@view_fg_color, .06); }
 .zterm-swatch { padding: 2px; min-width: 22px; min-height: 22px; border-radius: 99px; border: 2px solid transparent; }
@@ -64,23 +70,23 @@ pub fn color_tile(hex: &str, icon: &str, size: i32) -> gtk::Overlay {
     let area = gtk::DrawingArea::builder().content_width(size).content_height(size).build();
     area.set_draw_func(move |_, cr, w, h| {
         let (w, h) = (w as f64, h as f64);
-        let r = (w.min(h) * 0.28).max(4.0);
+        let r = (w.min(h) * 0.24).max(4.0);
         cr.new_sub_path();
         cr.arc(w - r, r, r, -std::f64::consts::FRAC_PI_2, 0.0);
         cr.arc(w - r, h - r, r, 0.0, std::f64::consts::FRAC_PI_2);
         cr.arc(r, h - r, r, std::f64::consts::FRAC_PI_2, std::f64::consts::PI);
         cr.arc(r, r, r, std::f64::consts::PI, 1.5 * std::f64::consts::PI);
         cr.close_path();
-        cr.set_source_rgba(color.red() as f64, color.green() as f64, color.blue() as f64, 0.22);
+        cr.set_source_rgba(color.red() as f64, color.green() as f64, color.blue() as f64, 0.14);
         let _ = cr.fill_preserve();
-        cr.set_source_rgba(color.red() as f64, color.green() as f64, color.blue() as f64, 0.9);
-        cr.set_line_width(1.5);
+        cr.set_source_rgba(color.red() as f64, color.green() as f64, color.blue() as f64, 0.38);
+        cr.set_line_width(1.0);
         let _ = cr.stroke();
     });
     let overlay = gtk::Overlay::new();
     overlay.set_child(Some(&area));
-    let img = gtk::Image::from_icon_name(icon);
-    img.set_pixel_size(size / 2);
+    let img = icons::image(icon, size / 2);
+    img.add_css_class("zterm-tile-icon");
     overlay.add_overlay(&img);
     overlay.set_valign(gtk::Align::Center);
     overlay
@@ -104,7 +110,7 @@ pub fn logo(size: i32) -> gtk::Image {
     let bytes = glib::Bytes::from_static(include_bytes!("../data/icons/com.latiefahmad.zterm.png"));
     let img = match gdk::Texture::from_bytes(&bytes) {
         Ok(t) => gtk::Image::from_paintable(Some(&t)),
-        Err(_) => gtk::Image::from_icon_name("utilities-terminal-symbolic"),
+        Err(_) => icons::image("terminal-window", 24),
     };
     img.set_pixel_size(size);
     img

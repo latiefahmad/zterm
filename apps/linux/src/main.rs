@@ -6,6 +6,7 @@ mod config;
 mod ctx;
 mod editor;
 mod hosts;
+mod icons;
 mod keychain;
 mod onboarding;
 mod page;

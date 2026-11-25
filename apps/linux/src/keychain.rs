@@ -5,15 +5,15 @@ use zterm_core::SshKey;
 use gtk::{gio, glib};
 
 use crate::ctx::{self, Ctx};
-use crate::page;
+use crate::{icons, page};
 
 pub fn build(ctx: &Ctx) -> gtk::Widget {
     let import = gtk::Button::builder().build();
-    import.set_child(Some(&adw::ButtonContent::builder().icon_name("document-open-symbolic").label(tr!("Import")).build()));
+    import.set_child(Some(&icons::content("folder-open", &tr!("Import"))));
     let c = ctx.clone();
     import.connect_clicked(move |_| import_dialog(&c));
     let generate = gtk::Button::builder().build();
-    generate.set_child(Some(&adw::ButtonContent::builder().icon_name("list-add-symbolic").label(tr!("Generate Key")).build()));
+    generate.set_child(Some(&icons::content("plus", &tr!("Generate Key"))));
     generate.add_css_class("suggested-action");
     let c = ctx.clone();
     generate.connect_clicked(move |_| generate_dialog(&c));
@@ -36,7 +36,7 @@ fn render(ctx: &Ctx, body: &gtk::Box) {
     if keys.is_empty() {
         body.append(
             &adw::StatusPage::builder()
-                .icon_name("dialog-password-symbolic")
+                .icon_name(&icons::themed("key"))
                 .title(tr!("Belum ada SSH key"))
                 .description(tr!("Generate key Ed25519 baru atau import dari ~/.ssh."))
                 .vexpand(true)
@@ -56,11 +56,11 @@ fn render(ctx: &Ctx, body: &gtk::Box) {
             .subtitle(glib::markup_escape_text(&format!("{} · {} · {usage}", k.key_type, k.fingerprint)))
             .build();
         row.set_subtitle_lines(2);
-        let icon = gtk::Image::from_icon_name(if k.passphrase.is_some() { "channel-secure-symbolic" } else { "dialog-password-symbolic" });
+        let icon = icons::image(if k.passphrase.is_some() { "lock-key" } else { "key" }, 18);
         row.add_prefix(&icon);
 
-        let copy = gtk::Button::builder().icon_name("edit-copy-symbolic").tooltip_text(tr!("Salin public key")).valign(gtk::Align::Center).build();
-        copy.add_css_class("flat");
+        let copy = icons::button("copy", &tr!("Salin public key"));
+        copy.set_valign(gtk::Align::Center);
         let (c, pubkey) = (ctx.clone(), k.public_key.clone());
         copy.connect_clicked(move |_| {
             ctx::copy_text(&pubkey);
@@ -68,14 +68,14 @@ fn render(ctx: &Ctx, body: &gtk::Box) {
         });
         row.add_suffix(&copy);
 
-        let rename = gtk::Button::builder().icon_name("document-edit-symbolic").tooltip_text(tr!("Ganti nama")).valign(gtk::Align::Center).build();
-        rename.add_css_class("flat");
+        let rename = icons::button("pencil-simple", &tr!("Ganti nama"));
+        rename.set_valign(gtk::Align::Center);
         let (c, key) = (ctx.clone(), k.clone());
         rename.connect_clicked(move |_| rename_dialog(&c, &key));
         row.add_suffix(&rename);
 
-        let del = gtk::Button::builder().icon_name("user-trash-symbolic").tooltip_text(tr!("Hapus")).valign(gtk::Align::Center).build();
-        del.add_css_class("flat");
+        let del = icons::button("trash", &tr!("Hapus"));
+        del.set_valign(gtk::Align::Center);
         let (c, key) = (ctx.clone(), k.clone());
         del.connect_clicked(move |_| delete_dialog(&c, &key, used));
         row.add_suffix(&del);
@@ -203,7 +203,7 @@ fn import_dialog(ctx: &Ctx) {
     frame.set_child(Some(&scroll));
     g2.add(&frame);
     let pick = gtk::Button::builder().halign(gtk::Align::Start).margin_top(8).build();
-    pick.set_child(Some(&adw::ButtonContent::builder().icon_name("folder-open-symbolic").label(tr!("Pilih file…")).build()));
+    pick.set_child(Some(&icons::content("folder-open", &tr!("Pilih file…"))));
     g2.add(&pick);
     page.add(&g2);
 

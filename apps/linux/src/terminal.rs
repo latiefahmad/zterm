@@ -14,7 +14,7 @@ use vte::prelude::*;
 
 use crate::config;
 use crate::ctx::{self, Ctx};
-use crate::theme;
+use crate::{icons, theme};
 
 pub struct Session {
     pub host: Host,
@@ -107,7 +107,7 @@ impl Session {
         if let Some(p) = self.page() {
             p.set_title(&ctx::host_title(&self.host));
             p.set_loading(false);
-            p.set_indicator_icon(Some(&gio::ThemedIcon::new("network-offline-symbolic")));
+            p.set_indicator_icon(Some(&gio::ThemedIcon::new(&icons::themed("wifi-slash"))));
         }
         if let Some(ctx) = self.ctx.upgrade() {
             ctx.changed();
@@ -222,7 +222,7 @@ fn open(ctx: &Ctx, host: Host, key: Option<SshKey>, jump: Option<Host>, run: Opt
     let page = ctx.tabs.append(&root);
     page.set_title(&ctx::host_title(&session.host));
     page.set_tooltip(&if local { tr!("Terminal lokal") } else { ctx::host_address(&session.host, ctx.hide_addresses.get()) });
-    page.set_icon(Some(&gio::ThemedIcon::new(if local { "utilities-terminal-symbolic" } else { "network-server-symbolic" })));
+    page.set_icon(Some(&gio::ThemedIcon::new(&icons::themed(if local { "terminal-window" } else { "hard-drives" }))));
     *session.page.borrow_mut() = Some(page.clone());
 
     {

@@ -8,12 +8,12 @@ use zterm_core::Snippet;
 use gtk::glib;
 
 use crate::ctx::{self, Ctx};
-use crate::{page, terminal};
+use crate::{icons, page, terminal};
 
 pub fn build(ctx: &Ctx) -> gtk::Widget {
     let search = gtk::SearchEntry::builder().placeholder_text(tr!("Cari snippet…")).width_chars(18).build();
     let add = gtk::Button::builder().build();
-    add.set_child(Some(&adw::ButtonContent::builder().icon_name("list-add-symbolic").label(tr!("Snippet Baru")).build()));
+    add.set_child(Some(&icons::content("plus", &tr!("Snippet Baru"))));
     add.add_css_class("suggested-action");
     let c = ctx.clone();
     add.connect_clicked(move |_| editor(&c, None));
@@ -39,7 +39,7 @@ fn render(ctx: &Ctx, body: &gtk::Box, query: &str) {
     if all.is_empty() {
         body.append(
             &adw::StatusPage::builder()
-                .icon_name("accessories-text-editor-symbolic")
+                .icon_name(&icons::themed("brackets-curly"))
                 .title(tr!("Belum ada snippet"))
                 .description(tr!("Simpan perintah yang sering dipakai, misalnya cek disk atau restart service."))
                 .vexpand(true)
@@ -58,10 +58,10 @@ fn render(ctx: &Ctx, body: &gtk::Box, query: &str) {
             .build();
         row.set_subtitle_lines(3);
         row.add_css_class("property");
-        row.add_prefix(&gtk::Image::from_icon_name("accessories-text-editor-symbolic"));
+        row.add_prefix(&icons::image("brackets-curly", 18));
 
-        let run_tab = gtk::Button::builder().icon_name("utilities-terminal-symbolic").tooltip_text(tr!("Jalankan di tab aktif")).valign(gtk::Align::Center).build();
-        run_tab.add_css_class("flat");
+        let run_tab = icons::button("terminal-window", &tr!("Jalankan di tab aktif"));
+        run_tab.set_valign(gtk::Align::Center);
         let (c, cmd) = (ctx.clone(), s.command.clone());
         run_tab.connect_clicked(move |_| match terminal::last_session(&c) {
             Some(sess) => {
@@ -76,21 +76,21 @@ fn render(ctx: &Ctx, body: &gtk::Box, query: &str) {
         row.add_suffix(&run_tab);
 
         let run = gtk::Button::builder().tooltip_text(tr!("Jalankan di beberapa host")).valign(gtk::Align::Center).build();
-        run.set_child(Some(&adw::ButtonContent::builder().icon_name("media-playback-start-symbolic").label(tr!("Jalankan")).build()));
+        run.set_child(Some(&icons::content("play", &tr!("Jalankan"))));
         run.add_css_class("pill");
         run.add_css_class("small");
         let (c, sn) = (ctx.clone(), s.clone());
         run.connect_clicked(move |_| run_dialog(&c, &sn));
         row.add_suffix(&run);
 
-        let edit = gtk::Button::builder().icon_name("document-edit-symbolic").tooltip_text(tr!("Edit")).valign(gtk::Align::Center).build();
-        edit.add_css_class("flat");
+        let edit = icons::button("pencil-simple", &tr!("Edit"));
+        edit.set_valign(gtk::Align::Center);
         let (c, sn) = (ctx.clone(), s.clone());
         edit.connect_clicked(move |_| editor(&c, Some(sn.clone())));
         row.add_suffix(&edit);
 
-        let del = gtk::Button::builder().icon_name("user-trash-symbolic").tooltip_text(tr!("Hapus")).valign(gtk::Align::Center).build();
-        del.add_css_class("flat");
+        let del = icons::button("trash", &tr!("Hapus"));
+        del.set_valign(gtk::Align::Center);
         let (c, id) = (ctx.clone(), s.id.clone());
         del.connect_clicked(move |_| {
             if let Some(v) = c.vault() {

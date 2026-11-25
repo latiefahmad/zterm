@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate data ikon Phosphor Duotone untuk macOS dan Windows (Linux menyusul).
+// Generate data ikon Phosphor Duotone untuk macOS, Windows, dan Linux.
 //
 // Sumber: @phosphor-icons/core (ISC). SVG duotone punya dua path: lapisan
 // sekunder (opacity 0.2) dan garis utama. Skrip ini menormalkan semua perintah
@@ -8,7 +8,7 @@
 //
 // Jalankan: node scripts/gen-phosphor-icons.mjs
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
@@ -16,6 +16,7 @@ const VERSION = "2.1.1";
 const BASE = `https://cdn.jsdelivr.net/npm/@phosphor-icons/core@${VERSION}/assets/duotone`;
 const ROOT = path.resolve(import.meta.dirname, "..");
 const CACHE = path.join(ROOT, "shared", "icons", ".cache");
+const LINUX_ACTIONS = path.join(ROOT, "apps", "linux", "data", "icons", "hicolor", "scalable", "actions");
 
 // Ikon yang dipakai aplikasi. Tambahkan di sini lalu jalankan ulang skrip.
 const ICONS = [
@@ -420,7 +421,27 @@ ${Object.entries(icons)
 `;
   await writeFile(path.join(ROOT, "apps", "windows", "Zterm", "Core", "PhosphorIcons.g.cs"), cs);
 
-  console.log(`Selesai: ${ICONS.length} ikon -> shared/icons/phosphor.json + Windows.`);
+  // Linux: satu SVG simbolik per ikon. GTK mewarnai ulang path sesuai `color`
+  // CSS dan tetap mempertahankan opacity 0.2 pada lapisan duotone.
+  await mkdir(LINUX_ACTIONS, { recursive: true });
+  const files = new Set();
+  for (const [name, g] of Object.entries(icons)) {
+    const file = `zterm-${name}-symbolic.svg`;
+    files.add(file);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <path fill="#000000" opacity="0.2" d="${g.secondary}"/>
+  <path fill="#000000" d="${g.primary}"/>
+</svg>
+`;
+    await writeFile(path.join(LINUX_ACTIONS, file), svg);
+  }
+  for (const old of await readdir(LINUX_ACTIONS)) {
+    if (old.startsWith("zterm-") && old.endsWith("-symbolic.svg") && !files.has(old)) {
+      await unlink(path.join(LINUX_ACTIONS, old));
+    }
+  }
+
+  console.log(`Selesai: ${ICONS.length} ikon -> shared/icons/phosphor.json + Windows + Linux.`);
 }
 
 main().catch((e) => {

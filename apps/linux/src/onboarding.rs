@@ -8,6 +8,7 @@ use gtk::{gio, glib};
 
 use crate::config;
 use crate::ctx::Ctx;
+use crate::icons;
 use crate::theme;
 use crate::window::language_button;
 
@@ -169,15 +170,14 @@ pub fn show_create(ctx: &Ctx) {
     let (scroll, col) = column();
 
     let back = gtk::Button::builder().halign(gtk::Align::Start).build();
-    back.set_child(Some(&adw::ButtonContent::builder().icon_name("go-previous-symbolic").label(tr!("Kembali")).build()));
+    back.set_child(Some(&icons::content("arrow-left", &tr!("Kembali"))));
     back.add_css_class("flat");
     back.set_margin_bottom(20);
     let c = ctx.clone();
     back.connect_clicked(move |_| show_welcome(&c));
     col.append(&back);
 
-    let icon = gtk::Image::from_icon_name("system-lock-screen-symbolic");
-    icon.set_pixel_size(36);
+    let icon = icons::image("lock-simple", 36);
     icon.set_halign(gtk::Align::Start);
     icon.add_css_class("accent");
     col.append(&icon);
@@ -299,10 +299,10 @@ pub fn show_lock(ctx: &Ctx) {
     let row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
     row.set_margin_top(24);
     let pw = password_entry(&tr!("Master password"));
-    let go = gtk::Button::from_icon_name("go-next-symbolic");
+    let go = gtk::Button::builder().tooltip_text(tr!("Buka vault")).build();
+    go.set_child(Some(&icons::image("arrow-right", 18)));
     go.add_css_class("suggested-action");
     go.add_css_class("circular");
-    go.set_tooltip_text(Some(&tr!("Buka vault")));
     row.append(&pw);
     row.append(&go);
     col.append(&row);

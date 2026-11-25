@@ -1113,57 +1113,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "zterm-core"
-version = "1.0.0"
-dependencies = [
- "argon2",
- "base64 0.22.1",
- "chacha20poly1305",
- "ed25519-dalek 2.2.0",
- "flate2",
- "futures-util",
- "getrandom 0.3.4",
- "libc",
- "lzma-rs",
- "mongodb",
- "mysql_async",
- "native-tls",
- "postgres-native-tls",
- "redis",
- "reqwest",
- "rusqlite",
- "russh",
- "russh-sftp",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "ssh-key 0.6.7",
- "tar",
- "thiserror",
- "tiberius",
- "tokio",
- "tokio-postgres",
- "tokio-util",
- "uniffi",
- "uuid",
- "x25519-dalek",
- "zip",
-]
-
-[[package]]
-name = "zterm"
-version = "1.0.1"
-dependencies = [
- "zterm-core",
- "gtk4",
- "libadwaita",
- "libc",
- "serde_json",
- "uuid",
- "vte4",
-]
-
-[[package]]
 name = "dunce"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6122,4 +6071,55 @@ dependencies = [
  "crc32fast",
  "log",
  "simd-adler32",
+]
+
+[[package]]
+name = "zterm"
+version = "1.0.0"
+dependencies = [
+ "gtk4",
+ "libadwaita",
+ "libc",
+ "serde_json",
+ "uuid",
+ "vte4",
+ "zterm-core",
+]
+
+[[package]]
+name = "zterm-core"
+version = "1.0.0"
+dependencies = [
+ "argon2",
+ "base64 0.22.1",
+ "chacha20poly1305",
+ "ed25519-dalek 2.2.0",
+ "flate2",
+ "futures-util",
+ "getrandom 0.3.4",
+ "libc",
+ "lzma-rs",
+ "mongodb",
+ "mysql_async",
+ "native-tls",
+ "postgres-native-tls",
+ "redis",
+ "reqwest",
+ "rusqlite",
+ "russh",
+ "russh-sftp",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "ssh-key 0.6.7",
+ "tar",
+ "thiserror",
+ "tiberius",
+ "tokio",
+ "tokio-postgres",
+ "tokio-util",
+ "uniffi",
+ "uuid",
+ "x25519-dalek",
+ "zip",
 ]

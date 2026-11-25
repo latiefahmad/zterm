@@ -4,16 +4,17 @@ use adw::prelude::*;
 use gtk::{gio, glib};
 
 use crate::ctx::{App, Ctx};
-use crate::{hosts, keychain, onboarding, snippets, terminal, theme};
+use crate::{hosts, icons, keychain, onboarding, snippets, terminal, theme};
 
-/// Halaman sidebar MVP: (id, judul, ikon).
+/// Halaman sidebar MVP: (id, judul, ikon Phosphor).
 const SECTIONS: [(&str, &str, &str); 3] = [
-    ("hosts", "Hosts", "network-server-symbolic"),
-    ("keychain", "Keychain", "dialog-password-symbolic"),
-    ("snippets", "Snippets", "accessories-text-editor-symbolic"),
+    ("hosts", "Hosts", "hard-drives"),
+    ("keychain", "Keychain", "key"),
+    ("snippets", "Snippets", "brackets-curly"),
 ];
 
 pub fn build(app: &adw::Application) {
+    icons::install();
     let window = adw::ApplicationWindow::builder()
         .application(app)
         .title("Zterm")
@@ -56,7 +57,7 @@ fn build_main(ctx: &Ctx) -> gtk::Widget {
     list.add_css_class("zterm-sidebar");
     for (_, title, icon) in SECTIONS {
         let row = gtk::Box::new(gtk::Orientation::Horizontal, 12);
-        row.append(&gtk::Image::from_icon_name(icon));
+        row.append(&icons::image(icon, 18));
         row.append(&gtk::Label::new(Some(&tr!(title))));
         list.append(&row);
     }
@@ -77,8 +78,7 @@ fn build_main(ctx: &Ctx) -> gtk::Widget {
     soon.set_margin_end(14);
     soon.set_margin_bottom(8);
 
-    let lock = gtk::Button::builder().icon_name("system-lock-screen-symbolic").tooltip_text(tr!("Kunci vault (Ctrl+Shift+L)")).build();
-    lock.add_css_class("flat");
+    let lock = icons::button("lock-simple", &tr!("Kunci vault (Ctrl+Shift+L)"));
     let c = ctx.clone();
     lock.connect_clicked(move |_| onboarding::lock(&c));
     let footer = gtk::Box::new(gtk::Orientation::Horizontal, 6);
@@ -118,7 +118,7 @@ fn build_main(ctx: &Ctx) -> gtk::Widget {
 
     let home = ctx.tabs.append_pinned(&ctx.pages);
     home.set_title(&tr!("Beranda"));
-    home.set_icon(Some(&gio::ThemedIcon::new("view-grid-symbolic")));
+    home.set_icon(Some(&gio::ThemedIcon::new(&icons::themed("squares-four"))));
     home.set_tooltip(&tr!("Daftar host (Ctrl+0)"));
     *ctx.home.borrow_mut() = Some(home);
 
@@ -138,12 +138,12 @@ fn build_main(ctx: &Ctx) -> gtk::Widget {
     let tab_bar = adw::TabBar::builder().view(&ctx.tabs).autohide(false).expand_tabs(false).build();
     header.set_title_widget(Some(&tab_bar));
 
-    let local_btn = gtk::Button::builder().icon_name("utilities-terminal-symbolic").tooltip_text(tr!("Terminal lokal (Ctrl+Shift+T)")).build();
+    let local_btn = icons::button("terminal-window", &tr!("Terminal lokal (Ctrl+Shift+T)"));
     let c = ctx.clone();
     local_btn.connect_clicked(move |_| terminal::open_local(&c));
     header.pack_start(&local_btn);
 
-    let snippet_btn = gtk::MenuButton::builder().icon_name("accessories-text-editor-symbolic").tooltip_text(tr!("Jalankan snippet di tab ini")).build();
+    let snippet_btn = icons::menu_button("brackets-curly", &tr!("Jalankan snippet di tab ini"));
     let popover = gtk::Popover::new();
     snippet_btn.set_popover(Some(&popover));
     {
@@ -175,7 +175,9 @@ fn build_main(ctx: &Ctx) -> gtk::Widget {
         .build();
 
     // Sidebar jadi overlay di jendela sempit
-    let toggle = gtk::ToggleButton::builder().icon_name("sidebar-show-symbolic").tooltip_text(tr!("Sidebar")).visible(false).build();
+    let toggle = gtk::ToggleButton::builder().tooltip_text(tr!("Sidebar")).visible(false).build();
+    toggle.set_child(Some(&icons::image("sidebar-simple", 18)));
+    toggle.add_css_class("flat");
     split.bind_property("show-sidebar", &toggle, "active").bidirectional().sync_create().build();
     split.bind_property("collapsed", &toggle, "visible").sync_create().build();
     header.pack_start(&toggle);
@@ -274,9 +276,9 @@ pub fn language_button(_ctx: &Ctx, labeled: bool) -> gtk::MenuButton {
     let b = gtk::MenuButton::builder().menu_model(&menu).tooltip_text("Bahasa / Language").build();
     if labeled {
         let current = if crate::i18n::english() { "English" } else { "Bahasa Indonesia" };
-        b.set_child(Some(&adw::ButtonContent::builder().icon_name("preferences-desktop-locale-symbolic").label(current).build()));
+        b.set_child(Some(&icons::content("globe", current)));
     } else {
-        b.set_icon_name("preferences-desktop-locale-symbolic");
+        b.set_child(Some(&icons::image("globe", 18)));
     }
     b.add_css_class("flat");
     b

@@ -1,6 +1,6 @@
 name: Build check
 
-# Verifikasi kompilasi macOS + Windows tanpa menerbitkan rilis.
+# Verifikasi kompilasi macOS + Windows + Linux tanpa menerbitkan rilis.
 # Jalankan manual dari tab Actions (atau `gh workflow run ci.yml`).
 on:
   workflow_dispatch:
@@ -59,3 +59,35 @@ jobs:
       - name: Build app
         shell: pwsh
         run: dotnet build apps/windows/Zterm/Zterm.csproj -c Release -p:Platform=x64 -r win-x64
+
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Pasang GTK4, libadwaita, VTE
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libssl-dev \
+            libgtk-4-dev libadwaita-1-dev libvte-2.91-gtk4-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/linux -> target
+
+      - name: Cek kompilasi
+        run: cargo check --manifest-path apps/linux/Cargo.toml --locked
+
+      - name: Cek aset ikon Phosphor
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in $(grep -rhoE 'icons::(themed|image|button|menu_button|content)\("[a-z0-9-]+"' apps/linux/src | sed -E 's/.*"([a-z0-9-]+)"/\1/' | sort -u); do
+            if [ ! -f "apps/linux/data/icons/hicolor/scalable/actions/zterm-$name-symbolic.svg" ]; then
+              echo "Ikon tidak ditemukan: $name"
+              missing=1
+            fi
+          done
+          exit $missing
