@@ -173,12 +173,13 @@ struct SearchField: View {
     @Binding var text: String
     var prompt: String
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+        HStack(spacing: 7) {
+            PhosphorIcon(name: "magnifying-glass", size: 13, tint: .secondary)
             TextField(prompt, text: $text).textFieldStyle(.plain).frame(width: 170)
         }
         .padding(.horizontal, 10).frame(height: 30)
-        .background(Theme.ink.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+        .background(Theme.field, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Theme.cardStroke))
     }
 }
 

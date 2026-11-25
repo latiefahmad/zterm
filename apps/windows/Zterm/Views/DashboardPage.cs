@@ -29,13 +29,13 @@ internal sealed class DashboardPage : PageBase
         var search = Ui.Search(L.T("Cari server, OS, grup…"), D.Query, q => { D.Query = q; RenderGrid(); }, 240);
         search.HorizontalAlignment = HorizontalAlignment.Right;
         _filters = Ui.Columns("Auto,*", 12, new Border(), search);
-        _body = Ui.Col(20, header, _summary, _filters, _grid);
-        var scroll = Ui.Scroll(_body);
+        _body = Ui.Col(18, header, _summary, _filters, _grid);
+        var scroll = Ui.Scroll(_body, 24);
         Children.Add(scroll);
         Children.Add(_bar);
         SizeChanged += (s, e) =>
         {
-            var cols = Math.Max(1, (int)((e.NewSize.Width - 56 + 14) / 304));
+            var cols = Math.Max(1, (int)((e.NewSize.Width - 48 + 14) / 304));
             if (cols != _columns) { _columns = cols; RenderGrid(); }
         };
         Loaded += (s, e) => { D.Start(); Render(); };
@@ -53,8 +53,9 @@ internal sealed class DashboardPage : PageBase
     {
         _actions.Children.Clear();
         if (D.Tiles.Values.Any(t => t.State == ServerTile.Status.Offline))
-            _actions.Children.Add(Ui.IconBtn(G.Refresh, L.T("Coba lagi semua server yang offline"), D.RetryOffline));
-        var bell = Ui.Secondary(D.Alerts ? L.T("Notifikasi aktif") : L.T("Notifikasi"), D.Alerts ? "\uEA8F" : "\uE7ED", () => M.SetDashboardAlerts(!D.Alerts),
+            _actions.Children.Add(Ph.Btn("arrows-clockwise", L.T("Coba lagi semua server yang offline"), D.RetryOffline));
+        var bell = Ui.SecondaryIcon(D.Alerts ? L.T("Notifikasi aktif") : L.T("Notifikasi"),
+            D.Alerts ? "bell-ringing" : "bell-slash", () => M.SetDashboardAlerts(!D.Alerts),
             D.Alerts ? Theme.Brush(Theme.Accent) : null);
         ToolTipService.SetToolTip(bell, D.Alerts
             ? L.T("Dashboard terus memantau di latar belakang dan memberi notifikasi saat server mati atau CPU/RAM/disk di atas 90%. Klik untuk mematikan.")
@@ -62,7 +63,7 @@ internal sealed class DashboardPage : PageBase
         _actions.Children.Add(bell);
         if (M.Hosts.Length > 0)
         {
-            var run = Ui.Primary(L.T("Jalankan perintah"), G.Play, () => new RunManyDialog(M.NewRunMany(D.SelectedIds)).Show());
+            var run = Ui.PrimaryIcon(L.T("Jalankan perintah"), "play", () => new RunManyDialog(M.NewRunMany(D.SelectedIds)).Show());
             ToolTipService.SetToolTip(run, L.T("Jalankan satu perintah di banyak server sekaligus, hasilnya per server"));
             _actions.Children.Add(run);
         }
@@ -83,7 +84,7 @@ internal sealed class DashboardPage : PageBase
         _grid.Children.Clear();
         if (M.Hosts.Length == 0)
         {
-            _grid.Children.Add(Ui.EmptyState(G.Gauge, L.T("Belum ada server"),
+            _grid.Children.Add(Ui.EmptyStateIcon(Ph.Icon("hard-drives", 30, Theme.Brush(Theme.Accent)), L.T("Belum ada server"),
                 L.T("Tambahkan host di menu Hosts — semua server langsung tampil di sini lengkap dengan pemakaian CPU, RAM, dan disk.")));
             return;
         }
@@ -110,22 +111,22 @@ internal sealed class DashboardPage : PageBase
         var cpu = live.Count == 0 ? 0 : live.Average(t => t.CpuNow);
         ulong used = 0, total = 0;
         foreach (var t in live) if (t.Sample is { } s) { used += s.MemUsedBytes; total += s.MemTotalBytes; }
-        return Ui.Columns("*,*,*,*", 14,
-            Stat(L.T("Online"), $"{D.Online}/{D.Tiles.Count}", G.Server, Theme.Green),
-            Stat(L.T("Perlu perhatian"), D.Attention.ToString(), G.Warning, D.Attention > 0 ? Theme.Red : "#94A3B8"),
-            Stat(L.T("CPU rata-rata"), live.Count == 0 ? "—" : $"{cpu:0}%", G.Gauge, Theme.Accent),
-            Stat(L.T("RAM terpakai"), total == 0 ? "—" : $"{Ui.Bytes(used)} / {Ui.Bytes(total)}", G.Stack, Theme.Accent3));
+        return Ui.Columns("*,*,*,*", 12,
+            Stat(L.T("Online"), $"{D.Online}/{D.Tiles.Count}", "pulse", Theme.Green),
+            Stat(L.T("Perlu perhatian"), D.Attention.ToString(), "warning", D.Attention > 0 ? Theme.Red : "#71717A"),
+            Stat(L.T("CPU rata-rata"), live.Count == 0 ? "—" : $"{cpu:0}%", "cpu", Theme.Accent),
+            Stat(L.T("RAM terpakai"), total == 0 ? "—" : $"{Ui.Bytes(used)} / {Ui.Bytes(total)}", "memory", Theme.Accent3));
     }
 
-    private static Border Stat(string title, string value, string glyph, string hex)
+    private static Border Stat(string title, string value, string ph, string hex)
     {
         var icon = new Border
         {
-            Width = 34, Height = 34, CornerRadius = new CornerRadius(10), Background = Theme.Brush(hex, 0.12),
-            Child = Ui.Icon(glyph, 14, Theme.Brush(hex))
+            Width = 34, Height = 34, CornerRadius = new CornerRadius(8), Background = Theme.Brush(hex, 0.10),
+            Child = Ph.Icon(ph, 17, Theme.Brush(hex))
         };
-        var text = Ui.Col(2, Ui.Text(title, 11.5, fg: Theme.Text2),
-            Ui.Text(value, 17, FontWeights.Bold).With(t => t.TextTrimming = TextTrimming.CharacterEllipsis));
+        var text = Ui.Col(2, Ui.Text(title, 11, fg: Theme.Text2),
+            Ui.Text(value, 17, FontWeights.SemiBold).With(t => t.TextTrimming = TextTrimming.CharacterEllipsis));
         return Ui.Card(Ui.Columns("Auto,*", 12, icon, text), 12);
     }
 
@@ -134,29 +135,31 @@ internal sealed class DashboardPage : PageBase
     private UIElement Card(ServerTile t)
     {
         var selected = D.Selection.Contains(t.Id);
+        var tint = Theme.Brush(t.Host.Color);
         var avatar = new Border
         {
-            Width = 32, Height = 32, CornerRadius = new CornerRadius(9), Background = Theme.TintGradient(t.Host.Color),
-            Child = selected ? Ui.Icon(G.Check, 13, new SolidColorBrush(Microsoft.UI.Colors.White))
-                : Ui.Text(t.Host.Title().Length > 0 ? t.Host.Title()[..1].ToUpperInvariant() : "?", 14, FontWeights.Bold, new SolidColorBrush(Microsoft.UI.Colors.White))
+            Width = 30, Height = 30, CornerRadius = new CornerRadius(8), Background = Theme.Brush(t.Host.Color, selected ? 0.22 : 0.14),
+            Child = selected
+                ? Ph.Icon("check", 13, tint)
+                : Ui.Text(t.Host.Title().Length > 0 ? t.Host.Title()[..1].ToUpperInvariant() : "?", 13, FontWeights.SemiBold, tint)
                     .With(x => { x.HorizontalAlignment = HorizontalAlignment.Center; x.VerticalAlignment = VerticalAlignment.Center; }),
         };
         var pick = Ui.Plain(avatar, () => D.Toggle(t.Id), new Thickness(0));
         ToolTipService.SetToolTip(pick, selected ? L.T("Batal pilih") : L.T("Pilih untuk dibuka bersama (split & broadcast)"));
         var subtitle = t.Info?.Os is { Length: > 0 } os ? os : t.Host.Address();
         var head = Ui.Columns("Auto,*,Auto,Auto,Auto", 8, pick,
-            Ui.Col(1, Ui.Text(t.Host.Title(), 13.5, FontWeights.SemiBold).With(x => x.TextTrimming = TextTrimming.CharacterEllipsis),
+            Ui.Col(1, Ui.Text(t.Host.Title(), 13, FontWeights.SemiBold).With(x => x.TextTrimming = TextTrimming.CharacterEllipsis),
                 Ui.Text(subtitle, 11.5, fg: Theme.Text2).With(x => x.TextTrimming = TextTrimming.CharacterEllipsis)),
             Status(t),
-            Ui.IconBtn(G.Terminal, L.T("Buka terminal"), () => M.Connect([t.Id]), size: 12),
-            Ui.IconBtn(G.Folder, L.T("Buka SFTP"), () => _ = M.OpenSftp(t.Host), size: 12));
+            Ph.Btn("terminal-window", L.T("Buka terminal"), () => M.Connect([t.Id]), size: 14),
+            Ph.Btn("folder-open", L.T("Buka SFTP"), () => _ = M.OpenSftp(t.Host), size: 14));
 
         UIElement content = t.State switch
         {
-            ServerTile.Status.Offline => Ui.Col(8,
-                Ui.Row(6, Ui.Icon(G.Warning, 13, Theme.Brush(Theme.Red)), Ui.Text(L.T("Tidak bisa dihubungi"), 13, FontWeights.SemiBold, Theme.Brush(Theme.Red))),
+            ServerTile.Status.Offline => Ui.Col(10,
+                Ui.Row(6, Ph.Icon("wifi-slash", 14, Theme.Brush(Theme.Red)), Ui.Text(L.T("Tidak bisa dihubungi"), 12.5, FontWeights.SemiBold, Theme.Brush(Theme.Red))),
                 Ui.Text(t.Error ?? "", 11.5, fg: Theme.Text2, wrap: true).With(x => { x.MaxLines = 3; x.IsTextSelectionEnabled = true; }),
-                Ui.Secondary(L.T("Coba lagi"), null, () => D.Retry(t)).With(b => b.Margin = new Thickness(0, 6, 0, 0))),
+                Ui.SecondaryIcon(L.T("Coba lagi"), "arrows-clockwise", () => D.Retry(t)).With(b => b.Margin = new Thickness(0, 2, 0, 0))),
             _ when t.Sample == null => Ui.Row(8, new ProgressRing { Width = 16, Height = 16, IsActive = true }, Ui.Text(L.T("Menghubungkan…"), 12.5, fg: Theme.Text2))
                 .With(x => { x.HorizontalAlignment = HorizontalAlignment.Center; x.Margin = new Thickness(0, 46, 0, 46); }),
             _ => Metrics(t),
@@ -167,11 +170,11 @@ internal sealed class DashboardPage : PageBase
             : t.Health == ServerTile.Level.Warn ? Theme.Brush(Theme.Orange, 0.45) : Theme.CardStroke;
         var card = new Border
         {
-            Child = Ui.Col(12, head, content), Padding = new Thickness(14), CornerRadius = new CornerRadius(14), Background = Theme.Card,
+            Child = Ui.Col(13, head, content), Padding = new Thickness(16), CornerRadius = new CornerRadius(12), Background = Theme.Card,
             BorderBrush = stroke, BorderThickness = new Thickness(selected ? 1.5 : 1), MinHeight = 196,
         };
-        card.PointerEntered += (_, _) => card.Background = Theme.CardHover;
-        card.PointerExited += (_, _) => card.Background = Theme.Card;
+        card.PointerEntered += (_, _) => { card.Background = Theme.CardHover; if (!selected) card.BorderBrush = Theme.Ink(0.18); };
+        card.PointerExited += (_, _) => { card.Background = Theme.Card; if (!selected) card.BorderBrush = stroke; };
         var menu = new MenuFlyout();
         void Item(string text, Action a) { var it = new MenuFlyoutItem { Text = text }; it.Click += (_, _) => a(); menu.Items.Add(it); }
         Item(L.T("Buka terminal"), () => M.Connect([t.Id]));
@@ -208,20 +211,20 @@ internal sealed class DashboardPage : PageBase
     {
         var s = t.Sample!;
         var cpuLevel = ServerTile.LevelOf(t.CpuNow / 100);
-        var cpu = Ui.Col(0, Ui.Text("CPU", 11.5, fg: Theme.Text2),
-            Ui.Text($"{t.CpuNow:0}%", 24, FontWeights.Bold, cpuLevel == ServerTile.Level.Ok ? Theme.Text : Theme.Brush(Tint(cpuLevel, Theme.Accent))));
-        cpu.Width = 64;
-        var top = Ui.Columns("Auto,*", 12, cpu, Spark(t.Cpu));
-        var foot = Ui.Columns("Auto,Auto,*,Auto,Auto", 12,
-            Foot(G.Clock, Uptime(s.UptimeSecs)), Foot(G.Gauge, s.Load1.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)),
-            new Border(), Foot(G.Download, Rate(t.Rx)), Foot(G.Upload, Rate(t.Tx)));
+        var cpu = Ui.Col(1, Ui.Text("CPU", 10.5, fg: Theme.Text2),
+            Ui.Text($"{t.CpuNow:0}%", 23, FontWeights.SemiBold, cpuLevel == ServerTile.Level.Ok ? Theme.Text : Theme.Brush(Tint(cpuLevel, Theme.Accent))));
+        cpu.Width = 58;
+        var top = Ui.Columns("Auto,*", 14, cpu, Spark(t.Cpu));
+        var foot = Ui.Columns("Auto,Auto,*,Auto,Auto", 14,
+            Foot("clock", Uptime(s.UptimeSecs)), Foot("gauge", s.Load1.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)),
+            new Border(), Foot("arrow-down", Rate(t.Rx)), Foot("arrow-up", Rate(t.Tx)));
         return Ui.Col(11, top, Bar("RAM", s.MemUsedBytes, s.MemTotalBytes, Theme.Accent3), Bar("Disk", s.DiskUsedBytes, s.DiskTotalBytes, Theme.Orange), foot);
     }
 
     /// <summary>Grafik CPU kecil (30 sampel terakhir, mengalir dari kanan).</summary>
     private static UIElement Spark(List<double> cpu)
     {
-        const double H = 40;
+        const double H = 42;
         var canvas = new Canvas { Height = H, VerticalAlignment = VerticalAlignment.Bottom };
         canvas.SizeChanged += (_, e) =>
         {
@@ -230,8 +233,8 @@ internal sealed class DashboardPage : PageBase
             if (cpu.Count == 0 || w <= 0) return;
             var step = w / 29;
             var x0 = w - (cpu.Count - 1) * step;
-            var line = new Polyline { Stroke = Theme.Brush(Theme.Accent), StrokeThickness = 2, StrokeLineJoin = PenLineJoin.Round };
-            var area = new Polygon { Fill = Theme.Brush(Theme.Accent, 0.16) };
+            var line = new Polyline { Stroke = Theme.Brush(Theme.Accent), StrokeThickness = 1.5, StrokeLineJoin = PenLineJoin.Round };
+            var area = new Polygon { Fill = Theme.Brush(Theme.Accent, 0.12) };
             area.Points.Add(new Windows.Foundation.Point(x0, H));
             for (int k = 0; k < cpu.Count; k++)
             {
@@ -250,20 +253,20 @@ internal sealed class DashboardPage : PageBase
     {
         var f = total > 0 ? Math.Min(1, (double)used / total) : 0;
         var level = ServerTile.LevelOf(f);
-        var track = new Grid { Height = 5, CornerRadius = new CornerRadius(3), Background = Theme.Ink(0.08) };
+        var track = new Grid { Height = 4, CornerRadius = new CornerRadius(2), Background = Theme.Ink(0.07) };
         track.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(Math.Max(0.02, f), GridUnitType.Star) });
         track.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(Math.Max(0.0001, 1 - f), GridUnitType.Star) });
-        track.Children.Add(new Border { CornerRadius = new CornerRadius(3), Background = Theme.Brush(Tint(level, color)) });
+        track.Children.Add(new Border { CornerRadius = new CornerRadius(2), Background = Theme.Brush(Tint(level, color)) });
         var head = Ui.Columns("Auto,Auto,*,Auto", 6,
-            Ui.Text(label, 11.5, FontWeights.Medium),
-            Ui.Text($"{f * 100:0}%", 11.5, FontWeights.SemiBold, level == ServerTile.Level.Ok ? Theme.Text2 : Theme.Brush(Tint(level, color))),
+            Ui.Text(label, 11, FontWeights.Medium),
+            Ui.Text($"{f * 100:0}%", 11, FontWeights.Medium, level == ServerTile.Level.Ok ? Theme.Text2 : Theme.Brush(Tint(level, color))),
             new Border(),
             Ui.Text(total > 0 ? $"{Ui.Bytes(used)} / {Ui.Bytes(total)}" : "—", 10.5, fg: Theme.Text2).With(t => t.FontFamily = Theme.MonoFont));
-        return Ui.Col(4, head, track);
+        return Ui.Col(5, head, track);
     }
 
-    private static UIElement Foot(string glyph, string text) => Ui.Row(3, Ui.Icon(glyph, 10, Theme.Text2),
-        Ui.Text(text, 11, fg: Theme.Text2).With(t => t.FontFamily = Theme.MonoFont));
+    private static UIElement Foot(string ph, string text) => Ui.Row(4, Ph.Icon(ph, 11, Theme.Text2),
+        Ui.Text(text, 10.5, fg: Theme.Text2).With(t => t.FontFamily = Theme.MonoFont));
 
     private static string Uptime(ulong s)
     {
@@ -289,22 +292,22 @@ internal sealed class DashboardPage : PageBase
         if (ids.Count == 0) return;
         var count = new Border
         {
-            MinWidth = 24, Height = 24, CornerRadius = new CornerRadius(12), Background = Theme.Brush(Theme.Accent),
-            Child = Ui.Text(ids.Count.ToString(), 13, FontWeights.Bold, new SolidColorBrush(Microsoft.UI.Colors.Black))
+            MinWidth = 22, Height = 22, CornerRadius = new CornerRadius(6), Background = Theme.Brush(Theme.Accent),
+            Child = Ui.Text(ids.Count.ToString(), 12, FontWeights.SemiBold, new SolidColorBrush(Theme.Hex("#06231E")))
                 .With(t => { t.HorizontalAlignment = HorizontalAlignment.Center; t.VerticalAlignment = VerticalAlignment.Center; }),
         };
-        var cancel = Ui.Plain(Ui.Text(L.T("Batal"), 13, fg: Theme.Text2), () => { D.Selection.Clear(); Render(); }, new Thickness(8, 4, 8, 4));
-        var open = Ui.Secondary(L.T("Buka tab"), G.Terminal, () => { M.Connect(ids); D.Selection.Clear(); });
-        var runMany = Ui.Secondary(L.T("Jalankan perintah"), G.Play, () => new RunManyDialog(M.NewRunMany(ids)).Show());
-        var split = Ui.Primary("Split & broadcast", "", () => { M.OpenSplit(ids, true); D.Selection.Clear(); });
+        var cancel = Ui.Plain(Ui.Text(L.T("Batal"), 12.5, fg: Theme.Text2), () => { D.Selection.Clear(); Render(); }, new Thickness(8, 4, 8, 4));
+        var open = Ui.SecondaryIcon(L.T("Buka tab"), "terminal-window", () => { M.Connect(ids); D.Selection.Clear(); });
+        var runMany = Ui.SecondaryIcon(L.T("Jalankan perintah"), "play", () => new RunManyDialog(M.NewRunMany(ids)).Show());
+        var split = Ui.PrimaryIcon(L.T("Split & broadcast"), "squares-four", () => { M.OpenSplit(ids, true); D.Selection.Clear(); });
         split.IsEnabled = ids.Count >= 2 && ids.Count <= AppModel.MaxSplit;
         ToolTipService.SetToolTip(split, ids.Count > AppModel.MaxSplit ? L.T("Maksimal {} server dalam satu split", AppModel.MaxSplit) : L.T("Buka berdampingan, ketikan dikirim ke semua"));
         _bar.Children.Add(new Border
         {
-            CornerRadius = new CornerRadius(24), Padding = new Thickness(14, 8, 8, 8), BorderThickness = new Thickness(1), BorderBrush = Theme.Ink(0.1),
-            Background = Theme.Dark ? Theme.Brush("#1A1F27") : new SolidColorBrush(Microsoft.UI.Colors.White),
-            Shadow = new ThemeShadow(), Translation = new System.Numerics.Vector3(0, 0, 24),
-            Child = Ui.Row(12, count, Ui.Text(L.T("server dipilih"), 13).With(t => t.VerticalAlignment = VerticalAlignment.Center), cancel, open, runMany, split),
+            CornerRadius = new CornerRadius(12), Padding = new Thickness(14, 8, 8, 8), BorderThickness = new Thickness(1), BorderBrush = Theme.CardStroke,
+            Background = Theme.Panel,
+            Shadow = new ThemeShadow(), Translation = new System.Numerics.Vector3(0, 0, 18),
+            Child = Ui.Row(12, count, Ui.Text(L.T("server dipilih"), 12.5).With(t => t.VerticalAlignment = VerticalAlignment.Center), cancel, open, runMany, split),
         });
     }
 }

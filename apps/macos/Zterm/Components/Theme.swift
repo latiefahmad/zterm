@@ -34,25 +34,30 @@ enum Theme {
     static let accent = Color(hex: "#3FD0B4")
     static let accent2 = Color(hex: "#5B9CF5")
     static let accent3 = Color(hex: "#9D7CF2")
+    static let green = Color(hex: "#4ADE80")
+    static let orange = Color(hex: "#F2A65A")
+    static let red = Color(hex: "#F0616D")
 
-    /// Hitam di mode terang, putih di mode gelap — dipakai dengan opacity untuk garis & lapisan.
+    /// Hitam di mode terang, putih di mode gelap - dipakai dengan opacity untuk garis & lapisan.
     static let ink = Color.adaptive(light: .black, dark: .white)
 
-    static let bg = Color.adaptive(light: ns("#F4F6F9"), dark: ns("#0B0E13"))
-    static let panel = Color.adaptive(light: ns("#FBFCFD"), dark: ns("#0F131A"))
-    static let card = Color.adaptive(light: .white, dark: NSColor.white.withAlphaComponent(0.045))
-    static let cardHover = Color.adaptive(light: .white, dark: NSColor.white.withAlphaComponent(0.075))
-    static let cardStroke = Color.adaptive(light: NSColor.black.withAlphaComponent(0.08), dark: NSColor.white.withAlphaComponent(0.08))
-    static let field = Color.adaptive(light: NSColor.black.withAlphaComponent(0.04), dark: NSColor.black.withAlphaComponent(0.25))
-    static let shadow = Color.adaptive(light: NSColor.black.withAlphaComponent(0.10), dark: NSColor.black.withAlphaComponent(0.40))
+    /// Permukaan netral ala shadcn: kertas zinc, garis tipis, tanpa lapisan kaca.
+    static let bg = Color.adaptive(light: ns("#F7F7F8"), dark: ns("#09090B"))
+    static let panel = Color.adaptive(light: ns("#FFFFFF"), dark: ns("#0C0C0F"))
+    static let card = Color.adaptive(light: ns("#FFFFFF"), dark: ns("#131316"))
+    static let cardHover = Color.adaptive(light: ns("#FAFAFA"), dark: ns("#18181B"))
+    static let cardStroke = Color.adaptive(light: ns("#E4E4E7"), dark: ns("#27272A"))
+    static let field = Color.adaptive(light: ns("#F4F4F5"), dark: ns("#18181B"))
+    static let shadow = Color.adaptive(light: NSColor.black.withAlphaComponent(0.06), dark: NSColor.black.withAlphaComponent(0.50))
 
     static let hostColors = ["#3FD0B4", "#5B9CF5", "#9D7CF2", "#F2A65A", "#F0616D", "#8BD450", "#E879C6", "#94A3B8"]
     /// Pilihan warna kartu host (bisa juga warna bebas lewat color picker).
     static let cardPalette = ["#3FD0B4", "#22C55E", "#84CC16", "#EAB308", "#F2A65A", "#F97316", "#F0616D", "#E11D48",
                               "#E879C6", "#C084FC", "#9D7CF2", "#6366F1", "#5B9CF5", "#06B6D4", "#14B8A6", "#94A3B8"]
 
+    /// Dipertahankan sebagai nama lama, tetapi kini satu warna: aksen rata tanpa gradien.
     static let brandGradient = LinearGradient(
-        colors: [accent, accent2, accent3], startPoint: .topLeading, endPoint: .bottomTrailing)
+        colors: [accent, accent], startPoint: .top, endPoint: .bottom)
 }
 
 // MARK: - Tampilan (Sistem / Terang / Gelap)
@@ -105,9 +110,8 @@ struct GlassCard: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(padding)
-            .background(Theme.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.cardStroke))
-            .shadow(color: Theme.shadow.opacity(0.35), radius: 2, y: 1)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.cardStroke))
     }
 }
 
@@ -125,7 +129,7 @@ enum ZtermButtonSize {
     var radius: CGFloat { self == .large ? 10 : 8 }
 }
 
-/// Tombol utama: gradien brand, glow halus, terang saat hover, mengecil saat ditekan.
+/// Tombol utama: aksen rata, teks gelap, tanpa glow.
 struct PrimaryButtonStyle: ButtonStyle {
     var wide = false
     var size: ZtermButtonSize = .regular
@@ -145,15 +149,14 @@ struct PrimaryButtonStyle: ButtonStyle {
             configuration.label
                 .font(size.font)
                 .lineLimit(1)
-                .foregroundStyle(Color.black.opacity(0.82))
+                .foregroundStyle(Color(hex: "#06231E"))
                 .padding(.horizontal, size.hPad)
                 .frame(height: size.height)
                 .frame(maxWidth: wide ? .infinity : nil)
-                .background(Theme.brandGradient, in: RoundedRectangle(cornerRadius: size.radius, style: .continuous))
+                .background(Theme.accent, in: RoundedRectangle(cornerRadius: size.radius, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: size.radius, style: .continuous)
-                    .fill(.white.opacity(hover && enabled ? 0.14 : 0)))
-                .shadow(color: Theme.accent.opacity(enabled ? (hover ? 0.4 : 0.22) : 0), radius: hover ? 12 : 8, y: 3)
-                .scaleEffect(configuration.isPressed ? 0.97 : 1)
+                    .fill(.white.opacity(hover && enabled ? 0.12 : 0)))
+                .scaleEffect(configuration.isPressed ? 0.98 : 1)
                 .opacity(enabled ? 1 : 0.45)
                 .contentShape(Rectangle())
                 .onHover { h in withAnimation(.ztermHover) { hover = h } }

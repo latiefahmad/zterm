@@ -164,17 +164,22 @@ internal sealed class ShellPage : Grid
     private UIElement SidebarRow(Section s)
     {
         var selected = M.ActiveSessionId == null && M.Section == s;
-        var icon = Ui.TintIcon(s.Glyph(), s.Tint());
+        var icon = new Border
+        {
+            Width = 26, Height = 26, CornerRadius = new CornerRadius(7),
+            Background = selected ? Theme.Brush(Theme.Accent, 0.12) : Theme.Ink(0.05),
+            Child = Ph.Icon(s.Ph(), 15, selected ? Theme.Brush(Theme.Accent) : Theme.Text2),
+        };
         var title = Ui.Text(s.Title(), 13, selected ? FontWeights.SemiBold : FontWeights.Medium, selected ? Theme.Text : Theme.Text2);
         var n = Badge(s);
         UIElement? badge = n > 0 ? Ui.Pill(n.ToString()) : null;
         var row = Ui.Columns("Auto,*,Auto", 11, icon, title, badge);
-        var bar = new Border { Width = 3, Height = 16, CornerRadius = new CornerRadius(2), Background = Theme.Brush(s.Tint()), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(-8, 0, 0, 0), Visibility = selected ? Visibility.Visible : Visibility.Collapsed };
+        var bar = new Border { Width = 3, Height = 16, CornerRadius = new CornerRadius(2), Background = Theme.Brush(Theme.Accent), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(-8, 0, 0, 0), Visibility = selected ? Visibility.Visible : Visibility.Collapsed };
         var b = Ui.Plain(new Grid { Children = { row, bar } }, () => { M.Navigate(s); }, new Thickness(8, 6, 8, 6));
-        b.Height = 38;
+        b.Height = 36;
         b.HorizontalAlignment = HorizontalAlignment.Stretch;
-        b.Background = selected ? Theme.Ink(0.09) : new SolidColorBrush(Colors.Transparent);
-        b.CornerRadius = new CornerRadius(10);
+        b.Background = selected ? Theme.Ink(0.07) : new SolidColorBrush(Colors.Transparent);
+        b.CornerRadius = new CornerRadius(8);
         return b;
     }
 

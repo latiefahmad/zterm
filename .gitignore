@@ -4,6 +4,9 @@
 # Situs: salinan lokal dengan Google Picker key asli
 site/team.local.html
 
+# Cache unduhan ikon Phosphor (hasil generate tetap di-commit)
+shared/icons/.cache/
+
 # Rust
 core/target/
 

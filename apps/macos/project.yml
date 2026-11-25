@@ -23,6 +23,9 @@ targets:
       # Ikon Nerd Font untuk prompt Oh My Posh / Starship (dibagi dengan Windows)
       - path: ../../fonts/SymbolsNerdFontMono-Regular.ttf
         buildPhase: resources
+      # Data ikon Phosphor Duotone (dibagi dengan Windows & Linux)
+      - path: ../../shared/icons/phosphor.json
+        buildPhase: resources
     dependencies:
       - framework: Frameworks/ZtermCoreFFI.xcframework
         embed: false

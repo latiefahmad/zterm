@@ -34,15 +34,15 @@ internal static class Theme
     /// <summary>Hitam di mode terang, putih di mode gelap (dipakai dengan opacity).</summary>
     public static SolidColorBrush Ink(double opacity) => new(Dark ? Color.FromArgb((byte)(255 * opacity), 255, 255, 255) : Color.FromArgb((byte)(255 * opacity), 0, 0, 0));
 
-    public static SolidColorBrush Bg => Brush(Dark ? "#0B0E13" : "#F4F6F9");
-    public static SolidColorBrush Panel => Brush(Dark ? "#0F131A" : "#FBFCFD");
-    public static SolidColorBrush Card => Dark ? Ink(0.045) : new SolidColorBrush(Colors.White);
-    public static SolidColorBrush CardHover => Dark ? Ink(0.075) : new SolidColorBrush(Colors.White);
-    public static SolidColorBrush CardStroke => Ink(0.08);
-    public static SolidColorBrush Field => new(Dark ? Color.FromArgb(64, 0, 0, 0) : Color.FromArgb(10, 0, 0, 0));
-    public static SolidColorBrush Text => Brush(Dark ? "#E6EDF3" : "#1B1F24");
-    public static SolidColorBrush Text2 => Ink(Dark ? 0.62 : 0.58);
-    public static SolidColorBrush Text3 => Ink(Dark ? 0.38 : 0.36);
+    public static SolidColorBrush Bg => Brush(Dark ? "#09090B" : "#F7F7F8");
+    public static SolidColorBrush Panel => Brush(Dark ? "#0C0C0F" : "#FFFFFF");
+    public static SolidColorBrush Card => Brush(Dark ? "#131316" : "#FFFFFF");
+    public static SolidColorBrush CardHover => Brush(Dark ? "#18181B" : "#FAFAFA");
+    public static SolidColorBrush CardStroke => Brush(Dark ? "#27272A" : "#E4E4E7");
+    public static SolidColorBrush Field => Brush(Dark ? "#18181B" : "#F4F4F5");
+    public static SolidColorBrush Text => Brush(Dark ? "#FAFAFA" : "#18181B");
+    public static SolidColorBrush Text2 => Ink(Dark ? 0.62 : 0.56);
+    public static SolidColorBrush Text3 => Ink(Dark ? 0.38 : 0.34);
     public static SolidColorBrush AccentBrush => Brush(Accent);
 
     public static LinearGradientBrush Gradient(params string[] hexes)
@@ -53,18 +53,11 @@ internal static class Theme
         return g;
     }
 
-    public static LinearGradientBrush BrandGradient => Gradient(Accent, Accent2, Accent3);
+    /// <summary>Nama lama, kini satu warna: aksen rata tanpa gradien.</summary>
+    public static LinearGradientBrush BrandGradient => Gradient(Accent, Accent);
 
-    /// <summary>Gradien dari satu warna (warna → versi lebih gelap), untuk ikon host & menu.</summary>
-    public static LinearGradientBrush TintGradient(string hex)
-    {
-        var c = Hex(hex);
-        var dark = Color.FromArgb(255, (byte)(c.R * 0.72), (byte)(c.G * 0.72), (byte)(c.B * 0.72));
-        var g = new LinearGradientBrush { StartPoint = new Point(0, 0), EndPoint = new Point(1, 1) };
-        g.GradientStops.Add(new GradientStop { Color = c, Offset = 0 });
-        g.GradientStops.Add(new GradientStop { Color = dark, Offset = 1 });
-        return g;
-    }
+    /// <summary>Nama lama, kini satu warna: ikon host/menu memakai warna rata.</summary>
+    public static LinearGradientBrush TintGradient(string hex) => Gradient(hex, hex);
 
     public static readonly string[] HostColors = ["#3FD0B4", "#5B9CF5", "#9D7CF2", "#F2A65A", "#F0616D", "#8BD450", "#E879C6", "#94A3B8"];
     public static readonly string[] CardPalette = ["#3FD0B4", "#22C55E", "#84CC16", "#EAB308", "#F2A65A", "#F97316", "#F0616D", "#E11D48",

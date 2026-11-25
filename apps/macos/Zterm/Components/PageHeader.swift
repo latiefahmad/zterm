@@ -8,9 +8,9 @@ struct PageHeader<Actions: View>: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 26, weight: .bold, design: .rounded))
-                Text(subtitle).font(.callout).foregroundStyle(.secondary).lineLimit(1)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).font(.system(size: 22, weight: .semibold)).tracking(-0.2)
+                Text(subtitle).font(.system(size: 12.5)).foregroundStyle(.secondary).lineLimit(1)
             }
             Spacer()
             actions()
@@ -18,30 +18,51 @@ struct PageHeader<Actions: View>: View {
     }
 }
 
-/// Keadaan kosong dengan ikon melayang.
+/// Keadaan kosong dengan ikon datar di dalam kotak netral.
 struct EmptyState: View {
-    let icon: String
+    private let sfSymbol: String?
+    private let phosphor: String?
     let title: String
     let text: String
-    @State private var float = false
+
+    init(icon: String, title: String, text: String) {
+        sfSymbol = icon
+        phosphor = nil
+        self.title = title
+        self.text = text
+    }
+
+    init(ph: String, title: String, text: String) {
+        sfSymbol = nil
+        phosphor = ph
+        self.title = title
+        self.text = text
+    }
 
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 38, weight: .light))
-                .foregroundStyle(Theme.brandGradient)
-                .offset(y: float ? -4 : 4)
-                .animation(.easeInOut(duration: 2).repeatForever(), value: float)
-            Text(title).font(.title3.bold())
-            Text(text).foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 380)
+        VStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Theme.ink.opacity(0.05))
+                    .frame(width: 64, height: 64)
+                if let phosphor {
+                    PhosphorIcon(name: phosphor, size: 30, tint: Theme.accent)
+                } else if let sfSymbol {
+                    Image(systemName: sfSymbol)
+                        .font(.system(size: 26, weight: .light))
+                        .foregroundStyle(Theme.accent)
+                }
+            }
+            Text(title).font(.system(size: 16, weight: .semibold))
+            Text(text).font(.system(size: 12.5)).foregroundStyle(.secondary)
+                .multilineTextAlignment(.center).frame(maxWidth: 380)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 70)
-        .onAppear { float = true }
+        .padding(.top, 64)
     }
 }
 
-/// Baris/kartu dengan efek hover yang seragam.
+/// Baris/kartu dengan sorotan garis yang seragam.
 struct HoverCard<Content: View>: View {
     var padding: CGFloat = 14
     @ViewBuilder var content: () -> Content
@@ -50,10 +71,8 @@ struct HoverCard<Content: View>: View {
     var body: some View {
         content()
             .padding(padding)
-            .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(hover ? Theme.cardHover : Theme.card))
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.ink.opacity(hover ? 0.14 : 0.08)))
-            .shadow(color: Theme.shadow.opacity(hover ? 1 : 0), radius: 12, y: 6)
-            .offset(y: hover ? -1 : 0)
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(hover ? Theme.cardHover : Theme.card))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(hover ? Theme.ink.opacity(0.16) : Theme.cardStroke))
             .animation(.ztermHover, value: hover)
             .onHover { hover = $0 }
     }
@@ -65,9 +84,9 @@ struct Badge: View {
     var color: Color = Theme.accent
     var body: some View {
         Text(text)
-            .font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 7).padding(.vertical, 2)
-            .background(color.opacity(0.15), in: Capsule())
+            .font(.system(size: 10, weight: .medium))
+            .padding(.horizontal, 6).padding(.vertical, 2)
+            .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
             .foregroundStyle(color)
     }
 }

@@ -102,7 +102,7 @@ internal static class Ui
         return g;
     }
 
-    public static Border Card(UIElement child, double pad = 16, double radius = 14) => new()
+    public static Border Card(UIElement child, double pad = 16, double radius = 12) => new()
     {
         Child = child, Padding = new Thickness(pad), CornerRadius = new CornerRadius(radius),
         Background = Theme.Card, BorderBrush = Theme.CardStroke, BorderThickness = new Thickness(1)
@@ -119,9 +119,9 @@ internal static class Ui
 
     public static Border Badge(string text, string hex = Theme.Accent) => new()
     {
-        Background = Theme.Brush(hex, 0.15), CornerRadius = new CornerRadius(6), Padding = new Thickness(6, 1, 6, 2),
+        Background = Theme.Brush(hex, 0.12), CornerRadius = new CornerRadius(6), Padding = new Thickness(6, 1, 6, 2),
         VerticalAlignment = VerticalAlignment.Center,
-        Child = new TextBlock { Text = text, FontSize = 10, FontWeight = FontWeights.SemiBold, Foreground = Theme.Brush(hex), CharacterSpacing = 40 }
+        Child = new TextBlock { Text = text, FontSize = 10, FontWeight = FontWeights.Medium, Foreground = Theme.Brush(hex), CharacterSpacing = 20 }
     };
 
     public static Border Pill(string text, Brush? fg = null) => new()
@@ -138,23 +138,35 @@ internal static class Ui
         return Row(7, Icon(glyph, 13, fg), new TextBlock { Text = text, Foreground = fg, FontWeight = FontWeights.SemiBold });
     }
 
-    /// <summary>Tombol utama: gradien brand, teks gelap.</summary>
+    private static UIElement PhLabel(string text, string name, Brush fg) =>
+        Row(7, Ph.Icon(name, 14, fg), new TextBlock { Text = text, Foreground = fg, FontWeight = FontWeights.SemiBold });
+
+    /// <summary>Tombol utama: aksen rata, teks gelap.</summary>
     public static Button Primary(string text, string? glyph, Action click, bool large = false)
     {
-        var fg = new SolidColorBrush(Color.FromArgb(220, 6, 18, 16));
+        var fg = new SolidColorBrush(Theme.Hex("#06231E"));
+        return PrimaryShell(Label(text, glyph, fg), fg, click, large);
+    }
+
+    public static Button PrimaryIcon(string text, string ph, Action click, bool large = false)
+    {
+        var fg = new SolidColorBrush(Theme.Hex("#06231E"));
+        return PrimaryShell(PhLabel(text, ph, fg), fg, click, large);
+    }
+
+    private static Button PrimaryShell(UIElement content, Brush fg, Action click, bool large)
+    {
         var b = new Button
         {
-            Content = Label(text, glyph, fg), Background = Theme.BrandGradient, Foreground = fg, BorderThickness = new Thickness(0),
+            Content = content, Background = Theme.Brush(Theme.Accent), Foreground = fg, BorderThickness = new Thickness(0),
             CornerRadius = new CornerRadius(large ? 10 : 8), Padding = large ? new Thickness(18, 10, 18, 10) : new Thickness(12, 6, 12, 7),
             FontWeight = FontWeights.SemiBold
         };
-        var hover = Theme.BrandGradient;
-        hover.Opacity = 0.88;
-        b.Resources["ButtonBackgroundPointerOver"] = hover;
-        b.Resources["ButtonBackgroundPressed"] = Theme.BrandGradient.With(g => g.Opacity = 0.75);
+        b.Resources["ButtonBackgroundPointerOver"] = Theme.Brush(Theme.Accent, 0.88);
+        b.Resources["ButtonBackgroundPressed"] = Theme.Brush(Theme.Accent, 0.76);
         b.Resources["ButtonForegroundPointerOver"] = fg;
         b.Resources["ButtonForegroundPressed"] = fg;
-        b.Resources["ButtonBackgroundDisabled"] = Theme.BrandGradient.With(g => g.Opacity = 0.4);
+        b.Resources["ButtonBackgroundDisabled"] = Theme.Brush(Theme.Accent, 0.4);
         b.Click += (_, _) => click();
         return b;
     }
@@ -162,13 +174,24 @@ internal static class Ui
     public static Button Secondary(string text, string? glyph, Action click, Brush? fg = null)
     {
         var f = fg ?? Theme.Text;
+        return SecondaryShell(Label(text, glyph, f), f, click);
+    }
+
+    public static Button SecondaryIcon(string text, string ph, Action click, Brush? fg = null)
+    {
+        var f = fg ?? Theme.Text;
+        return SecondaryShell(PhLabel(text, ph, f), f, click);
+    }
+
+    private static Button SecondaryShell(UIElement content, Brush f, Action click)
+    {
         var b = new Button
         {
-            Content = Label(text, glyph, f), Background = Theme.Ink(0.07), BorderBrush = Theme.Ink(0.08), BorderThickness = new Thickness(1),
+            Content = content, Background = Theme.Ink(0.04), BorderBrush = Theme.CardStroke, BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8), Padding = new Thickness(12, 6, 12, 7), Foreground = f
         };
-        b.Resources["ButtonBackgroundPointerOver"] = Theme.Ink(0.12);
-        b.Resources["ButtonBackgroundPressed"] = Theme.Ink(0.16);
+        b.Resources["ButtonBackgroundPointerOver"] = Theme.Ink(0.08);
+        b.Resources["ButtonBackgroundPressed"] = Theme.Ink(0.12);
         b.Resources["ButtonForegroundPointerOver"] = f;
         b.Click += (_, _) => click();
         return b;
@@ -227,33 +250,35 @@ internal static class Ui
     /// <summary>Header halaman: judul + subjudul di kiri, kontrol di kanan.</summary>
     public static Grid Header(string title, string subtitle, params UIElement?[] trailing)
     {
-        var left = Col(2, Title(title), Secondary(subtitle).With(t => t.TextWrapping = TextWrapping.WrapWholeWords));
+        var left = Col(3, Text(title, 22, FontWeights.SemiBold), Secondary(subtitle).With(t => t.TextWrapping = TextWrapping.WrapWholeWords));
         var right = Row(8, trailing);
         right.HorizontalAlignment = HorizontalAlignment.Right;
         return Columns("*,Auto", 16, left, right);
     }
 
-    public static UIElement EmptyState(string glyph, string title, string text, UIElement? action = null)
+    public static UIElement EmptyState(string glyph, string title, string text, UIElement? action = null) =>
+        EmptyStateIcon(new FontIcon { Glyph = glyph, FontSize = 28, Foreground = Theme.Brush(Theme.Accent) }, title, text, action);
+
+    public static UIElement EmptyStateIcon(UIElement iconContent, string title, string text, UIElement? action = null)
     {
         var icon = new Border
         {
-            Width = 76, Height = 76, CornerRadius = new CornerRadius(22), Background = Theme.Ink(0.05), HorizontalAlignment = HorizontalAlignment.Center,
-            Child = new FontIcon { Glyph = glyph, FontSize = 32, Foreground = Theme.BrandGradient }
+            Width = 64, Height = 64, CornerRadius = new CornerRadius(14), Background = Theme.Ink(0.05), HorizontalAlignment = HorizontalAlignment.Center,
+            Child = iconContent
         };
-        var p = Col(10, icon, Text(title, 18, FontWeights.Bold).With(t => t.HorizontalAlignment = HorizontalAlignment.Center),
-            Secondary(text, 13, true).With(t => { t.HorizontalAlignment = HorizontalAlignment.Center; t.TextAlignment = TextAlignment.Center; t.MaxWidth = 380; }));
+        var p = Col(12, icon, Text(title, 16, FontWeights.SemiBold).With(t => t.HorizontalAlignment = HorizontalAlignment.Center),
+            Secondary(text, 12.5, true).With(t => { t.HorizontalAlignment = HorizontalAlignment.Center; t.TextAlignment = TextAlignment.Center; t.MaxWidth = 380; }));
         if (action is FrameworkElement a) { a.HorizontalAlignment = HorizontalAlignment.Center; a.Margin = new Thickness(0, 8, 0, 0); p.Children.Add(a); }
-        p.Margin = new Thickness(0, 60, 0, 0);
+        p.Margin = new Thickness(0, 56, 0, 0);
         p.HorizontalAlignment = HorizontalAlignment.Center;
-        Float(icon);
         return p;
     }
 
-    /// <summary>Ikon berkotak gradien (seperti ikon menu sidebar).</summary>
+    /// <summary>Ikon berkotak netral (bukan gradien) untuk menu dan daftar.</summary>
     public static Border TintIcon(string glyph, string hex, double size = 24, double glyphSize = 12, double radius = 7) => new()
     {
-        Width = size, Height = size, CornerRadius = new CornerRadius(radius), Background = Theme.TintGradient(hex),
-        Child = new FontIcon { Glyph = glyph, FontSize = glyphSize, Foreground = new SolidColorBrush(Colors.White) }
+        Width = size, Height = size, CornerRadius = new CornerRadius(radius), Background = Theme.Brush(hex, 0.12),
+        Child = new FontIcon { Glyph = glyph, FontSize = glyphSize, Foreground = Theme.Brush(hex) }
     };
 
     public static Border Avatar(string? name, string? email, double size)

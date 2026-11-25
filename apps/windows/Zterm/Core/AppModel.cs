@@ -36,6 +36,15 @@ internal static class SectionInfo
         Section.About => G.Info, _ => G.Person,
     };
 
+    /// <summary>Nama ikon Phosphor Duotone untuk sidebar.</summary>
+    public static string Ph(this Section s) => s switch
+    {
+        Section.Dashboard => "gauge", Section.Hosts => "hard-drives", Section.ServerAdmin => "wrench", Section.Team => "users-three",
+        Section.Keychain => "key", Section.Forwarding => "arrows-left-right", Section.Sftp => "folder-open", Section.Database => "database",
+        Section.LocalServer => "stack", Section.Docker => "cube", Section.Snippets => "brackets-curly", Section.KnownHosts => "fingerprint",
+        Section.Logs => "clock", Section.About => "info", _ => "user-circle",
+    };
+
     public static string Tint(this Section s) => s switch
     {
         Section.Dashboard => "#F43F5E", Section.Hosts => "#3B82F6", Section.ServerAdmin => "#0EA5E9", Section.Team => "#22C55E", Section.Keychain => "#F59E0B", Section.Forwarding => "#10B981", Section.Sftp => "#06B6D4",

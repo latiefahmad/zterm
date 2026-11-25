@@ -176,15 +176,10 @@ struct SidebarRow: View {
             HStack(spacing: 11) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(section.tint.gradient)
-                        .opacity(selected ? 1 : 0.9)
-                    Image(systemName: section.icon)
-                        .font(.system(size: 11.5, weight: .bold))
-                        .foregroundStyle(.white)
+                        .fill(selected ? Theme.accent.opacity(0.12) : Theme.ink.opacity(0.05))
+                    PhosphorIcon(name: section.ph, size: 15, tint: selected ? Theme.accent : .secondary)
                 }
-                .frame(width: 24, height: 24)
-                .shadow(color: section.tint.opacity(selected ? 0.55 : 0), radius: 6, y: 2)
-                .scaleEffect(hover && !selected ? 1.06 : 1)
+                .frame(width: 26, height: 26)
 
                 Text(section.title)
                     .font(.system(size: 13, weight: selected ? .semibold : .medium))
@@ -222,6 +217,27 @@ struct SidebarRow: View {
 }
 
 extension Section {
+    /// Nama ikon Phosphor Duotone untuk sidebar.
+    var ph: String {
+        switch self {
+        case .hosts: "hard-drives"
+        case .dashboard: "gauge"
+        case .serverAdmin: "wrench"
+        case .team: "users-three"
+        case .keychain: "key"
+        case .forwarding: "arrows-left-right"
+        case .sftp: "folder-open"
+        case .database: "database"
+        case .localServer: "stack"
+        case .docker: "cube"
+        case .snippets: "brackets-curly"
+        case .knownHosts: "fingerprint"
+        case .logs: "clock"
+        case .about: "info"
+        case .account: "user-circle"
+        }
+    }
+
     /// Warna ikon tiap menu.
     var tint: Color {
         switch self {
@@ -268,7 +284,7 @@ struct AccountFooter: View {
                         SyncIcon(state: model.sync)
                             .font(.system(size: 7))
                             .frame(width: 14, height: 14)
-                            .background(Theme.brandGradient, in: Circle())
+                            .background(Theme.accent, in: Circle())
                             .overlay(Circle().strokeBorder(Theme.panel, lineWidth: 1.5))
                             .offset(x: 3, y: 3)
                     }
