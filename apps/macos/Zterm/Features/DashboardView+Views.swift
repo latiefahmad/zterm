@@ -78,7 +78,7 @@ struct DashboardView: View {
         .animation(.zterm, value: dash.filter)
         .animation(.ztermSnappy, value: dash.selection)
         .onAppear { dash.start(model) }
-        .onChange(of: model.hosts) { dash.start(model) }
+        .onChange(of: model.hosts.map(\.id)) { dash.start(model) }
         .onDisappear { if !dash.alerts { dash.stop() } }
         .sheet(item: Binding(get: { model.runMany }, set: { model.runMany = $0 })) { RunManyView(run: $0) }
     }
