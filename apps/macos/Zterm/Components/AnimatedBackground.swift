@@ -1,33 +1,16 @@
 import SwiftUI
 
-/// Background mesh gradient yang bergerak pelan + grid titik berkilau.
+/// Latar netral dengan satu sorotan aksen halus dan grid titik statis.
 struct AnimatedBackground: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var scheme
 
-    private var palette: [Color] {
-        scheme == .dark
-            ? ["#05070B", "#0A1A20", "#07090F", "#0B1A2E", "#0F3B3A", "#160F2A", "#05070B", "#101532", "#05070B"].map(Color.init(hex:))
-            : ["#F7FAFC", "#E3F6F2", "#F4F6FB", "#E6EEFB", "#C9F0E7", "#EEE8FB", "#F8FAFC", "#E4E9FA", "#F7F8FB"].map(Color.init(hex:))
-    }
-
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { ctx in
-            let t = ctx.date.timeIntervalSinceReferenceDate
-            ZStack {
-                MeshGradient(
-                    width: 3, height: 3,
-                    points: [
-                        [0, 0], [0.5, 0], [1, 0],
-                        [0, 0.5], [Float(0.5 + 0.18 * sin(t * 0.35)), Float(0.5 + 0.16 * cos(t * 0.28))], [1, 0.5],
-                        [0, 1], [Float(0.5 + 0.2 * cos(t * 0.22)), 1], [1, 1],
-                    ],
-                    colors: palette
-                )
-                DotGrid(time: t)
-                    .blendMode(scheme == .dark ? .plusLighter : .normal)
-                    .opacity(scheme == .dark ? 0.55 : 0.4)
-            }
+        ZStack {
+            (scheme == .dark ? Color(hex: "#09090B") : Color(hex: "#F7F7F8"))
+            RadialGradient(colors: [Theme.accent.opacity(scheme == .dark ? 0.12 : 0.16), .clear],
+                           center: .topLeading, startRadius: 0, endRadius: 900)
+            DotGrid(time: 0)
+                .opacity(scheme == .dark ? 0.35 : 0.5)
         }
         .ignoresSafeArea()
     }

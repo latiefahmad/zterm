@@ -80,8 +80,7 @@ struct WelcomeView: View {
             }
             .padding(.top, 40)
 
-            Label(L("Data host dienkripsi di perangkatmu. Login Google hanya untuk sync lewat Google Drive milikmu."),
-                  systemImage: "lock.shield")
+            PhosphorLabel(sf: "lock.shield", text: L("Data host dienkripsi di perangkatmu. Login Google hanya untuk sync lewat Google Drive milikmu."), size: 11)
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
@@ -147,16 +146,13 @@ struct CreatePasswordView: View {
             Button {
                 model.phase = .welcome
             } label: {
-                Label(L("Kembali"), systemImage: "chevron.left").font(.callout)
+                PhosphorLabel(sf: "chevron.left", text: L("Kembali"), size: 12).font(.callout)
             }
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)
             .padding(.bottom, 24)
 
-            Image(systemName: "lock.rotation")
-                .font(.system(size: 34, weight: .semibold))
-                .foregroundStyle(Theme.brandGradient)
-                .symbolEffect(.bounce, value: valid)
+            PhosphorIcon(sf: "lock.rotation", size: 34, tint: Theme.accent)
                 .staggerIn(0, base: 0.05)
 
             Text(L("Buat master password"))
@@ -209,7 +205,7 @@ struct CreatePasswordView: View {
             .padding(.top, 24)
             .staggerIn(4, base: 0.05)
 
-            Label(L("Tidak bisa dipulihkan jika lupa. Simpan di tempat aman."), systemImage: "exclamationmark.triangle")
+            PhosphorLabel(sf: "exclamationmark.triangle", text: L("Tidak bisa dipulihkan jika lupa. Simpan di tempat aman."), size: 12)
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .padding(.top, 14)
@@ -261,10 +257,7 @@ struct RestoreView: View {
         VStack(spacing: 0) {
             ZStack {
                 Circle().fill(Theme.accent.opacity(0.15)).frame(width: 84, height: 84)
-                Image(systemName: "icloud.and.arrow.down.fill")
-                    .font(.system(size: 34, weight: .semibold))
-                    .foregroundStyle(Theme.brandGradient)
-                    .symbolEffect(.bounce, options: .repeat(.periodic(delay: 2)))
+                PhosphorIcon(sf: "icloud.and.arrow.down.fill", size: 34, tint: Theme.accent)
             }
             .staggerIn(0, base: 0.05)
             .padding(.bottom, 22)
@@ -288,7 +281,7 @@ struct RestoreView: View {
                 } label: {
                     Group {
                         if busy { ProgressView().controlSize(.small).tint(.black) }
-                        else { Image(systemName: "arrow.right") }
+                        else { PhosphorIcon(sf: "arrow.right", size: 14) }
                     }
                     .frame(width: 18, height: 18)
                 }
@@ -360,7 +353,7 @@ struct LockView: View {
                 } label: {
                     Group {
                         if busy { ProgressView().controlSize(.small).tint(.black) }
-                        else { Image(systemName: "arrow.right") }
+                        else { PhosphorIcon(sf: "arrow.right", size: 14) }
                     }
                     .frame(width: 18, height: 18)
                 }
@@ -380,7 +373,7 @@ struct LockView: View {
                 Button {
                     Task { await biometric() }
                 } label: {
-                    Label(L("Buka dengan Touch ID"), systemImage: "touchid")
+                    PhosphorLabel(sf: "touchid", text: L("Buka dengan Touch ID"), size: 12)
                 }
                 .buttonStyle(SecondaryButtonStyle(wide: true, size: .large))
                 .padding(.top, 14)

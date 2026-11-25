@@ -225,7 +225,7 @@ internal sealed class ShellPage : Grid
     private UIElement UpdateCard(AvailableUpdate u)
     {
         var close = M.UpdateBusy ? null : Ui.IconBtn(G.Close, L.T("Nanti"), M.DismissUpdate, size: 9);
-        var top = Ui.Columns("Auto,*,Auto", 6, Ui.Icon(G.Sparkle, 13, Theme.BrandGradient), Ui.Text(L.T("Versi {} tersedia", u.Version), 12, FontWeights.SemiBold), close);
+        var top = Ui.Columns("Auto,*,Auto", 6, Ui.Icon(G.Sparkle, 13, Theme.AccentBrush), Ui.Text(L.T("Versi {} tersedia", u.Version), 12, FontWeights.SemiBold), close);
         var body = Ui.Col(8, top, Ui.Secondary(L.T("Kamu memakai {}.", Config.Version), 11));
         if (M.UpdateBusy)
         {

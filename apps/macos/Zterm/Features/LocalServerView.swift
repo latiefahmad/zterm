@@ -171,19 +171,19 @@ struct LocalServerView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 PageHeader(title: L("Server Lokal"), subtitle: L("Web server & database di komputermu — seperti MAMP, tanpa install manual")) {
-                    Button { NSWorkspace.shared.open(URL(fileURLWithPath: stack.rootPath)) } label: { Image(systemName: "folder") }
+                    Button { NSWorkspace.shared.open(URL(fileURLWithPath: stack.rootPath)) } label: { PhosphorIcon(sf: "folder", size: 14) }
                         .buttonStyle(SecondaryButtonStyle()).help(L("Buka folder data & log"))
                     if stack.anyRunning {
-                        Button { Task { await stack.stopAll() } } label: { Label(L("Stop semua"), systemImage: "stop.fill") }
+                        Button { Task { await stack.stopAll() } } label: { PhosphorLabel(sf: "stop.fill", text: L("Stop semua"), size: 12) }
                             .buttonStyle(SecondaryButtonStyle())
                     } else {
-                        Button { Task { await stack.startAll() } } label: { Label(L("Start semua"), systemImage: "play.fill") }
+                        Button { Task { await stack.startAll() } } label: { PhosphorLabel(sf: "play.fill", text: L("Start semua"), size: 12) }
                             .buttonStyle(PrimaryButtonStyle())
                             .disabled(!stack.services.contains { $0.missing.isEmpty })
                     }
                 }
                 if let e = stack.error {
-                    Label(e, systemImage: "exclamationmark.triangle.fill")
+                    PhosphorLabel(sf: "exclamationmark.triangle.fill", text: e, size: 12)
                         .font(.callout).foregroundStyle(.red)
                         .padding(12).frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
@@ -219,7 +219,7 @@ private struct PowerButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 7) {
-                if busy { ProgressView().controlSize(.small) } else { Image(systemName: running ? "stop.fill" : "power") }
+                if busy { ProgressView().controlSize(.small) } else { PhosphorIcon(sf: running ? "stop.fill" : "power", size: 13) }
                 Text(busy ? (running ? L("Menghentikan…") : L("Menyalakan…")) : running ? L("Stop") : L("Start"))
             }
             .frame(minWidth: 96)
@@ -256,7 +256,7 @@ private struct ComponentRow: View {
         let stack = model.stack
         if let c = stack.component(id) {
             HStack(spacing: 10) {
-                Image(systemName: c.state == .notInstalled ? "arrow.down.circle" : "checkmark.circle.fill")
+                PhosphorIcon(sf: c.state == .notInstalled ? "arrow.down.circle" : "checkmark.circle.fill", size: 14)
                     .foregroundStyle(c.state == .notInstalled ? Color.secondary : Color(hex: "#4ADE80"))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("\(c.name) \(c.version)").font(.system(size: 12.5, weight: .medium))
@@ -272,7 +272,7 @@ private struct ComponentRow: View {
                 if stack.downloads[id] != nil {
                     Button(L("Batal")) { stack.cancelInstall(id) }.buttonStyle(SecondaryButtonStyle())
                 } else if c.state == .notInstalled {
-                    Button { stack.install(id) } label: { Label(L("Unduh"), systemImage: "arrow.down") }
+                    Button { stack.install(id) } label: { PhosphorLabel(sf: "arrow.down", text: L("Unduh"), size: 12) }
                         .buttonStyle(SecondaryButtonStyle())
                         .disabled(!c.available)
                 }
@@ -293,11 +293,9 @@ private struct WebCard: View {
         let running = svc?.running == true
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 14) {
-                Image(systemName: "globe")
-                    .font(.system(size: 22, weight: .semibold)).foregroundStyle(.black.opacity(0.72))
+                PhosphorIcon(sf: "globe", size: 22).foregroundStyle(.black.opacity(0.72))
                     .frame(width: 48, height: 48)
-                    .background(LinearGradient(colors: [Color(hex: "#3FD0B4"), Color(hex: "#5B9CF5")], startPoint: .topLeading, endPoint: .bottomTrailing),
-                                in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                    .background(Theme.accent, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 10) {
                         Text(L("Web server")).font(.system(size: 18, weight: .bold))
@@ -308,13 +306,13 @@ private struct WebCard: View {
                 }
                 Spacer()
                 if running {
-                    Button { NSWorkspace.shared.open(stack.webURL) } label: { Label(L("Buka di browser"), systemImage: "safari") }
+                    Button { NSWorkspace.shared.open(stack.webURL) } label: { PhosphorLabel(sf: "safari", text: L("Buka di browser"), size: 12) }
                         .buttonStyle(SecondaryButtonStyle())
                 }
                 Menu {
                     Button(L("Lihat log")) { showLog = "web" }
                     Button(L("Buka folder proyek")) { NSWorkspace.shared.open(URL(fileURLWithPath: stack.settings.docRoot)) }
-                } label: { Image(systemName: "ellipsis").frame(width: 26, height: 26) }
+                } label: { PhosphorIcon(sf: "ellipsis", size: 14).frame(width: 26, height: 26) }
                     .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
                 PowerButton(running: running, busy: stack.busy.contains("web"), enabled: svc?.missing.isEmpty == true) {
                     Task { await stack.toggle("web") }
@@ -355,7 +353,7 @@ private struct WebCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             if let e = svc?.error, !running {
-                Label(e, systemImage: "exclamationmark.circle").font(.system(size: 11.5)).foregroundStyle(.orange).lineLimit(2)
+                PhosphorLabel(sf: "exclamationmark.circle", text: e, size: 12).font(.system(size: 11.5)).foregroundStyle(.orange).lineLimit(2)
             }
         }
         .padding(18)
@@ -411,8 +409,7 @@ private struct LocalDbCard: View {
         let installed = comp.map { $0.state != .notInstalled && $0.state != .installing } ?? false
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                Image(systemName: kind.icon)
-                    .font(.system(size: 17, weight: .semibold)).foregroundStyle(.white)
+                PhosphorIcon(sf: kind.icon, size: 17).foregroundStyle(.white)
                     .frame(width: 40, height: 40)
                     .background(Color(hex: kind.color), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
@@ -427,7 +424,7 @@ private struct LocalDbCard: View {
                         Divider()
                         Button(L("Hapus program…"), role: .destructive) { confirmRemove = true }.disabled(running)
                     }
-                } label: { Image(systemName: "ellipsis").frame(width: 24, height: 24) }
+                } label: { PhosphorIcon(sf: "ellipsis", size: 13).frame(width: 24, height: 24) }
                     .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
             }
 
@@ -445,13 +442,13 @@ private struct LocalDbCard: View {
                 Text(verbatim: "127.0.0.1:\(String(svc?.port ?? 0)) · \(kind.note)").font(.system(size: 11)).foregroundStyle(.tertiary)
                 if running {
                     Button { Task { await openInDatabase(port: svc?.port ?? 0) } } label: {
-                        Label(L("Buka di Database"), systemImage: "tablecells").frame(maxWidth: .infinity)
+                        PhosphorLabel(sf: "tablecells", text: L("Buka di Database"), size: 12).frame(maxWidth: .infinity)
                     }
                     .buttonStyle(SecondaryButtonStyle())
                 }
             }
             if let e = svc?.error, !running {
-                Label(e, systemImage: "exclamationmark.circle").font(.system(size: 11)).foregroundStyle(.orange).lineLimit(3)
+                PhosphorLabel(sf: "exclamationmark.circle", text: e, size: 12).font(.system(size: 11)).foregroundStyle(.orange).lineLimit(3)
             }
         }
         .padding(16)
@@ -499,7 +496,7 @@ private struct LogSheet: View {
             HStack {
                 Text(L("Log {}", service == "web" ? "web server" : service)).font(.title3.bold())
                 Spacer()
-                Button { text = model.stack.log(service) } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(SecondaryButtonStyle())
+                Button { text = model.stack.log(service) } label: { PhosphorIcon(sf: "arrow.clockwise", size: 13) }.buttonStyle(SecondaryButtonStyle())
             }
             ScrollView {
                 Text(text.isEmpty ? L("Belum ada log.") : text)

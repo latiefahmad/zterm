@@ -31,7 +31,7 @@ struct DbConnectionList: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 PageHeader(title: "Database", subtitle: L("PostgreSQL, MySQL, MariaDB, SQL Server, SQLite, Redis, MongoDB, ClickHouse & lainnya")) {
-                    Button { picking = true } label: { Label(L("Koneksi Baru"), systemImage: "plus") }
+                    Button { picking = true } label: { PhosphorLabel(sf: "plus", text: L("Koneksi Baru"), size: 12) }
                         .buttonStyle(PrimaryButtonStyle())
                 }
                 if model.databases.isEmpty {
@@ -73,9 +73,8 @@ struct EngineBadge: View {
             .font(.system(size: size * 0.36, weight: .heavy, design: .rounded))
             .foregroundStyle(.white)
             .frame(width: size, height: size)
-            .background(Color(hex: preset.color).gradient, in: RoundedRectangle(cornerRadius: size * 0.26, style: .continuous))
+            .background(Color(hex: preset.color), in: RoundedRectangle(cornerRadius: size * 0.26, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: size * 0.26, style: .continuous).strokeBorder(.white.opacity(0.2)))
-            .shadow(color: Color(hex: preset.color).opacity(0.35), radius: 6, y: 2)
     }
 }
 
@@ -163,7 +162,7 @@ struct DbCard: View {
                     Spacer(minLength: 0)
                 }
                 Button { Task { await model.openDatabase(db) } } label: {
-                    Label(L("Buka"), systemImage: "bolt.fill").frame(maxWidth: .infinity)
+                    PhosphorLabel(sf: "bolt.fill", text: L("Buka"), size: 12).frame(maxWidth: .infinity)
                 }
                 .buttonStyle(PrimaryButtonStyle(wide: true))
             }
@@ -235,7 +234,7 @@ struct DbEditor: View {
             }
 
             if let testResult {
-                Label(testResult, systemImage: testOK ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                PhosphorLabel(sf: testOK ? "checkmark.circle.fill" : "exclamationmark.triangle.fill", text: testResult, size: 12)
                     .font(.callout)
                     .foregroundStyle(testOK ? Color(hex: "#4ADE80") : .orange)
                     .lineLimit(3)
@@ -247,7 +246,7 @@ struct DbEditor: View {
                     Task { await test() }
                 } label: {
                     HStack(spacing: 6) {
-                        if testing { ProgressView().controlSize(.small) } else { Image(systemName: "bolt.horizontal") }
+                        if testing { ProgressView().controlSize(.small) } else { PhosphorIcon(sf: "bolt.horizontal", size: 13) }
                         Text(L("Tes koneksi"))
                     }
                 }
@@ -256,7 +255,7 @@ struct DbEditor: View {
                 Spacer()
                 Button(L("Batal")) { dismiss() }.buttonStyle(SecondaryButtonStyle()).keyboardShortcut(.cancelAction)
                 Button(L("Simpan")) { save(open: false) }.buttonStyle(SecondaryButtonStyle())
-                Button { save(open: true) } label: { Label(L("Simpan & Buka"), systemImage: "bolt.fill") }
+                Button { save(open: true) } label: { PhosphorLabel(sf: "bolt.fill", text: L("Simpan & Buka"), size: 12) }
                     .buttonStyle(PrimaryButtonStyle())
                     .keyboardShortcut(.defaultAction)
             }
@@ -319,14 +318,14 @@ struct DbWorkspaceView: View {
             switch ws.status {
             case .connecting:
                 VStack(spacing: 14) {
-                    EngineBadge(preset: preset, size: 56).symbolEffect(.pulse)
+                    EngineBadge(preset: preset, size: 56)
                     ProgressView().controlSize(.small)
                     Text(L("Menyambung ke {}…", ws.conn.title)).foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .failed(let msg):
                 VStack(spacing: 12) {
-                    Image(systemName: "bolt.horizontal.circle").font(.system(size: 40)).foregroundStyle(.orange)
+                    PhosphorIcon(sf: "bolt.horizontal.circle", size: 40).foregroundStyle(.orange)
                     Text(L("Gagal tersambung")).font(.title3.bold())
                     Text(msg).foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 480).textSelection(.enabled)
                     HStack {
@@ -387,17 +386,17 @@ struct DbWorkspaceView: View {
     private var breadcrumb: some View {
         HStack(spacing: 6) {
             Button { withAnimation(.zterm) { ws.selectedDb = nil; ws.selectedTable = nil; ws.tab = .overview } } label: {
-                Label(L("Server"), systemImage: "server.rack")
+                PhosphorLabel(sf: "server.rack", text: L("Server"), size: 12)
             }
             .buttonStyle(.plain)
             if let db = ws.selectedDb {
-                Image(systemName: "chevron.right").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary)
-                Button { Task { await ws.selectDatabase(db) } } label: { Label(db, systemImage: "cylinder") }
+                PhosphorIcon(sf: "chevron.right", size: 9).foregroundStyle(.tertiary)
+                Button { Task { await ws.selectDatabase(db) } } label: { PhosphorLabel(sf: "cylinder", text: db, size: 12) }
                     .buttonStyle(.plain)
             }
             if let t = ws.selectedTable {
-                Image(systemName: "chevron.right").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary)
-                Label(t.name, systemImage: t.isView ? "eye" : "tablecells").foregroundStyle(.primary)
+                PhosphorIcon(sf: "chevron.right", size: 9).foregroundStyle(.tertiary)
+                PhosphorLabel(sf: t.isView ? "eye" : "tablecells", text: t.name, size: 12).foregroundStyle(.primary)
                     .transition(.opacity.combined(with: .move(edge: .leading)))
             }
             Spacer()
@@ -415,7 +414,7 @@ struct DbWorkspaceView: View {
                     withAnimation(.ztermSnappy) { ws.tab = t }
                     Task { await ws.loadTab() }
                 } label: {
-                    Label(t.title, systemImage: t.icon)
+                    PhosphorLabel(sf: t.icon, text: t.title, size: 12)
                         .font(.system(size: 12.5, weight: ws.tab == t ? .semibold : .regular))
                         .padding(.horizontal, 12).padding(.vertical, 7)
                         .foregroundStyle(ws.tab == t ? .primary : .secondary)
@@ -427,7 +426,7 @@ struct DbWorkspaceView: View {
             }
             Spacer()
             if let r = ws.shownResult, !r.columns.isEmpty {
-                Button { ws.exportCSV() } label: { Label(L("Ekspor CSV"), systemImage: "square.and.arrow.down") }
+                Button { ws.exportCSV() } label: { PhosphorLabel(sf: "square.and.arrow.down", text: L("Ekspor CSV"), size: 12) }
                     .buttonStyle(SecondaryButtonStyle())
             }
         }
@@ -475,12 +474,12 @@ struct DbWorkspaceView: View {
     private var browseBar: some View {
         HStack(spacing: 10) {
             HStack(spacing: 6) {
-                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                PhosphorIcon(sf: "magnifyingglass", size: 13).foregroundStyle(.secondary)
                 TextField(L("Cari di tabel ini (semua kolom)"), text: $ws.quickSearch)
                     .textFieldStyle(.plain)
                     .onSubmit { Task { await ws.submitQuickSearch() } }
                 if !ws.quickSearch.isEmpty {
-                    Button { Task { await ws.clearFilters() } } label: { Image(systemName: "xmark.circle.fill") }
+                    Button { Task { await ws.clearFilters() } } label: { PhosphorIcon(sf: "xmark.circle.fill", size: 13) }
                         .buttonStyle(.plain).foregroundStyle(.secondary).help(L("Hapus pencarian"))
                 }
             }
@@ -491,7 +490,7 @@ struct DbWorkspaceView: View {
             .frame(maxWidth: 320)
             if ws.isFiltered {
                 HStack(spacing: 6) {
-                    Image(systemName: "line.3.horizontal.decrease.circle.fill").foregroundStyle(Theme.accent)
+                    PhosphorIcon(sf: "line.3.horizontal.decrease.circle.fill", size: 13).foregroundStyle(Theme.accent)
                     Text(ws.filterSummary).lineLimit(1).truncationMode(.tail)
                     Button(L("Hapus filter")) { Task { await ws.clearFilters() } }
                         .buttonStyle(.plain).foregroundStyle(Theme.accent)
@@ -503,7 +502,7 @@ struct DbWorkspaceView: View {
             Button {
                 withAnimation(.ztermSnappy) { ws.tab = .search }
                 Task { await ws.loadTab() }
-            } label: { Label(L("Cari per kolom"), systemImage: "slider.horizontal.3") }
+            } label: { PhosphorLabel(sf: "slider.horizontal.3", text: L("Cari per kolom"), size: 12) }
             .buttonStyle(.plain).font(.system(size: 12)).foregroundStyle(.secondary)
         }
         .padding(.horizontal, 12).padding(.vertical, 7)
@@ -584,7 +583,7 @@ struct DbWorkspaceView: View {
 
     @ViewBuilder private var errorBar: some View {
         if let e = ws.error {
-            Label(e, systemImage: "exclamationmark.triangle.fill")
+            PhosphorLabel(sf: "exclamationmark.triangle.fill", text: e, size: 12)
                 .font(.system(size: 12)).foregroundStyle(.orange).lineLimit(3).textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 12).padding(.vertical, 8)
@@ -614,11 +613,11 @@ struct DbWorkspaceView: View {
                         ForEach(ws.history, id: \.self) { q in
                             Button(String(q.prefix(80))) { ws.query = q }
                         }
-                    } label: { Label(L("Riwayat"), systemImage: "clock.arrow.circlepath") }
+                    } label: { PhosphorLabel(sf: "clock.arrow.circlepath", text: L("Riwayat"), size: 12) }
                     .menuStyle(.borderlessButton).fixedSize()
                 }
                 if let db = ws.activeDatabase {
-                    Label(db, systemImage: "cylinder").font(.caption).foregroundStyle(.secondary)
+                    PhosphorLabel(sf: "cylinder", text: db, size: 12).font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Text(ws.conn.engine.isSQL ? L("⌘⏎ untuk menjalankan") : L("Satu perintah per baris"))
@@ -627,7 +626,7 @@ struct DbWorkspaceView: View {
                     Task { await ws.run() }
                 } label: {
                     HStack(spacing: 6) {
-                        if ws.running { ProgressView().controlSize(.small).tint(.black) } else { Image(systemName: "play.fill") }
+                        if ws.running { ProgressView().controlSize(.small).tint(.black) } else { PhosphorIcon(sf: "play.fill", size: 12) }
                         Text(L("Jalankan"))
                     }
                 }
@@ -644,7 +643,7 @@ struct DbWorkspaceView: View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
                 if let e = ws.error {
-                    Label(e, systemImage: "exclamationmark.triangle.fill")
+                    PhosphorLabel(sf: "exclamationmark.triangle.fill", text: e, size: 12)
                         .font(.system(size: 12)).foregroundStyle(.orange).lineLimit(2).textSelection(.enabled)
                 } else if let r = ws.result {
                     Text(r.columns.isEmpty
@@ -685,8 +684,7 @@ private struct DbSearchForm: View {
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
-                        Label(L("Kueri dengan contoh — isi kolom yang ingin dicari, kosongkan sisanya. Wildcard: %"),
-                              systemImage: "magnifyingglass")
+                        PhosphorLabel(sf: "magnifyingglass", text: L("Kueri dengan contoh — isi kolom yang ingin dicari, kosongkan sisanya. Wildcard: %"), size: 12)
                             .font(.system(size: 12.5)).foregroundStyle(.secondary)
                         VStack(spacing: 0) {
                             row(header: true, Text(L("Kolom")), Text(L("Jenis")), Text(L("Operator")), Text(L("Nilai")))
@@ -716,7 +714,7 @@ private struct DbSearchForm: View {
                     Spacer()
                     Button(L("Reset")) { for i in ws.searchForm.indices { ws.searchForm[i].value = "" } }
                         .buttonStyle(SecondaryButtonStyle())
-                    Button { Task { await ws.submitSearch() } } label: { Label(L("Kirim"), systemImage: "magnifyingglass") }
+                    Button { Task { await ws.submitSearch() } } label: { PhosphorLabel(sf: "magnifyingglass", text: L("Kirim"), size: 12) }
                         .buttonStyle(PrimaryButtonStyle())
                         .keyboardShortcut(.return, modifiers: .command)
                 }
@@ -761,10 +759,10 @@ private struct DbTree: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 6) {
-                Image(systemName: "magnifyingglass").foregroundStyle(.secondary).font(.caption)
+                PhosphorIcon(sf: "magnifyingglass", size: 12).foregroundStyle(.secondary)
                 TextField(ws.conn.engine == .redis ? L("Cari key…") : L("Cari tabel…"), text: $filter).textFieldStyle(.plain).font(.system(size: 12))
                 if !filter.isEmpty {
-                    Button { filter = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.tertiary) }.buttonStyle(.plain)
+                    Button { filter = "" } label: { PhosphorIcon(sf: "xmark.circle.fill", size: 12).foregroundStyle(.tertiary) }.buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 9).frame(height: 28)
@@ -781,7 +779,7 @@ private struct DbTree: View {
                             withAnimation(.ztermSnappy) { ws.showSystem.toggle() }
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "chevron.right").font(.system(size: 9, weight: .bold))
+                                PhosphorIcon(sf: "chevron.right", size: 9)
                                     .rotationEffect(.degrees(ws.showSystem ? 90 : 0))
                                 Text(L("SISTEM")).tracking(1.2)
                                 Text("\(ws.systemDatabases.count)").padding(.horizontal, 5).background(Theme.ink.opacity(0.08), in: Capsule())
@@ -854,7 +852,7 @@ private struct DbNodeRow: View {
             Button(action: onToggle) {
                 Group {
                     if loading { ProgressView().controlSize(.mini) }
-                    else { Image(systemName: "chevron.right").font(.system(size: 9, weight: .bold)).rotationEffect(.degrees(open ? 90 : 0)) }
+                    else { PhosphorIcon(sf: "chevron.right", size: 9).rotationEffect(.degrees(open ? 90 : 0)) }
                 }
                 .frame(width: 14, height: 22)
                 .contentShape(Rectangle())
@@ -864,8 +862,7 @@ private struct DbNodeRow: View {
 
             Button(action: onSelect) {
                 HStack(spacing: 7) {
-                    Image(systemName: open ? "cylinder.split.1x2.fill" : "cylinder.split.1x2")
-                        .font(.system(size: 11.5))
+                    PhosphorIcon(sf: open ? "cylinder.split.1x2.fill" : "cylinder.split.1x2", size: 11.5)
                         .foregroundStyle(system ? AnyShapeStyle(.tertiary) : AnyShapeStyle(Theme.accent))
                     Text(name).font(.system(size: 12.5, weight: active ? .semibold : .regular)).lineLimit(1).truncationMode(.middle)
                         .foregroundStyle(system ? .secondary : .primary)
@@ -901,7 +898,7 @@ struct TableRow: View {
     var body: some View {
         Button(action: onOpen) {
             HStack(spacing: 8) {
-                Image(systemName: icon).font(.system(size: 11)).foregroundStyle(table.isView ? Theme.accent3 : Theme.accent2).frame(width: 14)
+                PhosphorIcon(sf: icon, size: 11).foregroundStyle(table.isView ? Theme.accent3 : Theme.accent2).frame(width: 14)
                 Text(table.name).font(.system(size: 12)).lineLimit(1).truncationMode(.middle)
                 Spacer(minLength: 0)
                 if engine == .postgres || engine == .sqlserver, !["public", "dbo"].contains(table.schema) {
@@ -952,7 +949,7 @@ private struct DbOverview: View {
                      L("ukuran"), "internaldrive", Color(hex: "#F59E0B"))
                 Spacer()
                 HStack(spacing: 6) {
-                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary).font(.caption)
+                    PhosphorIcon(sf: "magnifyingglass", size: 12).foregroundStyle(.secondary)
                     TextField(L("Filter tabel"), text: $filter).textFieldStyle(.plain).font(.system(size: 12))
                 }
                 .padding(.horizontal, 9).frame(width: 200, height: 28)
@@ -990,7 +987,7 @@ private struct DbOverview: View {
 
     private func stat(_ value: String, _ label: String, _ icon: String, _ tint: Color) -> some View {
         HStack(spacing: 8) {
-            Image(systemName: icon).foregroundStyle(tint)
+            PhosphorIcon(sf: icon, size: 13).foregroundStyle(tint)
             VStack(alignment: .leading, spacing: 0) {
                 Text(value).font(.system(size: 16, weight: .bold, design: .rounded)).contentTransition(.numericText())
                 Text(label).font(.system(size: 10.5)).foregroundStyle(.secondary)
@@ -1009,7 +1006,7 @@ private struct OverviewRow: View {
         Button(action: onOpen) {
             HStack(spacing: 0) {
                 HStack(spacing: 8) {
-                    Image(systemName: table.isView ? "eye" : "tablecells").foregroundStyle(table.isView ? Theme.accent3 : Theme.accent2)
+                    PhosphorIcon(sf: table.isView ? "eye" : "tablecells", size: 13).foregroundStyle(table.isView ? Theme.accent3 : Theme.accent2)
                     Text(table.name).lineLimit(1)
                     if hover {
                         Text(L("Telusuri →")).font(.system(size: 10.5, weight: .semibold)).foregroundStyle(Theme.accent)
@@ -1047,8 +1044,7 @@ private struct ServerOverview: View {
                     ForEach(Array(ws.userDatabases.enumerated()), id: \.element) { i, db in
                         Button { Task { await ws.selectDatabase(db) } } label: {
                             HStack(spacing: 10) {
-                                Image(systemName: "cylinder.split.1x2.fill").font(.system(size: 18))
-                                    .foregroundStyle(Theme.brandGradient)
+                                PhosphorIcon(sf: "cylinder.split.1x2.fill", size: 18, tint: Theme.accent)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(db).font(.system(size: 13.5, weight: .semibold)).lineLimit(1)
                                     Text(ws.dbTables[db].map { L("{} tabel", $0.count) } ?? L("Klik untuk membuka"))
@@ -1153,7 +1149,7 @@ struct ResultGrid: View {
         let color: Color = key == "PRI" ? Color(hex: "#F59E0B") : key == "UNI" ? Theme.accent3 : Theme.accent2
         HStack {
             if !key.isEmpty {
-                Label(key == "PRI" ? "PRIMARY" : key == "UNI" ? "UNIQUE" : key == "MUL" ? "INDEX" : key, systemImage: "key.fill")
+                PhosphorLabel(sf: "key.fill", text: key == "PRI" ? "PRIMARY" : key == "UNI" ? "UNIQUE" : key == "MUL" ? "INDEX" : key, size: 12)
                     .font(.system(size: 10, weight: .bold)).foregroundStyle(color)
                     .padding(.horizontal, 6).padding(.vertical, 2)
                     .background(color.opacity(0.14), in: Capsule())

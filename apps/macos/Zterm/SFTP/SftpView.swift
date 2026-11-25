@@ -38,7 +38,7 @@ struct SftpView: View {
         }
         .overlay(alignment: .bottom) {
             if let n = sftp.notice, sftp.error == nil {
-                Label(n, systemImage: "checkmark.circle.fill")
+                PhosphorLabel(sf: "checkmark.circle.fill", text: n, size: 12)
                     .font(.callout)
                     .padding(.horizontal, 14).padding(.vertical, 9)
                     .background(.ultraThickMaterial, in: Capsule())
@@ -47,7 +47,7 @@ struct SftpView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
             if let e = sftp.error {
-                Label(e, systemImage: "exclamationmark.triangle.fill")
+                PhosphorLabel(sf: "exclamationmark.triangle.fill", text: e, size: 12)
                     .font(.callout)
                     .padding(.horizontal, 14).padding(.vertical, 9)
                     .background(.ultraThickMaterial, in: Capsule())
@@ -87,13 +87,13 @@ struct SftpHeader: View {
                     Button(h.title) { Task { await model.openSftp(h) } }
                 }
             } label: {
-                Label(sftp.host == nil ? L("Pilih host") : L("Ganti host"), systemImage: "server.rack")
+                PhosphorLabel(sf: "server.rack", text: sftp.host == nil ? L("Pilih host") : L("Ganti host"), size: 12)
             }
             .menuStyle(.button)
             .fixedSize()
             .disabled(model.hosts.isEmpty)
             if sftp.status == .connected {
-                Button { Task { await sftp.disconnect() } } label: { Label(L("Putuskan"), systemImage: "xmark.circle") }
+                Button { Task { await sftp.disconnect() } } label: { PhosphorLabel(sf: "xmark.circle", text: L("Putuskan"), size: 12) }
                     .buttonStyle(SecondaryButtonStyle())
             }
         }
@@ -115,15 +115,15 @@ struct SftpPicker: View {
                         Button { Task { await model.openSftp(h) } } label: {
                             HStack(spacing: 10) {
                                 RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                    .fill(Color(hex: h.color).gradient)
-                                    .overlay(Image(systemName: "folder.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(.black.opacity(0.7)))
+                                    .fill(Color(hex: h.color))
+                                    .overlay(PhosphorIcon(sf: "folder.fill", size: 14).foregroundStyle(.black.opacity(0.7)))
                                     .frame(width: 34, height: 34)
                                 VStack(alignment: .leading, spacing: 1) {
                                     Text(h.title).font(.system(size: 13, weight: .semibold)).lineLimit(1)
                                     Text(h.displayAddress(hidden: true)).font(.system(size: 11, design: .monospaced)).foregroundStyle(.secondary)
                                 }
                                 Spacer()
-                                Image(systemName: "arrow.right.circle.fill").foregroundStyle(Color(hex: h.color))
+                                PhosphorIcon(sf: "arrow.right.circle.fill", size: 14).foregroundStyle(Color(hex: h.color))
                             }
                             .padding(12)
                             .contentShape(Rectangle())
@@ -152,7 +152,7 @@ struct SftpFailed: View {
     let message: String
     var body: some View {
         VStack(spacing: 14) {
-            Image(systemName: "bolt.horizontal.circle").font(.system(size: 40)).foregroundStyle(.orange)
+            PhosphorIcon(sf: "bolt.horizontal.circle", size: 40).foregroundStyle(.orange)
             Text(L("Tidak bisa membuka SFTP")).font(.title3.bold())
             Text(message).foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 440)
             HStack {
@@ -179,7 +179,7 @@ struct Breadcrumb: View {
             HStack(spacing: 2) {
                 Button("/") { onTap("/") }.buttonStyle(.plain)
                 ForEach(parts.indices, id: \.self) { i in
-                    Image(systemName: "chevron.right").font(.system(size: 8, weight: .bold)).foregroundStyle(.tertiary)
+                    PhosphorIcon(sf: "chevron.right", size: 8).foregroundStyle(.tertiary)
                     Button(parts[i]) { onTap("/" + parts[...i].joined(separator: "/")) }
                         .buttonStyle(.plain)
                         .foregroundStyle(i == parts.count - 1 ? .primary : .secondary)
@@ -228,10 +228,8 @@ struct TransferRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: transfer.kind == .upload ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                .font(.system(size: 18))
+            PhosphorIcon(sf: transfer.kind == .upload ? "arrow.up.circle.fill" : "arrow.down.circle.fill", size: 18)
                 .foregroundStyle(color)
-                .symbolEffect(.pulse, isActive: transfer.state == .running)
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(transfer.name).font(.system(size: 12, weight: .medium)).lineLimit(1)
@@ -246,7 +244,7 @@ struct TransferRow: View {
             if transfer.state == .running {
                 IconButton(symbol: "xmark", help: L("Batalkan"), action: onCancel)
             } else {
-                Image(systemName: icon).foregroundStyle(color).frame(width: 28)
+                PhosphorIcon(sf: icon, size: 15).foregroundStyle(color).frame(width: 28)
                     .transition(.scale.combined(with: .opacity))
             }
         }

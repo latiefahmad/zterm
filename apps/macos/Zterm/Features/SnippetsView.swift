@@ -17,11 +17,14 @@ struct SnippetsView: View {
             VStack(alignment: .leading, spacing: 22) {
                 PageHeader(title: "Snippets", subtitle: L("Perintah favorit — jalankan ke satu atau banyak host sekaligus")) {
                     SearchField(text: $query, prompt: L("Cari snippet…"))
-                    Button { editing = .blank() } label: { Label(L("Snippet Baru"), systemImage: "plus") }
+                    Button { editing = .blank() } label: {
+                        PhosphorLabel(text: L("Snippet Baru"), icon: "plus", size: 12,
+                                      tint: Color(hex: "#06231E"))
+                    }
                         .buttonStyle(PrimaryButtonStyle())
                 }
                 if model.snippets.isEmpty {
-                    EmptyState(icon: "curlybraces", title: L("Belum ada snippet"),
+                    EmptyState(ph: "brackets-curly", title: L("Belum ada snippet"),
                                text: L("Simpan perintah yang sering dipakai, misalnya cek disk atau restart service."))
                 } else {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 12)], spacing: 12) {
@@ -49,11 +52,12 @@ struct SnippetCard: View {
         HoverCard {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
-                    Image(systemName: "curlybraces")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.black.opacity(0.7))
-                        .frame(width: 34, height: 34)
-                        .background(Theme.brandGradient, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Theme.accent3.opacity(0.13))
+                        RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(Theme.accent3.opacity(0.24))
+                        PhosphorIcon(name: "brackets-curly", size: 15, tint: Theme.accent3)
+                    }
+                    .frame(width: 34, height: 34)
                     Text(snippet.label).font(.system(size: 14, weight: .semibold)).lineLimit(1)
                     Spacer()
                     IconButton(symbol: "pencil", help: L("Edit"), action: onEdit)
@@ -70,11 +74,14 @@ struct SnippetCard: View {
                     Spacer()
                     if model.activeSessionID != nil {
                         Button { model.runInActiveSession(snippet); model.flash(L("Dikirim ke tab aktif")) } label: {
-                            Label(L("Tab aktif"), systemImage: "terminal")
+                            PhosphorLabel(text: L("Tab aktif"), icon: "terminal-window", size: 12)
                         }
                         .buttonStyle(SecondaryButtonStyle())
                     }
-                    Button(action: onRun) { Label(L("Jalankan"), systemImage: "play.fill") }
+                    Button(action: onRun) {
+                        PhosphorLabel(text: L("Jalankan"), icon: "play", size: 12,
+                                      tint: Color(hex: "#06231E"))
+                    }
                         .buttonStyle(PrimaryButtonStyle())
                 }
             }
@@ -132,9 +139,8 @@ struct RunSnippetSheet: View {
                     ForEach(model.hosts) { h in
                         let on = picked.contains(h.id)
                         HStack(spacing: 10) {
-                            Image(systemName: on ? "checkmark.circle.fill" : "circle")
-                                .foregroundStyle(on ? Theme.accent : .secondary)
-                                .contentTransition(.symbolEffect(.replace))
+                            PhosphorIcon(name: on ? "check-circle" : "circle", size: 15,
+                                         tint: on ? Theme.accent : .secondary)
                             Circle().fill(Color(hex: h.color)).frame(width: 8, height: 8)
                             Text(h.title)
                             Spacer()
@@ -158,7 +164,10 @@ struct RunSnippetSheet: View {
                 Button {
                     model.connect(model.hosts.map(\.id).filter(picked.contains), run: snippet.command)
                     dismiss()
-                } label: { Label(L("Jalankan di {} host", picked.count), systemImage: "play.fill") }
+                } label: {
+                    PhosphorLabel(text: L("Jalankan di {} host", picked.count), icon: "play", size: 12,
+                                  tint: Color(hex: "#06231E"))
+                }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(picked.isEmpty)
             }

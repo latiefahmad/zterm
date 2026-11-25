@@ -9,13 +9,14 @@ struct ForwardingView: View {
             VStack(alignment: .leading, spacing: 22) {
                 PageHeader(title: "Port Forwarding", subtitle: L("Teruskan port lewat SSH: local, remote, atau proxy SOCKS")) {
                     Button { editing = .blank(hostId: model.hosts.first?.id ?? "") } label: {
-                        Label(L("Aturan Baru"), systemImage: "plus")
+                        PhosphorLabel(text: L("Aturan Baru"), icon: "plus", size: 12,
+                                      tint: Color(hex: "#06231E"))
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(model.hosts.isEmpty)
                 }
                 if model.forwards.isEmpty {
-                    EmptyState(icon: "arrow.right.arrow.left", title: L("Belum ada aturan"),
+                    EmptyState(ph: "arrows-left-right", title: L("Belum ada aturan"),
                                text: model.hosts.isEmpty ? L("Tambahkan host dulu, lalu buat aturan port forwarding.")
                                    : L("Contoh: buka database server di localhost:5433 lewat tunnel SSH."))
                 } else {
@@ -46,11 +47,11 @@ struct ForwardRow: View {
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(running ? AnyShapeStyle(Theme.brandGradient) : AnyShapeStyle(Theme.ink.opacity(0.08)))
-                    Image(systemName: forward.kind.icon)
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundStyle(running ? Color.black.opacity(0.7) : .secondary)
-                        .symbolEffect(.pulse, isActive: state == .starting)
+                        .fill(running ? Theme.accent.opacity(0.14) : Theme.ink.opacity(0.06))
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(running ? Theme.accent.opacity(0.28) : Theme.cardStroke)
+                    PhosphorIcon(name: forward.kind.phIcon, size: 16,
+                                 tint: running ? Theme.accent : .secondary)
                 }
                 .frame(width: 40, height: 40)
 
@@ -89,7 +90,7 @@ struct StatusPill: View {
         let (text, color): (String, Color) = switch state {
         case .none: (L("Mati"), .gray)
         case .starting: (L("Menghubungkan"), .yellow)
-        case .running: (L("Aktif"), Color(hex: "#4ADE80"))
+        case .running: (L("Aktif"), Theme.green)
         case .failed: (L("Gagal"), .orange)
         }
         HStack(spacing: 6) {
@@ -137,7 +138,7 @@ struct ForwardEditor: View {
                 TextField(L("Port"), value: $f.bindPort, format: .number.grouping(.never)).ztermField().frame(width: 90)
             }
             if f.kind != .dynamic {
-                Image(systemName: "arrow.down").foregroundStyle(.secondary).frame(maxWidth: .infinity)
+                PhosphorIcon(name: "arrow-down", size: 13, tint: .secondary).frame(maxWidth: .infinity)
                 HStack(spacing: 8) {
                     TextField(L("Host tujuan"), text: $f.destHost).ztermField()
                     TextField(L("Port"), value: $f.destPort, format: .number.grouping(.never)).ztermField().frame(width: 90)
@@ -166,7 +167,7 @@ extension PortForward {
 
 extension ForwardKind {
     var short: String { switch self { case .local: "LOCAL"; case .remote: "REMOTE"; case .dynamic: "SOCKS" } }
-    var icon: String { switch self { case .local: "arrow.right.circle"; case .remote: "arrow.left.circle"; case .dynamic: "globe" } }
+    var phIcon: String { switch self { case .local: "arrow-right"; case .remote: "arrow-left"; case .dynamic: "globe" } }
     var explanation: String {
         switch self {
         case .local: L("Port di Mac ini diteruskan ke tujuan yang bisa dijangkau server. Contoh: 127.0.0.1:5433 → localhost:5432 (database di server).")

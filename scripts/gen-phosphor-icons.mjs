@@ -43,6 +43,19 @@ const ICONS = [
   "circle-notch", "waveform", "graph", "chart-scatter", "rows", "columns",
   "square", "sign-in", "caret-up", "arrow-left", "arrow-right", "dot-outline",
   "minus", "trash", "pencil-simple", "plus-circle", "minus-circle",
+  // Halaman lain: navigasi, status, berkas, dan aksi
+  "caret-left", "caret-double-left", "caret-double-right", "caret-up-down",
+  "arrow-up-right", "arrow-circle-right", "arrow-line-down",
+  "file", "file-text", "file-zip", "file-arrow-up", "file-arrow-down",
+  "file-magnifying-glass", "file-pdf", "image", "film-strip", "music-notes",
+  "cloud-check", "cloud-warning", "envelope-open", "google-logo",
+  "user", "users", "user-plus", "user-minus", "folder", "folder-plus",
+  "dots-three-circle", "minus-square", "hourglass", "tray", "seal-check",
+  "warning-circle", "laptop", "power", "table", "cursor-text",
+  "text-strikethrough", "stop", "stop-circle", "check-square", "lock-open",
+  "password", "prohibit", "calendar", "list-checks", "arrow-circle-left",
+  "arrow-circle-down", "arrow-circle-up", "clipboard", "hash",
+  "arrow-counter-clockwise", "arrows-down-up", "arrow-u-up-left", "question",
 ];
 
 const seen = new Set();

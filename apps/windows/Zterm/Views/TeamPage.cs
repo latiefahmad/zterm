@@ -103,7 +103,7 @@ internal sealed class TeamPage : PageBase
     private static UIElement Step(int n, string title, string text) => Ui.Card(Ui.Col(6,
         new Border
         {
-            Width = 22, Height = 22, CornerRadius = new CornerRadius(11), Background = Theme.BrandGradient, HorizontalAlignment = HorizontalAlignment.Left,
+            Width = 22, Height = 22, CornerRadius = new CornerRadius(11), Background = Theme.AccentBrush, HorizontalAlignment = HorizontalAlignment.Left,
             Child = new TextBlock { Text = n.ToString(), FontSize = 12, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Foreground = Theme.Brush("#000000", 0.75) }
         },
         Ui.Text(title, 13, FontWeights.SemiBold), Ui.Secondary(text, 12, wrap: true)), 14);

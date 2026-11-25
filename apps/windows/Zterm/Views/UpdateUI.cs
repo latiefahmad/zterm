@@ -34,6 +34,6 @@ internal static class UpdateUI
         Minimum = 0, Maximum = 100,
         Value = Math.Clamp(model.UpdateProgress, 0, 1) * 100,
         Height = 4, CornerRadius = new CornerRadius(2),
-        Foreground = Theme.BrandGradient, Background = Theme.Ink(0.08),
+        Foreground = Theme.AccentBrush, Background = Theme.Ink(0.08),
     };
 }

@@ -132,3 +132,100 @@ internal static class Ph
         return b;
     }
 }
+
+/// <summary>
+/// Peta glyph Segoe lama (G.*) ke Phosphor. Dipakai selama migrasi halaman,
+/// supaya helper Ui.Icon/TintIcon/EmptyState otomatis memakai ikon baru.
+/// </summary>
+internal static class PhGlyph
+{
+    private static readonly Dictionary<string, string> Map = Build();
+
+    private static Dictionary<string, string> Build()
+    {
+        var m = new Dictionary<string, string>();
+        void Add(string glyph, string name) { if (!string.IsNullOrEmpty(glyph)) m.TryAdd(glyph, name); }
+        Add(G.Server, "hard-drives");
+        Add(G.Key, "key");
+        Add(G.Forward, "arrows-left-right");
+        Add(G.Folder, "folder");
+        Add(G.Database, "database");
+        Add(G.Code, "file-code");
+        Add(G.Fingerprint, "fingerprint");
+        Add(G.History, "arrow-counter-clockwise");
+        Add(G.Heart, "heart");
+        Add(G.Info, "info");
+        Add(G.Person, "user");
+        Add(G.Lock, "lock-simple");
+        Add(G.Search, "magnifying-glass");
+        Add(G.Add, "plus");
+        Add(G.Edit, "pencil-simple");
+        Add(G.Delete, "trash");
+        Add(G.Copy, "copy");
+        Add(G.Refresh, "arrows-clockwise");
+        Add(G.Play, "play");
+        Add(G.Bolt, "lightning");
+        Add(G.Eye, "eye");
+        Add(G.EyeOff, "eye-slash");
+        Add(G.Grid, "squares-four");
+        Add(G.List, "list-dashes");
+        Add(G.More, "dots-three");
+        Add(G.Close, "x");
+        Add(G.Upload, "upload-simple");
+        Add(G.Download, "download-simple");
+        Add(G.NewFolder, "folder-plus");
+        Add(G.Up, "arrow-up");
+        Add(G.Home, "house");
+        Add(G.Sync, "arrows-clockwise");
+        Add(G.Cloud, "cloud");
+        Add(G.Globe, "globe");
+        Add(G.Back, "arrow-left");
+        Add(G.Next, "arrow-right");
+        Add(G.Save, "floppy-disk");
+        Add(G.Terminal, "terminal-window");
+        Add(G.Table, "table");
+        Add(G.Check, "check");
+        Add(G.Warning, "warning");
+        Add(G.Sparkle, "sparkle");
+        Add(G.Sun, "sun");
+        Add(G.Moon, "moon");
+        Add(G.Contrast, "circle-half");
+        Add(G.Apps, "squares-four");
+        Add(G.Document, "file");
+        Add(G.Link, "link-simple");
+        Add(G.Link2, "link-simple");
+        Add(G.Bug, "bug");
+        Add(G.Chat, "chat-circle-dots");
+        Add(G.Hello, "sparkle");
+        Add(G.SignOut, "sign-out");
+        Add(G.Tag, "tag");
+        Add(G.Text, "file-text");
+        Add(G.Clock, "clock");
+        Add(G.Filter, "funnel");
+        Add(G.Export, "arrow-square-out");
+        Add(G.Structure, "tree-structure");
+        Add(G.First, "caret-double-left");
+        Add(G.Prev, "caret-left");
+        Add(G.NextPage, "caret-right");
+        Add(G.Last, "caret-double-right");
+        Add(G.ChevronDown, "caret-down");
+        Add(G.ChevronRight, "caret-right");
+        Add(G.Shield, "shield-check");
+        Add(G.Rename, "pencil-simple");
+        Add(G.Permissions, "key");
+        Add(G.Stop, "stop");
+        Add(G.People, "users");
+        Add(G.Stack, "stack");
+        Add(G.AddFriend, "user-plus");
+        Add(G.Mail, "envelope-simple");
+        Add(G.RemovePerson, "user-minus");
+        Add(G.Checklist, "list-checks");
+        Add(G.Gauge, "gauge");
+        Add(G.Wrench, "wrench");
+        Add(G.Settings, "gear-six");
+        return m;
+    }
+
+    public static string? Name(string? glyph) =>
+        glyph != null && Map.TryGetValue(glyph, out var name) ? name : null;
+}

@@ -13,29 +13,21 @@ struct KeychainView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                HStack(spacing: 10) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Keychain").font(.system(size: 26, weight: .bold, design: .rounded))
-                        Text(L("SSH key tersimpan terenkripsi di vault. Pakai di host lewat Credentials → SSH Key."))
-                            .font(.callout).foregroundStyle(.secondary)
+                PageHeader(title: "Keychain", subtitle: L("SSH key tersimpan terenkripsi di vault. Pakai di host lewat Credentials → SSH Key.")) {
+                    Button { sheet = .importKey } label: {
+                        PhosphorLabel(text: L("Import"), icon: "download-simple", size: 12)
                     }
-                    Spacer()
-                    Button { sheet = .importKey } label: { Label(L("Import"), systemImage: "square.and.arrow.down") }
-                        .buttonStyle(SecondaryButtonStyle())
-                    Button { sheet = .generate } label: { Label(L("Generate Key"), systemImage: "sparkles") }
-                        .buttonStyle(PrimaryButtonStyle())
+                    .buttonStyle(SecondaryButtonStyle())
+                    Button { sheet = .generate } label: {
+                        PhosphorLabel(text: L("Generate Key"), icon: "sparkle", size: 12,
+                                      tint: Color(hex: "#06231E"))
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
                 }
 
                 if model.keys.isEmpty {
-                    VStack(spacing: 14) {
-                        Image(systemName: "key.horizontal")
-                            .font(.system(size: 40, weight: .light))
-                            .foregroundStyle(Theme.brandGradient)
-                            .symbolEffect(.wiggle, options: .repeat(.periodic(delay: 2.5)))
-                        Text(L("Belum ada SSH key")).font(.title3.bold())
-                        Text(L("Generate key Ed25519 baru atau import dari ~/.ssh.")).foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity).padding(.top, 70)
+                    EmptyState(ph: "key", title: L("Belum ada SSH key"),
+                               text: L("Generate key Ed25519 baru atau import dari ~/.ssh."))
                 } else {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 320), spacing: 12)], spacing: 12) {
                         ForEach(Array(model.keys.enumerated()), id: \.element.id) { i, k in
@@ -70,8 +62,10 @@ struct KeyCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.brandGradient.opacity(0.9))
-                    Image(systemName: "key.fill").font(.system(size: 16, weight: .bold)).foregroundStyle(.black.opacity(0.7))
+                    RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.accent.opacity(0.14))
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(Theme.accent.opacity(0.26))
+                    PhosphorIcon(name: "key", size: 17, tint: Theme.accent)
                 }
                 .frame(width: 40, height: 40)
                 VStack(alignment: .leading, spacing: 3) {
@@ -91,7 +85,7 @@ struct KeyCard: View {
                             .background(Theme.accent.opacity(0.15), in: Capsule())
                             .foregroundStyle(Theme.accent)
                         if key.passphrase != nil {
-                            Image(systemName: "lock.fill").font(.system(size: 10)).foregroundStyle(.secondary)
+                            PhosphorIcon(name: "lock-simple", size: 11, tint: .secondary)
                         }
                         Text(usedBy == 0 ? L("Belum dipakai") : L("Dipakai {} host", usedBy))
                             .font(.caption).foregroundStyle(.secondary)
@@ -113,19 +107,19 @@ struct KeyCard: View {
                     withAnimation(.ztermSnappy) { copied = true }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation(.zterm) { copied = false } }
                 } label: {
-                    Label(copied ? L("Tersalin!") : L("Salin public key"), systemImage: copied ? "checkmark" : "doc.on.doc")
-                        .contentTransition(.symbolEffect(.replace))
+                    PhosphorLabel(text: copied ? L("Tersalin!") : L("Salin public key"),
+                                  icon: copied ? "check" : "copy", size: 12,
+                                  tint: copied ? Theme.accent : .primary)
                 }
                 .buttonStyle(SecondaryButtonStyle())
-                .tint(copied ? Theme.accent : nil)
                 Spacer()
                 IconButton(symbol: "pencil", help: L("Ganti nama")) { newLabel = key.label; renaming = true }
                 IconButton(symbol: "trash", help: L("Hapus"), tint: .red) { confirmDelete = true }
             }
         }
         .padding(14)
-        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(hover ? Theme.cardHover : Theme.card))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.ink.opacity(hover ? 0.14 : 0.08)))
+        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(hover ? Theme.cardHover : Theme.card))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(hover ? Theme.ink.opacity(0.16) : Theme.cardStroke))
         .offset(y: hover ? -1 : 0)
         .shadow(color: Theme.shadow.opacity(hover ? 1 : 0), radius: 12, y: 6)
         .animation(.ztermHover, value: hover)
@@ -148,10 +142,9 @@ struct GenerateKeySheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             if let k = result {
-                Label(L("Key berhasil dibuat"), systemImage: "checkmark.seal.fill")
+                PhosphorLabel(text: L("Key berhasil dibuat"), icon: "seal-check", size: 16,
+                              tint: Theme.accent)
                     .font(.title3.bold())
-                    .foregroundStyle(Theme.accent)
-                    .symbolEffect(.bounce, value: result?.id)
                 Text(LocalizedStringKey(L("Tambahkan public key ini ke `~/.ssh/authorized_keys` di server.")))
                     .font(.callout).foregroundStyle(.secondary)
                 Text(k.publicKey)
@@ -227,7 +220,9 @@ struct ImportKeySheet: View {
                 Text(error).font(.caption).foregroundStyle(.red).transition(.opacity)
             }
             HStack {
-                Button { pickFile() } label: { Label(L("Pilih file…"), systemImage: "folder") }
+                Button { pickFile() } label: {
+                    PhosphorLabel(text: L("Pilih file…"), icon: "folder", size: 12)
+                }
                     .buttonStyle(SecondaryButtonStyle())
                 Spacer()
                 Button(L("Batal")) { dismiss() }.buttonStyle(SecondaryButtonStyle())

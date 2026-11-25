@@ -117,7 +117,7 @@ struct LinkButton: View {
     let icon: String
     let url: URL
     var body: some View {
-        Button { NSWorkspace.shared.open(url) } label: { Label(title, systemImage: icon) }
+        Button { NSWorkspace.shared.open(url) } label: { PhosphorLabel(sf: icon, text: title, size: 12) }
             .buttonStyle(SecondaryButtonStyle())
     }
 }
@@ -129,9 +129,8 @@ struct UpdateStatus: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: model.update == nil ? "checkmark.seal.fill" : "arrow.down.circle.fill")
+            PhosphorIcon(sf: model.update == nil ? "checkmark.seal.fill" : "arrow.down.circle.fill", size: 15)
                 .foregroundStyle(model.update == nil ? Theme.accent : .orange)
-                .contentTransition(.symbolEffect(.replace))
             VStack(alignment: .leading, spacing: 3) {
                 Text(model.update.map { L("Versi {} tersedia", $0.version) } ?? L("Kamu memakai versi terbaru ({})", AppVersion.current))
                     .font(.callout)

@@ -48,9 +48,7 @@ struct EmptyState: View {
                 if let phosphor {
                     PhosphorIcon(name: phosphor, size: 30, tint: Theme.accent)
                 } else if let sfSymbol {
-                    Image(systemName: sfSymbol)
-                        .font(.system(size: 26, weight: .light))
-                        .foregroundStyle(Theme.accent)
+                    PhosphorIcon(sf: sfSymbol, size: 28, tint: Theme.accent)
                 }
             }
             Text(title).font(.system(size: 16, weight: .semibold))

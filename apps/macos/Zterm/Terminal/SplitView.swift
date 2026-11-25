@@ -36,7 +36,7 @@ struct TerminalPanes: View {
             .frame(width: geo.size.width, height: geo.size.height, alignment: .topLeading)
             .overlay(alignment: .bottom) {
                 if model.splitVisible && model.broadcast {
-                    Label(L("Broadcast aktif — ketikan dikirim ke {} terminal", model.splitIDs.count), systemImage: "dot.radiowaves.left.and.right")
+                    PhosphorLabel(sf: "dot.radiowaves.left.and.right", text: L("Broadcast aktif — ketikan dikirim ke {} terminal", model.splitIDs.count), size: 12)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.black.opacity(0.8))
                         .padding(.horizontal, 14).padding(.vertical, 7)
@@ -103,11 +103,11 @@ private struct PaneHeader: View {
             Circle().fill(Color(hex: session.host.color)).frame(width: 7, height: 7)
             Text(session.title).font(.system(size: 11.5, weight: focused ? .semibold : .regular)).lineLimit(1)
             if model.broadcast {
-                Image(systemName: "dot.radiowaves.left.and.right").font(.system(size: 10)).foregroundStyle(.orange)
+                PhosphorIcon(sf: "dot.radiowaves.left.and.right", size: 10).foregroundStyle(.orange)
             }
             Spacer()
             Button { model.removeFromSplit(session.id) } label: {
-                Image(systemName: "rectangle.badge.minus").font(.system(size: 11))
+                PhosphorIcon(sf: "rectangle.badge.minus", size: 11)
             }
             .buttonStyle(.plain).foregroundStyle(.secondary)
             .help(L("Keluarkan dari split (tab tetap terbuka)"))
@@ -130,7 +130,7 @@ struct SplitMenu: View {
     var body: some View {
         let others = model.sessions.filter { s in s.id != model.activeSessionID && !(model.splitVisible && model.splitIDs.contains(s.id)) }
         Menu {
-            Button { model.splitDuplicate() } label: { Label(L("Duplikat tab ini"), systemImage: "plus.square.on.square") }
+            Button { model.splitDuplicate() } label: { PhosphorLabel(sf: "plus.square.on.square", text: L("Duplikat tab ini"), size: 12) }
                 .keyboardShortcut("d")
                 .disabled(!model.canSplit)
             if !others.isEmpty {
@@ -151,7 +151,7 @@ struct SplitMenu: View {
                 Button(L("Keluar dari split")) { model.unsplit() }
             }
         } label: {
-            Label(model.splitVisible ? L("Split · {}", model.splitIDs.count) : L("Split"), systemImage: "rectangle.split.2x1")
+            PhosphorLabel(sf: "rectangle.split.2x1", text: model.splitVisible ? L("Split · {}", model.splitIDs.count) : L("Split"), size: 12)
         }
         .menuStyle(.borderlessButton)
         .fixedSize()

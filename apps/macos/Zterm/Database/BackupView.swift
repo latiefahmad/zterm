@@ -256,10 +256,10 @@ struct BackupSheet: View {
                     Spacer()
                     Button(L("Batalkan")) { backups.cancel(db.id) }.buttonStyle(SecondaryButtonStyle())
                 } else {
-                    Button { Task { await backups.backup(db, app: model) } } label: { Label(L("Backup sekarang"), systemImage: "externaldrive.badge.plus") }
+                    Button { Task { await backups.backup(db, app: model) } } label: { PhosphorLabel(sf: "externaldrive.badge.plus", text: L("Backup sekarang"), size: 12) }
                         .buttonStyle(PrimaryButtonStyle())
                     Button { NSWorkspace.shared.open(BackupModel.folder(db).deletingLastPathComponent().appendingPathComponent(BackupModel.folder(db).lastPathComponent)) } label: {
-                        Label(L("Buka folder"), systemImage: "folder")
+                        PhosphorLabel(sf: "folder", text: L("Buka folder"), size: 12)
                     }
                     .buttonStyle(SecondaryButtonStyle())
                     .disabled(items.isEmpty)
@@ -296,7 +296,7 @@ struct BackupSheet: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let e = sched.lastError {
-                    Label(L("Backup terakhir gagal: {}", e), systemImage: "exclamationmark.triangle").font(.caption).foregroundStyle(Color(hex: "#F0616D"))
+                    PhosphorLabel(sf: "exclamationmark.triangle", text: L("Backup terakhir gagal: {}", e), size: 12).font(.caption).foregroundStyle(Color(hex: "#F0616D"))
                 } else if let last = sched.last {
                     Text(L("Backup terakhir: {}", last.formatted(date: .abbreviated, time: .shortened))).font(.caption).foregroundStyle(.secondary)
                 }
@@ -337,7 +337,7 @@ struct BackupSheet: View {
 
     private func row(_ item: BackupModel.Item, busy: Bool) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: "doc.zipper").foregroundStyle(Theme.accent)
+            PhosphorIcon(sf: "doc.zipper", size: 13).foregroundStyle(Theme.accent)
             VStack(alignment: .leading, spacing: 1) {
                 Text(item.date.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 12.5, weight: .semibold))
                 Text(item.name).font(.system(size: 11, design: .monospaced)).foregroundStyle(.secondary).lineLimit(1)

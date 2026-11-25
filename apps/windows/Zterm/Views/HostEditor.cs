@@ -121,14 +121,21 @@ internal sealed class HostEditor : Grid
     {
         var icon = new Border
         {
-            Width = 44, Height = 44, CornerRadius = new CornerRadius(10), Background = Theme.TintGradient(_h.Color),
-            Child = new FontIcon { Glyph = G.Server, FontSize = 17, Foreground = Theme.Brush("#000000", 0.7) }
+            Width = 44, Height = 44, CornerRadius = new CornerRadius(10),
+            Background = Theme.Brush(_h.Color, 0.14),
+            BorderBrush = Theme.Brush(_h.Color, 0.28), BorderThickness = new Thickness(1),
+            Child = Ph.Icon("hard-drives", 18, Theme.Brush(_h.Color))
         };
         var host = Ui.Field(L.T("IP atau hostname"), _h.Hostname, mono: true);
         host.TextChanged += (_, _) => { _h = _h with { Hostname = host.Text }; UpdateCanSave(); };
         if (IsNew) host.Loaded += (_, _) => host.Focus(FocusState.Programmatic);
         var card = EditorCard("Address", Ui.Columns("Auto,*", 10, icon, host));
-        _colorChanged += () => icon.Background = Theme.TintGradient(_h.Color);
+        _colorChanged += () =>
+        {
+            icon.Background = Theme.Brush(_h.Color, 0.14);
+            icon.BorderBrush = Theme.Brush(_h.Color, 0.28);
+            icon.Child = Ph.Icon("hard-drives", 18, Theme.Brush(_h.Color));
+        };
         return card;
     }
 
@@ -159,7 +166,12 @@ internal sealed class HostEditor : Grid
         {
             CornerRadius = new CornerRadius(12), Padding = new Thickness(12), Background = Theme.Card, BorderBrush = Theme.Brush(_h.Color, 0.5), BorderThickness = new Thickness(1),
             Child = Ui.Columns("Auto,*", 10,
-                new Border { Width = 34, Height = 34, CornerRadius = new CornerRadius(9), Background = Theme.TintGradient(_h.Color), Child = new FontIcon { Glyph = G.Server, FontSize = 13, Foreground = Theme.Brush("#000000", 0.7) } },
+                new Border
+                {
+                    Width = 34, Height = 34, CornerRadius = new CornerRadius(9),
+                    Background = Theme.Brush(_h.Color, 0.14), BorderBrush = Theme.Brush(_h.Color, 0.28),
+                    BorderThickness = new Thickness(1), Child = Ph.Icon("hard-drives", 14, Theme.Brush(_h.Color))
+                },
                 Ui.Col(1, Ui.Text(string.IsNullOrEmpty(_h.Label) ? (string.IsNullOrEmpty(_h.Hostname) ? L.T("Host baru") : _h.Hostname) : _h.Label, 13, FontWeights.SemiBold),
                     Ui.Text($"{_h.Username}@••••••••", 11, fg: Theme.Text2, mono: true)))
         };
@@ -169,9 +181,9 @@ internal sealed class HostEditor : Grid
             var active = string.Equals(_h.Color, c, StringComparison.OrdinalIgnoreCase);
             var dot = new Border
             {
-                Width = 26, Height = 26, CornerRadius = new CornerRadius(13), Background = Theme.TintGradient(c),
+                Width = 26, Height = 26, CornerRadius = new CornerRadius(13), Background = Theme.Brush(c, 0.9),
                 BorderBrush = Theme.Brush("#FFFFFF", active ? 0.9 : 0), BorderThickness = new Thickness(2),
-                Child = active ? new FontIcon { Glyph = G.Check, FontSize = 10, Foreground = Theme.Brush("#000000", 0.7) } : null
+                Child = active ? Ph.Icon("check", 11, Theme.Brush("#000000", 0.72)) : null
             };
             var col = c;
             var b = Ui.Plain(dot, () => SetColor(col), new Thickness(2));

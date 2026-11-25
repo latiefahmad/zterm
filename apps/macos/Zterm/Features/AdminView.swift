@@ -323,7 +323,7 @@ struct AdminView: View {
             VStack(alignment: .leading, spacing: 16) {
                 PageHeader(title: L("Kelola Server"), subtitle: L("Proses, service, cron, dan log server — tanpa hafal perintah")) {
                     if admin.connected {
-                        Button { Task { await admin.load() } } label: { Image(systemName: "arrow.clockwise") }
+                        Button { Task { await admin.load() } } label: { PhosphorIcon(sf: "arrow.clockwise", size: 13) }
                             .buttonStyle(SecondaryButtonStyle()).help(L("Muat ulang"))
                     }
                 }
@@ -347,14 +347,14 @@ struct AdminView: View {
                 Spacer()
             } else if let e = admin.error, !admin.connected {
                 VStack(spacing: 12) {
-                    Image(systemName: "bolt.horizontal.circle").font(.largeTitle).foregroundStyle(Color(hex: "#F0616D"))
+                    PhosphorIcon(sf: "bolt.horizontal.circle", size: 34).foregroundStyle(Color(hex: "#F0616D"))
                     Text(e).foregroundStyle(.secondary).multilineTextAlignment(.center).textSelection(.enabled).frame(maxWidth: 460)
                     Button(L("Coba lagi")) { Task { await admin.select(admin.targetId, model: model) } }.buttonStyle(SecondaryButtonStyle())
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if admin.connected {
                 if let s = admin.system, !s.isRoot, !s.sudo {
-                    Label(L("User {} tanpa sudo: bisa melihat, tapi aksi yang butuh root (service, proses user lain, log sistem) akan ditolak.", s.user), systemImage: "lock.trianglebadge.exclamationmark")
+                    PhosphorLabel(sf: "lock.trianglebadge.exclamationmark", text: L("User {} tanpa sudo: bisa melihat, tapi aksi yang butuh root (service, proses user lain, log sistem) akan ditolak.", s.user), size: 12)
                         .font(.caption).foregroundStyle(Color(hex: "#F2A65A"))
                         .padding(.horizontal, 28).padding(.bottom, 10)
                 }
@@ -391,7 +391,7 @@ private struct HostPicker: View {
         let current = model.host(id: admin.targetId)
         Menu {
             ForEach(model.hosts) { h in
-                Button { Task { await admin.select(h.id, model: model) } } label: { Label(h.title, systemImage: "server.rack") }
+                Button { Task { await admin.select(h.id, model: model) } } label: { PhosphorLabel(sf: "server.rack", text: h.title, size: 12) }
             }
         } label: {
             HStack(spacing: 7) {
@@ -412,7 +412,7 @@ private struct SystemBadge: View {
     let system: AdminSystem
     var body: some View {
         HStack(spacing: 6) {
-            Image(systemName: system.isRoot ? "crown.fill" : system.sudo ? "key.fill" : "person.fill")
+            PhosphorIcon(sf: system.isRoot ? "crown.fill" : system.sudo ? "key.fill" : "person.fill", size: 13)
                 .foregroundStyle(system.isRoot || system.sudo ? Color(hex: "#4ADE80") : Color(hex: "#F2A65A"))
             Text(verbatim: "\(system.user) · \(system.isRoot ? "root" : system.sudo ? "sudo" : L("tanpa sudo"))")
             if !system.os.isEmpty { Text("· \(system.os)").foregroundStyle(.secondary) }
@@ -428,7 +428,7 @@ private struct TabPills: View {
         HStack(spacing: 2) {
             ForEach(AdminModel.Tab.allCases) { t in
                 Button { tab = t } label: {
-                    Label(t.title, systemImage: t.icon)
+                    PhosphorLabel(sf: t.icon, text: t.title, size: 12)
                         .font(.system(size: 12.5, weight: tab == t ? .semibold : .regular))
                         .padding(.horizontal, 12).padding(.vertical, 6)
                         .background(tab == t ? Theme.ink.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 8))
@@ -645,7 +645,7 @@ private struct ServiceDetail: View {
             HStack(spacing: 8) {
                 if s.enabled == "enabled" { action(L("Jangan jalan saat boot"), "power", "disable") }
                 else if s.enabled == "disabled" { action(L("Jalankan saat boot"), "power", "enable") }
-                Button { admin.showLogs(unit: s.name) } label: { Label(L("Lihat log"), systemImage: "doc.text.magnifyingglass") }
+                Button { admin.showLogs(unit: s.name) } label: { PhosphorLabel(sf: "doc.text.magnifyingglass", text: L("Lihat log"), size: 12) }
                     .buttonStyle(SecondaryButtonStyle())
             }
             .disabled(busy)
@@ -676,7 +676,7 @@ private struct ServiceDetail: View {
     @ViewBuilder private func action(_ title: String, _ icon: String, _ action: String, primary: Bool = false, danger: Bool = false) -> some View {
         let b = Button {
             if action == "stop", ["ssh", "sshd"].contains(service.name) { confirmStop = service.name } else { run(action) }
-        } label: { Label(title, systemImage: icon) }
+        } label: { PhosphorLabel(sf: icon, text: title, size: 12) }
         if primary { b.buttonStyle(PrimaryButtonStyle()) } else { b.buttonStyle(SecondaryButtonStyle()).foregroundStyle(danger ? Color(hex: "#F0616D") : .primary) }
     }
 }
@@ -698,7 +698,7 @@ private struct CronTab: View {
                     if admin.busy.contains("cron") { ProgressView().controlSize(.small) }
                     Spacer()
                     Button { editing = CronEdit(index: nil, job: CronJob(schedule: "0 2 * * *", command: "", enabled: true)) } label: {
-                        Label(L("Tambah jadwal"), systemImage: "plus")
+                        PhosphorLabel(sf: "plus", text: L("Tambah jadwal"), size: 12)
                     }
                     .buttonStyle(PrimaryButtonStyle())
                 }
@@ -800,7 +800,7 @@ private struct CronEditor: View {
                 }
                 TextField(L("menit jam tanggal bulan hari"), text: $edit.job.schedule)
                     .textFieldStyle(.roundedBorder).font(.system(size: 13, design: .monospaced))
-                Label(valid ? Lmsg(cronDescribe(schedule: edit.job.schedule)) : L("Format: menit jam tanggal bulan hari — mis. 30 2 * * 1-5"), systemImage: valid ? "clock" : "exclamationmark.triangle")
+                PhosphorLabel(sf: valid ? "clock" : "exclamationmark.triangle", text: valid ? Lmsg(cronDescribe(schedule: edit.job.schedule)) : L("Format: menit jam tanggal bulan hari — mis. 30 2 * * 1-5"), size: 12)
                     .font(.caption).foregroundStyle(valid ? Theme.accent : Color(hex: "#F2A65A"))
                 Text(L("Perintah")).font(.callout.weight(.semibold)).padding(.top, 6)
                 TextField(L("mis. /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1"), text: $edit.job.command)
@@ -850,7 +850,7 @@ private struct LogsTab: View {
             }
             HStack(spacing: 10) {
                 SearchField(text: $admin.logQuery, prompt: L("Saring baris…")).frame(maxWidth: 300)
-                Toggle(isOn: $admin.follow) { Label(L("Ikuti"), systemImage: "arrow.down.to.line") }
+                Toggle(isOn: $admin.follow) { PhosphorLabel(sf: "arrow.down.to.line", text: L("Ikuti"), size: 12) }
                     .toggleStyle(.button)
                     .help(L("Ambil baris baru tiap 2 detik"))
                 if admin.logViaSudo { Badge(text: "SUDO", color: Color(hex: "#F2A65A")) }
@@ -860,7 +860,7 @@ private struct LogsTab: View {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(lines.joined(separator: "\n"), forType: .string)
                     model.flash(L("{} baris log disalin", lines.count))
-                } label: { Image(systemName: "doc.on.doc") }
+                } label: { PhosphorIcon(sf: "doc.on.doc", size: 13) }
                 .buttonStyle(SecondaryButtonStyle()).help(L("Salin"))
             }
             if admin.sources.isEmpty {

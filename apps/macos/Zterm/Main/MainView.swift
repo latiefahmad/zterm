@@ -317,7 +317,7 @@ struct AccountFooter: View {
                 Button(L("Lihat profil")) { model.section = .account; model.showHome() }
                 Button(L("Kunci vault")) { model.lock() }
             } label: {
-                Image(systemName: "ellipsis.circle")
+                PhosphorIcon(name: "dots-three-circle", size: 16)
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
@@ -355,24 +355,23 @@ struct AccountFooter: View {
 /// Ikon status sync: berputar saat menyinkronkan, centang saat selesai.
 struct SyncIcon: View {
     let state: SyncState
+    var size: CGFloat = 12
+    var tint: Color = .black.opacity(0.75)
     @State private var spin = false
 
     var body: some View {
         Group {
             switch state {
-            case .off: Image(systemName: "person.fill")
-            case .idle, .synced: Image(systemName: "checkmark.icloud.fill")
+            case .off: PhosphorIcon(name: "user", size: size, tint: tint)
+            case .idle, .synced: PhosphorIcon(name: "cloud-check", size: size, tint: tint)
             case .syncing:
-                Image(systemName: "arrow.triangle.2.circlepath")
+                PhosphorIcon(name: "arrows-clockwise", size: size, tint: tint)
                     .rotationEffect(.degrees(spin ? 360 : 0))
                     .onAppear { withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) { spin = true } }
                     .onDisappear { spin = false }
-            case .failed, .needsLogin: Image(systemName: "exclamationmark.icloud.fill")
+            case .failed, .needsLogin: PhosphorIcon(name: "cloud-warning", size: size, tint: tint)
             }
         }
-        .font(.system(size: 12, weight: .bold))
-        .foregroundStyle(.black.opacity(0.75))
-        .contentTransition(.symbolEffect(.replace))
     }
 }
 
@@ -383,7 +382,7 @@ struct AppearanceMenu: View {
     var body: some View {
         Menu {
             Picker(L("Tampilan"), selection: $appearance) {
-                ForEach(AppearanceMode.allCases) { m in Label(m.title, systemImage: m.icon).tag(m) }
+                ForEach(AppearanceMode.allCases) { m in PhosphorLabel(sf: m.icon, text: m.title, size: 12).tag(m) }
             }
             .pickerStyle(.inline)
             Picker(LanguageSwitch.title, selection: LanguageSwitch.binding) {
@@ -391,8 +390,7 @@ struct AppearanceMenu: View {
             }
             .pickerStyle(.inline)
         } label: {
-            Image(systemName: appearance.icon)
-                .contentTransition(.symbolEffect(.replace))
+            PhosphorIcon(sf: appearance.icon, size: 15)
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
@@ -412,8 +410,7 @@ struct TabStrip: View {
         HStack(spacing: 6) {
 
             TabChip(isActive: model.activeSessionID == nil, ns: ns, onSelect: { model.showHome() }) {
-                Image(systemName: "square.grid.2x2.fill")
-                    .font(.system(size: 12))
+                PhosphorIcon(name: "squares-four", size: 13)
                     .frame(width: 18)
             }
             .help(L("Daftar host (⌘0)"))
@@ -430,20 +427,20 @@ struct TabStrip: View {
                 .padding(.vertical, 1)
             }
             Button { model.openLocalTerminal() } label: {
-                Image(systemName: "plus").font(.system(size: 11, weight: .semibold))
+                PhosphorIcon(name: "plus", size: 12, tint: .secondary)
                     .frame(width: 26, height: 26)
                     .background(Theme.ink.opacity(0.06), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
             .help(L("Terminal lokal (⇧⌘T)"))
             Spacer(minLength: 0)
             if let s = model.activeSession, !s.isLocal {
                 Button {
                     withAnimation(.zterm) { model.showServerInfo.toggle() }
                 } label: {
-                    Label(L("Info server"), systemImage: "cpu")
+                    PhosphorLabel(text: L("Info server"), icon: "cpu", size: 13,
+                                  tint: model.showServerInfo ? Theme.accent : .secondary)
                         .font(.system(size: 12, weight: model.showServerInfo ? .semibold : .regular))
                         .padding(.horizontal, 9).frame(height: 26)
                         .background(model.showServerInfo ? Theme.accent.opacity(0.16) : .clear, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
@@ -461,7 +458,8 @@ struct TabStrip: View {
             }
             if model.splitVisible {
                 Button { model.toggleBroadcast() } label: {
-                    Label(L("Broadcast"), systemImage: "dot.radiowaves.left.and.right")
+                    PhosphorLabel(text: L("Broadcast"), icon: "broadcast", size: 13,
+                                  tint: model.broadcast ? Color.orange : .secondary)
                         .font(.system(size: 12, weight: model.broadcast ? .semibold : .regular))
                         .padding(.horizontal, 9).frame(height: 26)
                         .background(model.broadcast ? Color.orange.opacity(0.18) : .clear, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
@@ -482,7 +480,7 @@ struct TabStrip: View {
                         Button(sn.label) { model.runInActiveSession(sn) }
                     }
                 } label: {
-                    Label(L("Snippet"), systemImage: "curlybraces")
+                    PhosphorLabel(text: L("Snippet"), icon: "brackets-curly", size: 13)
                 }
                 .menuStyle(.borderlessButton)
                 .fixedSize()
@@ -547,7 +545,7 @@ struct SessionTab: View {
                 onSelect: { model.activeSessionID = session.id }) {
             HStack(spacing: 7) {
                 if session.isLocal {
-                    Image(systemName: "apple.terminal").font(.system(size: 10.5, weight: .semibold)).foregroundStyle(.secondary)
+                    PhosphorIcon(name: "terminal-window", size: 12, tint: .secondary)
                 } else {
                     StatusDot(status: session.status, color: Color(hex: session.host.color))
                 }
@@ -558,7 +556,7 @@ struct SessionTab: View {
                 Button {
                     model.close(session)
                 } label: {
-                    Image(systemName: "xmark").font(.system(size: 9, weight: .bold))
+                    PhosphorIcon(name: "x", size: 9, tint: .secondary)
                         .frame(width: 16, height: 16)
                         .background(Theme.ink.opacity(hover ? 0.1 : 0), in: Circle())
                 }
@@ -610,13 +608,12 @@ struct UpdateCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                Image(systemName: "sparkles").foregroundStyle(Theme.brandGradient)
-                    .symbolEffect(.bounce, options: .repeat(.periodic(delay: 3)))
+                PhosphorIcon(name: "sparkle", size: 14, tint: Theme.accent)
                 Text(L("Versi {} tersedia", update.version)).font(.system(size: 12, weight: .semibold))
                 Spacer()
                 if !model.updateBusy {
                     Button { model.dismissUpdate() } label: {
-                        Image(systemName: "xmark").font(.system(size: 9, weight: .bold))
+                        PhosphorIcon(name: "x", size: 9, tint: .secondary)
                     }
                     .buttonStyle(.plain).foregroundStyle(.secondary)
                     .help(L("Nanti"))
@@ -658,8 +655,9 @@ struct AutocompleteMenu: View {
             Divider()
             Button(L("Hapus riwayat perintah ({})", CommandHistory.count), role: .destructive) { confirmClear = true }
         } label: {
-            Label(L("Autocomplete"), systemImage: enabled ? "text.cursor" : "text.badge.xmark")
-                .foregroundStyle(enabled ? Theme.accent : .secondary)
+            PhosphorLabel(sf: enabled ? "text.cursor" : "text.badge.xmark",
+                          text: L("Autocomplete"), size: 13,
+                          tint: enabled ? Theme.accent : .secondary)
         }
         .menuStyle(.borderlessButton)
         .fixedSize()

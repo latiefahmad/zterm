@@ -20,7 +20,7 @@ internal sealed class AdminPage : PageBase
     private readonly Border _banner = new() { Margin = new Thickness(28, 0, 28, 10) };
     private readonly Border _content = new() { Padding = new Thickness(28, 0, 28, 20) };
     private readonly StackPanel _actions;
-    private readonly AutoSuggestBox _procSearch, _svcSearch, _logSearch;
+    private readonly Grid _procSearch, _svcSearch, _logSearch;
     private StackPanel? _procList, _svcList;
     private RichTextBlock? _log;
     private ScrollViewer? _logScroll;

@@ -32,7 +32,7 @@ struct TerminalPane: View {
         .overlay(alignment: .bottom) {
             if case .disconnected(let code) = session.status {
                 HStack(spacing: 12) {
-                    Image(systemName: "bolt.horizontal.circle").foregroundStyle(.orange)
+                    PhosphorIcon(sf: "bolt.horizontal.circle", size: 14).foregroundStyle(.orange)
                     Text(code == 0 || session.isLocal ? L("Sesi selesai") : L("Koneksi terputus") + (code.map { L(" (kode {})", $0) } ?? ""))
                         .font(.callout.weight(.medium))
                     Button(session.isLocal ? L("Buka lagi") : L("Reconnect")) { session.reconnect() }.buttonStyle(PrimaryButtonStyle())
@@ -68,13 +68,10 @@ struct ConnectingOverlay: View {
                         .animation(.easeOut(duration: 1.8).repeatForever(autoreverses: false).delay(Double(i) * 0.6), value: t)
                 }
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(hex: host.color).gradient)
+                    .fill(Color(hex: host.color))
                     .frame(width: 64, height: 64)
-                    .shadow(color: Color(hex: host.color).opacity(0.6), radius: 20)
-                Image(systemName: "server.rack")
-                    .font(.system(size: 24, weight: .bold))
+                PhosphorIcon(sf: "server.rack", size: 24)
                     .foregroundStyle(.black.opacity(0.7))
-                    .symbolEffect(.pulse, options: .repeating)
             }
             .frame(height: 160)
 

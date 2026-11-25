@@ -25,8 +25,7 @@ internal sealed class OnboardingPage : Grid
             Center = new Point(0.3, 0.2), RadiusX = 0.9, RadiusY = 0.9,
             GradientStops =
             {
-                new GradientStop { Color = Theme.Hex(Theme.Accent, (byte)(App.Model.IsDark ? 40 : 30)), Offset = 0 },
-                new GradientStop { Color = Theme.Hex(Theme.Accent3, 18), Offset = 0.5 },
+                new GradientStop { Color = Theme.Hex(Theme.Accent, (byte)(App.Model.IsDark ? 30 : 24)), Offset = 0 },
                 new GradientStop { Color = Colors.Transparent, Offset = 1 },
             }
         };

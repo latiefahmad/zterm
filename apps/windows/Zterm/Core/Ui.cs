@@ -38,10 +38,11 @@ internal static class Ui
         Foreground = Theme.Text3, VerticalAlignment = VerticalAlignment.Center
     };
 
-    public static FontIcon Icon(string glyph, double size = 14, Brush? fg = null) => new()
+    public static FrameworkElement Icon(string glyph, double size = 14, Brush? fg = null)
     {
-        Glyph = glyph, FontSize = size, Foreground = fg ?? Theme.Text, VerticalAlignment = VerticalAlignment.Center
-    };
+        if (PhGlyph.Name(glyph) is { } name) return Ph.Icon(name, size, fg);
+        return new FontIcon { Glyph = glyph, FontSize = size, Foreground = fg ?? Theme.Text, VerticalAlignment = VerticalAlignment.Center };
+    }
 
     public static StackPanel Row(double spacing, params UIElement?[] kids)
     {
@@ -240,11 +241,22 @@ internal static class Ui
         NumberFormatter = new Windows.Globalization.NumberFormatting.DecimalFormatter { FractionDigits = 0, IsGrouped = false }
     };
 
-    public static AutoSuggestBox Search(string placeholder, string text, Action<string> changed, double width = 220)
+    public static Grid Search(string placeholder, string text, Action<string> changed, double width = 220)
     {
-        var s = new AutoSuggestBox { PlaceholderText = placeholder, Text = text, Width = width, QueryIcon = new SymbolIcon(Symbol.Find) };
-        s.TextChanged += (_, a) => { if (a.Reason == AutoSuggestionBoxTextChangeReason.UserInput) changed(s.Text); };
-        return s;
+        var box = new TextBox
+        {
+            PlaceholderText = placeholder, Text = text, Width = width,
+            Padding = new Thickness(10, 5, 30, 6), CornerRadius = new CornerRadius(8)
+        };
+        box.TextChanged += (_, _) => changed(box.Text);
+        var icon = Ph.Icon("magnifying-glass", 13, Theme.Text3);
+        icon.HorizontalAlignment = HorizontalAlignment.Right;
+        icon.Margin = new Thickness(0, 0, 10, 0);
+        icon.IsHitTestVisible = false;
+        var g = new Grid { Width = width };
+        g.Children.Add(box);
+        g.Children.Add(icon);
+        return g;
     }
 
     /// <summary>Header halaman: judul + subjudul di kiri, kontrol di kanan.</summary>
@@ -256,8 +268,13 @@ internal static class Ui
         return Columns("*,Auto", 16, left, right);
     }
 
-    public static UIElement EmptyState(string glyph, string title, string text, UIElement? action = null) =>
-        EmptyStateIcon(new FontIcon { Glyph = glyph, FontSize = 28, Foreground = Theme.Brush(Theme.Accent) }, title, text, action);
+    public static UIElement EmptyState(string glyph, string title, string text, UIElement? action = null)
+    {
+        var icon = PhGlyph.Name(glyph) is { } name
+            ? (UIElement)Ph.Icon(name, 30, Theme.Brush(Theme.Accent))
+            : new FontIcon { Glyph = glyph, FontSize = 28, Foreground = Theme.Brush(Theme.Accent) };
+        return EmptyStateIcon(icon, title, text, action);
+    }
 
     public static UIElement EmptyStateIcon(UIElement iconContent, string title, string text, UIElement? action = null)
     {
@@ -275,11 +292,17 @@ internal static class Ui
     }
 
     /// <summary>Ikon berkotak netral (bukan gradien) untuk menu dan daftar.</summary>
-    public static Border TintIcon(string glyph, string hex, double size = 24, double glyphSize = 12, double radius = 7) => new()
+    public static Border TintIcon(string glyph, string hex, double size = 24, double glyphSize = 12, double radius = 7)
     {
-        Width = size, Height = size, CornerRadius = new CornerRadius(radius), Background = Theme.Brush(hex, 0.12),
-        Child = new FontIcon { Glyph = glyph, FontSize = glyphSize, Foreground = Theme.Brush(hex) }
-    };
+        var icon = PhGlyph.Name(glyph) is { } name
+            ? (FrameworkElement)Ph.Icon(name, glyphSize, Theme.Brush(hex))
+            : new FontIcon { Glyph = glyph, FontSize = glyphSize, Foreground = Theme.Brush(hex) };
+        return new Border
+        {
+            Width = size, Height = size, CornerRadius = new CornerRadius(radius), Background = Theme.Brush(hex, 0.12),
+            Child = icon
+        };
+    }
 
     public static Border Avatar(string? name, string? email, double size)
     {
@@ -287,9 +310,9 @@ internal static class Ui
         var initial = s.Length > 0 ? s[..1].ToUpperInvariant() : "?";
         return new Border
         {
-            Width = size, Height = size, CornerRadius = new CornerRadius(size / 2), Background = email == null ? Theme.Ink(0.1) : Theme.BrandGradient,
+            Width = size, Height = size, CornerRadius = new CornerRadius(size / 2), Background = email == null ? Theme.Ink(0.1) : Theme.AccentBrush,
             Child = email == null
-                ? new FontIcon { Glyph = G.Person, FontSize = size * 0.45, Foreground = Theme.Text2 }
+                ? Ph.Icon("user", size * 0.45, Theme.Text2)
                 : new TextBlock { Text = initial, FontSize = size * 0.42, FontWeight = FontWeights.Bold, Foreground = new SolidColorBrush(Color.FromArgb(210, 0, 0, 0)), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }
         };
     }

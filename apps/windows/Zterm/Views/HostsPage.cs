@@ -139,9 +139,11 @@ internal sealed class HostsPage : PageBase
         var iconBox = new Border
         {
             Width = size, Height = size, CornerRadius = new CornerRadius(size * 0.28),
-            Background = selected ? Theme.BrandGradient : Theme.TintGradient(h.Color),
-            BorderBrush = Theme.Brush("#FFFFFF", 0.25), BorderThickness = new Thickness(1),
-            Child = new FontIcon { Glyph = selected ? G.Check : h.IsTeam() ? G.People : G.Server, FontSize = size * 0.38, Foreground = Theme.Brush("#000000", 0.72) }
+            Background = selected ? Theme.Brush(Theme.Accent, 0.16) : Theme.Brush(h.Color, 0.14),
+            BorderBrush = selected ? Theme.Brush(Theme.Accent, 0.4) : Theme.Brush(h.Color, 0.28),
+            BorderThickness = new Thickness(1),
+            Child = Ph.Icon(selected ? "check" : h.IsTeam() ? "users-three" : "hard-drives", size * 0.42,
+                            selected ? Theme.AccentBrush : Theme.Brush(h.Color))
         };
         var icon = new Grid { Width = size, Height = size, Children = { iconBox } };
         if (live)
@@ -279,7 +281,7 @@ internal sealed class HostsPage : PageBase
         if (M.Selection.Count == 0) { _selectionBar.Visibility = Visibility.Collapsed; return; }
         var count = new Border
         {
-            Background = Theme.BrandGradient, CornerRadius = new CornerRadius(11), Padding = new Thickness(8, 1, 8, 2),
+            Background = Theme.AccentBrush, CornerRadius = new CornerRadius(11), Padding = new Thickness(8, 1, 8, 2),
             Child = Ui.Text(M.Selection.Count.ToString(), 12, FontWeights.Bold, Theme.Brush("#000000", 0.8))
         };
         var row = Ui.Row(10, count, Ui.Text(L.T("host dipilih"), 13),

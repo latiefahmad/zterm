@@ -238,7 +238,7 @@ private struct ErrorBanner: View {
     let text: String
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+            PhosphorIcon(sf: "exclamationmark.triangle.fill", size: 15).foregroundStyle(.orange)
             Text(text).font(.callout).fixedSize(horizontal: false, vertical: true)
             Spacer()
             Button(L("Coba lagi")) { Task { await model.docker.select(model.docker.targetId, model: model) } }.buttonStyle(SecondaryButtonStyle())
@@ -295,7 +295,7 @@ private struct DockerSidebar: View {
             withAnimation(.ztermSnappy) { docker.tab = t }
         } label: {
             HStack(spacing: 9) {
-                Image(systemName: icon).font(.system(size: 13)).frame(width: 18).foregroundStyle(on ? dockerBlue : .secondary)
+                PhosphorIcon(sf: icon, size: 13).frame(width: 18).foregroundStyle(on ? dockerBlue : .secondary)
                 Text(title).font(.system(size: 13, weight: on ? .semibold : .regular))
                 Spacer()
                 if docker.info != nil {
@@ -317,15 +317,15 @@ private struct TargetMenu: View {
         let docker = model.docker
         let current = docker.targetId.flatMap { id in model.hosts.first { $0.id == id } }
         Menu {
-            Button { Task { await docker.select(nil, model: model) } } label: { Label(L("Mac ini"), systemImage: "laptopcomputer") }
+            Button { Task { await docker.select(nil, model: model) } } label: { PhosphorLabel(sf: "laptopcomputer", text: L("Mac ini"), size: 12) }
             if !model.hosts.isEmpty {
                 Divider()
                 ForEach(model.hosts) { h in
-                    Button { Task { await docker.select(h.id, model: model) } } label: { Label(h.title, systemImage: "server.rack") }
+                    Button { Task { await docker.select(h.id, model: model) } } label: { PhosphorLabel(sf: "server.rack", text: h.title, size: 12) }
                 }
             }
         } label: {
-            Label(current?.title ?? L("Mac ini"), systemImage: current == nil ? "laptopcomputer" : "server.rack")
+            PhosphorLabel(sf: current == nil ? "laptopcomputer" : "server.rack", text: current?.title ?? L("Mac ini"), size: 12)
                 .font(.system(size: 12.5, weight: .semibold))
         }
         .menuStyle(.button)
@@ -349,7 +349,7 @@ private struct ListHeader: View {
             if docker.tab == .containers {
                 SearchField(text: $docker.query, prompt: L("Cari"))
             }
-            Button { Task { await docker.refresh() } } label: { Image(systemName: "arrow.clockwise") }
+            Button { Task { await docker.refresh() } } label: { PhosphorIcon(sf: "arrow.clockwise", size: 13) }
                 .buttonStyle(SecondaryButtonStyle()).help(L("Muat ulang")).disabled(!docker.connected)
         }
         .padding(.horizontal, 18).padding(.vertical, 12)
@@ -373,7 +373,7 @@ private struct ContainerList: View {
     var body: some View {
         let docker = model.docker
         if docker.containers.isEmpty {
-            EmptyState(icon: "shippingbox", title: L("Belum ada container"), text: L("Container dari docker run atau docker compose akan muncul di sini."))
+            EmptyState(ph: "package", title: L("Belum ada container"), text: L("Container dari docker run atau docker compose akan muncul di sini."))
         } else {
             LazyVStack(alignment: .leading, spacing: 2) {
                 ForEach(docker.groups, id: \.0) { project, list in
@@ -424,7 +424,7 @@ private struct StatusIcon: View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.27, style: .continuous)
                 .fill(running ? dockerBlue.opacity(0.18) : Theme.ink.opacity(0.06))
-            Image(systemName: "shippingbox.fill").font(.system(size: size * 0.45)).foregroundStyle(running ? dockerBlue : .secondary)
+            PhosphorIcon(sf: "shippingbox.fill", size: size * 0.45).foregroundStyle(running ? dockerBlue : .secondary)
             Circle().fill(color).frame(width: size * 0.3, height: size * 0.3)
                 .overlay(Circle().strokeBorder(Color(nsColor: .windowBackgroundColor), lineWidth: 2))
                 .offset(x: size * 0.36, y: size * 0.36)
@@ -454,11 +454,11 @@ private struct ProjectRow: View {
         HoverRow(action: {
             withAnimation(.ztermSnappy) { if open { docker.collapsed.insert(name) } else { docker.collapsed.remove(name) } }
         }) {
-            Image(systemName: "chevron.right").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary)
+            PhosphorIcon(sf: "chevron.right", size: 10).foregroundStyle(.secondary)
                 .rotationEffect(.degrees(open ? 90 : 0)).frame(width: 12)
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous).fill(running > 0 ? dockerBlue.opacity(0.18) : Theme.ink.opacity(0.06))
-                Image(systemName: "square.stack.3d.up.fill").font(.system(size: 13)).foregroundStyle(running > 0 ? dockerBlue : .secondary)
+                PhosphorIcon(sf: "square.stack.3d.up.fill", size: 13).foregroundStyle(running > 0 ? dockerBlue : .secondary)
             }
             .frame(width: 30, height: 30)
             VStack(alignment: .leading, spacing: 1) {
@@ -501,7 +501,7 @@ private struct ContainerRow: View {
             Spacer(minLength: 6)
             if let p = firstPort(container.ports), running {
                 Button { if let u = docker.url(p) { NSWorkspace.shared.open(u) } } label: {
-                    HStack(spacing: 3) { Text(verbatim: ":\(p)"); Image(systemName: "arrow.up.right").font(.system(size: 8, weight: .bold)) }
+                    HStack(spacing: 3) { Text(verbatim: ":\(p)"); PhosphorIcon(sf: "arrow.up.right", size: 8) }
                         .font(.system(size: 11, weight: .medium, design: .monospaced)).foregroundStyle(dockerBlue)
                         .padding(.horizontal, 7).padding(.vertical, 3)
                         .background(dockerBlue.opacity(0.12), in: Capsule())
@@ -577,12 +577,12 @@ private struct ContainerDetail: View {
                 }
                 HStack(spacing: 8) {
                     if running {
-                        Button { Task { await docker.action(container, "stop") } } label: { Label(L("Stop"), systemImage: "stop.fill") }
+                        Button { Task { await docker.action(container, "stop") } } label: { PhosphorLabel(sf: "stop.fill", text: L("Stop"), size: 12) }
                     } else {
-                        Button { Task { await docker.action(container, "start") } } label: { Label(L("Start"), systemImage: "play.fill") }
+                        Button { Task { await docker.action(container, "start") } } label: { PhosphorLabel(sf: "play.fill", text: L("Start"), size: 12) }
                     }
-                    Button { Task { await docker.action(container, "restart") } } label: { Label(L("Restart"), systemImage: "arrow.clockwise") }
-                    Button { openShell() } label: { Label(L("Terminal"), systemImage: "terminal") }.disabled(!running)
+                    Button { Task { await docker.action(container, "restart") } } label: { PhosphorLabel(sf: "arrow.clockwise", text: L("Restart"), size: 12) }
+                    Button { openShell() } label: { PhosphorLabel(sf: "terminal", text: L("Terminal"), size: 12) }.disabled(!running)
                 }
                 .buttonStyle(SecondaryButtonStyle())
                 Picker("", selection: $tab) {
@@ -619,7 +619,7 @@ private struct ContainerDetail: View {
                         Button { if let u = docker.url(p.hostPort) { NSWorkspace.shared.open(u) } } label: {
                             HStack {
                                 Text(verbatim: "\(docker.url(p.hostPort)?.host() ?? "localhost"):\(p.hostPort)").foregroundStyle(dockerBlue)
-                                Image(systemName: "arrow.up.right").font(.system(size: 9, weight: .bold)).foregroundStyle(dockerBlue)
+                                PhosphorIcon(sf: "arrow.up.right", size: 9).foregroundStyle(dockerBlue)
                                 Spacer()
                                 Text(p.containerPort).foregroundStyle(.secondary)
                             }
@@ -743,7 +743,7 @@ private struct LiveLogs: View {
                 Toggle(L("Ikuti log baru"), isOn: $follow).toggleStyle(.switch).controlSize(.mini).font(.system(size: 11.5))
                 Spacer()
                 Button { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(text, forType: .string); model.flash(L("Log disalin")) } label: {
-                    Image(systemName: "doc.on.doc")
+                    PhosphorIcon(sf: "doc.on.doc", size: 13)
                 }
                 .buttonStyle(.plain).help(L("Salin log"))
             }
@@ -852,7 +852,7 @@ private struct NetworkList: View {
 private func icon(_ name: String, active: Bool) -> some View {
     ZStack {
         RoundedRectangle(cornerRadius: 8, style: .continuous).fill(active ? dockerBlue.opacity(0.16) : Theme.ink.opacity(0.06))
-        Image(systemName: name).font(.system(size: 13)).foregroundStyle(active ? dockerBlue : .secondary)
+        PhosphorIcon(sf: name, size: 13).foregroundStyle(active ? dockerBlue : .secondary)
     }
     .frame(width: 30, height: 30)
 }

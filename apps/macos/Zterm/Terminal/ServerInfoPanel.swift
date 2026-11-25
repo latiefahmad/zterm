@@ -104,7 +104,7 @@ struct ServerInfoPanel: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .failed(let msg):
                 VStack(spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle").font(.title2).foregroundStyle(.orange)
+                    PhosphorIcon(sf: "exclamationmark.triangle", size: 22).foregroundStyle(.orange)
                     Text(msg).font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center).textSelection(.enabled)
                     Button(L("Coba lagi")) { model.retryServerStats() }.buttonStyle(SecondaryButtonStyle())
                 }
@@ -122,8 +122,8 @@ struct ServerInfoPanel: View {
     private var header: some View {
         HStack(spacing: 10) {
             ZStack {
-                RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color(hex: stats.host.color).gradient)
-                Image(systemName: "cpu").font(.system(size: 14, weight: .bold)).foregroundStyle(.black.opacity(0.7))
+                RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color(hex: stats.host.color))
+                PhosphorIcon(sf: "cpu", size: 14).foregroundStyle(.black.opacity(0.7))
             }
             .frame(width: 32, height: 32)
             VStack(alignment: .leading, spacing: 1) {
@@ -192,7 +192,7 @@ struct ServerInfoPanel: View {
     private func spec(_ icon: String, _ label: String, _ value: String, last: Bool = false) -> some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 10) {
-                Image(systemName: icon).font(.system(size: 12)).foregroundStyle(.secondary).frame(width: 18)
+                PhosphorIcon(sf: icon, size: 12).foregroundStyle(.secondary).frame(width: 18)
                 Text(label).font(.system(size: 12)).foregroundStyle(.secondary).frame(width: 52, alignment: .leading)
                 Text(value).font(.system(size: 12, weight: .medium)).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -232,7 +232,7 @@ struct ServerInfoPanel: View {
             GeometryReader { g in
                 ZStack(alignment: .leading) {
                     Capsule().fill(Theme.ink.opacity(0.08))
-                    Capsule().fill(tint.gradient).frame(width: max(4, g.size.width * f))
+                    Capsule().fill(tint).frame(width: max(4, g.size.width * f))
                 }
             }
             .frame(height: 6)

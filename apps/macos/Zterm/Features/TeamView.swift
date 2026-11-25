@@ -16,15 +16,15 @@ struct TeamView: View {
                 PageHeader(title: L("Tim"), subtitle: L("Bagikan host ke rekan kerja — terenkripsi end-to-end lewat Google Drive")) {
                     if model.teamReady {
                         if model.teamBusy { ProgressView().controlSize(.small) }
-                        Button { joining = true } label: { Label(L("Gabung tim"), systemImage: "person.badge.plus") }
+                        Button { joining = true } label: { PhosphorLabel(sf: "person.badge.plus", text: L("Gabung tim"), size: 12) }
                             .buttonStyle(SecondaryButtonStyle())
-                        Button { creating = true } label: { Label(L("Buat tim"), systemImage: "plus") }
+                        Button { creating = true } label: { PhosphorLabel(sf: "plus", text: L("Buat tim"), size: 12) }
                             .buttonStyle(PrimaryButtonStyle())
                     }
                 }
 
                 if let err = model.teamError {
-                    Label(err, systemImage: "exclamationmark.triangle.fill")
+                    PhosphorLabel(sf: "exclamationmark.triangle.fill", text: err, size: 12)
                         .font(.callout)
                         .foregroundStyle(.red)
                         .padding(12)
@@ -81,11 +81,9 @@ private struct TeamSetupCard: View {
     var body: some View {
         HoverCard(padding: 22) {
             HStack(alignment: .top, spacing: 18) {
-                Image(systemName: "person.2.badge.key.fill")
-                    .font(.system(size: 30))
-                    .foregroundStyle(Theme.brandGradient)
+                PhosphorIcon(sf: "person.2.badge.key.fill", size: 30, tint: Theme.accent)
                     .frame(width: 56, height: 56)
-                    .background(Theme.ink.opacity(0.06), in: RoundedRectangle(cornerRadius: 14))
+                    .background(Theme.accent.opacity(0.1), in: RoundedRectangle(cornerRadius: 14))
                 VStack(alignment: .leading, spacing: 8) {
                     Text(model.accountEmail == nil ? L("Masuk dengan Google untuk memakai Tim") : L("Izinkan Zterm mengelola file Tim"))
                         .font(.title3.bold())
@@ -98,7 +96,7 @@ private struct TeamSetupCard: View {
                         working = true
                         Task { await model.grantTeamAccess(); working = false }
                     } label: {
-                        Label(model.accountEmail == nil ? L("Masuk dengan Google") : L("Izinkan akses Google Drive"), systemImage: "g.circle.fill")
+                        PhosphorLabel(sf: "g.circle.fill", text: model.accountEmail == nil ? L("Masuk dengan Google") : L("Izinkan akses Google Drive"), size: 12)
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(working)
@@ -128,7 +126,7 @@ private struct TeamIntro: View {
     private func step(_ n: Int, _ title: String, _ text: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("\(n)").font(.system(size: 12, weight: .bold)).frame(width: 22, height: 22)
-                .background(Theme.brandGradient, in: Circle()).foregroundStyle(.black.opacity(0.75))
+                .background(Theme.accent, in: Circle()).foregroundStyle(.black.opacity(0.75))
             Text(title).font(.system(size: 13, weight: .semibold))
             Text(text).font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
         }
@@ -147,7 +145,7 @@ private struct InviteRow: View {
     var body: some View {
         HoverCard(padding: 12) {
             HStack(spacing: 12) {
-                Image(systemName: "envelope.open.fill").foregroundStyle(Section.team.tint)
+                PhosphorIcon(sf: "envelope.open.fill", size: 16).foregroundStyle(Section.team.tint)
                     .frame(width: 34, height: 34)
                     .background(Section.team.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 9))
                 VStack(alignment: .leading, spacing: 2) {
@@ -210,12 +208,10 @@ private struct TeamCard: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            Image(systemName: "person.2.fill")
-                .font(.system(size: 18, weight: .semibold))
+            PhosphorIcon(sf: "person.2.fill", size: 18)
                 .foregroundStyle(.black.opacity(0.72))
                 .frame(width: 42, height: 42)
-                .background(LinearGradient(colors: [Section.team.tint, Section.team.tint.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                            in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .background(Section.team.tint, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 8) {
                     Text(team.name).font(.system(size: 17, weight: .bold))
@@ -230,7 +226,7 @@ private struct TeamCard: View {
                 Divider()
                 Button(team.isOwner ? L("Hapus tim…") : L("Keluar dari tim…"), role: .destructive) { confirmLeave = true }
             } label: {
-                Image(systemName: "ellipsis").frame(width: 28, height: 28)
+                PhosphorIcon(sf: "ellipsis", size: 14).frame(width: 28, height: 28)
             }
             .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
         }
@@ -296,7 +292,7 @@ private struct TeamCard: View {
                 HStack {
                     SectionTitle(text: L("Host dibagikan"))
                     Spacer()
-                    Button { sharing = true } label: { Label(L("Pilih host"), systemImage: "checklist") }
+                    Button { sharing = true } label: { PhosphorLabel(sf: "checklist", text: L("Pilih host"), size: 12) }
                         .buttonStyle(SecondaryButtonStyle())
                 }
                 if sharedHosts.isEmpty {
@@ -331,7 +327,7 @@ private struct TeamCard: View {
                 HStack {
                     SectionTitle(text: L("{} host dari tim", memberHosts.count))
                     Spacer()
-                    Button { withAnimation(.zterm) { model.section = .hosts } } label: { Label(L("Buka Hosts"), systemImage: "server.rack") }
+                    Button { withAnimation(.zterm) { model.section = .hosts } } label: { PhosphorLabel(sf: "server.rack", text: L("Buka Hosts"), size: 12) }
                         .buttonStyle(SecondaryButtonStyle())
                 }
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 8)], spacing: 8) {
@@ -339,15 +335,14 @@ private struct TeamCard: View {
                 }
             }
         case .waiting where team.error != nil:
-            Label(Lmsg(team.error ?? ""), systemImage: "exclamationmark.triangle")
+            PhosphorLabel(sf: "exclamationmark.triangle", text: Lmsg(team.error ?? ""), size: 12)
                 .font(.callout).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         case .waiting:
-            Label(L("Menunggu {} membuka Zterm agar kunci tim terkirim. Host tim muncul otomatis setelah itu.", team.ownerEmail),
-                  systemImage: "hourglass")
+            PhosphorLabel(sf: "hourglass", text: L("Menunggu {} membuka Zterm agar kunci tim terkirim. Host tim muncul otomatis setelah itu.", team.ownerEmail), size: 12)
                 .font(.callout).foregroundStyle(.secondary)
         case .revoked:
-            Label(L("Akses ke tim ini sudah dicabut atau timnya dihapus."), systemImage: "lock.slash")
+            PhosphorLabel(sf: "lock.slash", text: L("Akses ke tim ini sudah dicabut atau timnya dihapus."), size: 12)
                 .font(.callout).foregroundStyle(.secondary)
         }
     }
@@ -376,8 +371,7 @@ private struct HostChip: View {
                 Text(host.displayAddress(hidden: hideAddresses)).font(.system(size: 10.5, design: .monospaced)).foregroundStyle(.secondary).lineLimit(1)
             }
             Spacer()
-            Image(systemName: host.auth == .key ? "key.fill" : host.auth == .agent ? "person.badge.key" : "ellipsis.rectangle")
-                .font(.system(size: 11)).foregroundStyle(.tertiary)
+            PhosphorIcon(sf: host.auth == .key ? "key.fill" : host.auth == .agent ? "person.badge.key" : "ellipsis.rectangle", size: 11).foregroundStyle(.tertiary)
             if host.isTeam {
                 IconButton(symbol: "play.fill", help: L("Connect")) { model.connect([host.id]) }
             }
@@ -435,14 +429,14 @@ private struct JoinTeamSheet: View {
             Text(L("Gabung tim")).font(.title3.bold())
             VStack(alignment: .leading, spacing: 12) {
                 row(1, L("Buka halaman Gabung tim"), L("Masuk dengan akun Google yang diundang ({}), lalu pilih file tim.", model.accountEmail ?? "-")) {
-                    Button { openURL(TeamLinks.joinPage) } label: { Label(L("Buka halaman"), systemImage: "safari") }
+                    Button { openURL(TeamLinks.joinPage) } label: { PhosphorLabel(sf: "safari", text: L("Buka halaman"), size: 12) }
                         .buttonStyle(SecondaryButtonStyle())
                 }
                 row(2, L("Kembali ke sini"), L("Undangan yang sudah kamu pilih muncul di bawah.")) {
                     Button {
                         checking = true
                         Task { await model.refreshInvites(); checking = false }
-                    } label: { Label(checking ? L("Mengecek…") : L("Cek undangan"), systemImage: "arrow.clockwise") }
+                    } label: { PhosphorLabel(sf: "arrow.clockwise", text: checking ? L("Mengecek…") : L("Cek undangan"), size: 12) }
                         .buttonStyle(SecondaryButtonStyle()).disabled(checking)
                 }
             }
@@ -480,7 +474,7 @@ private struct JoinTeamSheet: View {
     private func row<B: View>(_ n: Int, _ title: String, _ text: String, @ViewBuilder button: () -> B) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Text("\(n)").font(.system(size: 12, weight: .bold)).frame(width: 22, height: 22)
-                .background(Theme.brandGradient, in: Circle()).foregroundStyle(.black.opacity(0.75))
+                .background(Theme.accent, in: Circle()).foregroundStyle(.black.opacity(0.75))
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.system(size: 13, weight: .semibold))
                 Text(text).font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
@@ -510,7 +504,7 @@ private struct ShareHostsSheet: View {
                             if picked.contains(h.id) { picked.remove(h.id) } else { picked.insert(h.id) }
                         } label: {
                             HStack(spacing: 10) {
-                                Image(systemName: picked.contains(h.id) ? "checkmark.square.fill" : "square")
+                                PhosphorIcon(sf: picked.contains(h.id) ? "checkmark.square.fill" : "square", size: 14)
                                     .foregroundStyle(picked.contains(h.id) ? Theme.accent : .secondary)
                                 RoundedRectangle(cornerRadius: 4).fill(Color(hex: h.color)).frame(width: 6, height: 20)
                                 Text(h.title).font(.system(size: 13, weight: .medium))

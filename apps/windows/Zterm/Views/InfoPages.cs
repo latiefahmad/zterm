@@ -40,7 +40,12 @@ internal sealed class KnownHostsPage : PageBase
         for (int i = 0; i < shown.Count; i++)
         {
             var e = shown[i];
-            var icon = new Border { Width = 34, Height = 34, CornerRadius = new CornerRadius(9), Background = Theme.Ink(0.06), Child = new FontIcon { Glyph = G.Fingerprint, FontSize = 17, Foreground = Theme.BrandGradient } };
+            var icon = new Border
+            {
+                Width = 34, Height = 34, CornerRadius = new CornerRadius(9),
+                Background = Theme.Brush(Theme.Accent, 0.08), BorderBrush = Theme.Brush(Theme.Accent, 0.2),
+                BorderThickness = new Thickness(1), Child = Ph.Icon("fingerprint", 17, Theme.AccentBrush)
+            };
             var info = Ui.Col(3, Ui.Row(8, Ui.Text(e.Display(M.HideAddresses), 13, FontWeights.SemiBold), Ui.Badge(e.ShortType, Theme.Accent2)),
                 Ui.Text(e.Fingerprint, 11, fg: Theme.Text2, mono: true).With(t => { t.IsTextSelectionEnabled = true; t.TextTrimming = TextTrimming.CharacterEllipsis; }));
             var del = Ui.IconBtn(G.Delete, L.T("Hapus dari known hosts"), async () =>
@@ -332,7 +337,7 @@ internal sealed class UpdatePanel : Grid
         }
 
         var content = Ui.Col(8,
-            Ui.Row(10, Ui.Icon(G.Sparkle, 14, Theme.BrandGradient), Ui.Text(L.T("Versi {} tersedia", u.Version), 13, FontWeights.SemiBold)));
+            Ui.Row(10, Ui.Icon(G.Sparkle, 14, Theme.AccentBrush), Ui.Text(L.T("Versi {} tersedia", u.Version), 13, FontWeights.SemiBold)));
         if (M.UpdateBusy)
         {
             content.Children.Add(UpdateUI.Bar(M));

@@ -41,7 +41,7 @@ struct HostEditor: View {
                             model.delete(original)
                             model.editingHost = nil
                         } label: {
-                            Label(L("Hapus host"), systemImage: "trash").frame(maxWidth: .infinity)
+                            PhosphorLabel(sf: "trash", text: L("Hapus host"), size: 12).frame(maxWidth: .infinity)
                         }
                         .buttonStyle(SecondaryButtonStyle(wide: true))
                         .foregroundStyle(.red)
@@ -82,7 +82,7 @@ struct HostEditor: View {
             Button {
                 save(connect: true)
             } label: {
-                Label(L("Connect"), systemImage: "bolt.fill").lineLimit(1)
+                PhosphorLabel(sf: "bolt.fill", text: L("Connect"), size: 12).lineLimit(1)
             }
             .help(L("Simpan lalu connect (⌘⏎)"))
             .buttonStyle(PrimaryButtonStyle())
@@ -113,13 +113,13 @@ struct HostEditor: View {
                         Button {
                             withAnimation(.ztermSnappy) { h.color = c }
                         } label: {
-                            Label(c, systemImage: h.color == c ? "checkmark.circle.fill" : "circle.fill")
+                            PhosphorLabel(sf: h.color == c ? "checkmark.circle.fill" : "circle.fill", text: c, size: 12)
                         }
                     }
                 } label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color(hex: h.color).gradient)
-                        Image(systemName: "server.rack").font(.system(size: 17, weight: .bold)).foregroundStyle(.black.opacity(0.7))
+                        RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color(hex: h.color))
+                        PhosphorIcon(sf: "server.rack", size: 17).foregroundStyle(.black.opacity(0.7))
                     }
                     .frame(width: 44, height: 44)
                 }
@@ -145,7 +145,7 @@ struct HostEditor: View {
                 if !groups.isEmpty {
                     Menu {
                         ForEach(groups, id: \.self) { g in Button(g) { h.group = g } }
-                    } label: { Image(systemName: "chevron.down") }
+                    } label: { PhosphorIcon(sf: "chevron.down", size: 10) }
                         .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
                 }
             }
@@ -188,8 +188,7 @@ struct HostEditor: View {
                         }
                         .textFieldStyle(.plain)
                         Button { showPassword.toggle() } label: {
-                            Image(systemName: showPassword ? "eye" : "eye.slash")
-                                .contentTransition(.symbolEffect(.replace))
+                            PhosphorIcon(sf: showPassword ? "eye" : "eye.slash", size: 13)
                         }
                         .buttonStyle(.plain).foregroundStyle(.secondary)
                     }
@@ -198,7 +197,7 @@ struct HostEditor: View {
                 case .key:
                     keyPicker
                 case .agent:
-                    Label(L("Memakai SSH agent sistem (mis. 1Password, ssh-agent)."), systemImage: "person.badge.key")
+                    PhosphorLabel(sf: "person.badge.key", text: L("Memakai SSH agent sistem (mis. 1Password, ssh-agent)."), size: 12)
                         .font(.callout).foregroundStyle(.secondary)
                 }
             }
@@ -218,7 +217,7 @@ struct HostEditor: View {
                 Button {
                     h.keyId = k.id
                 } label: {
-                    Label("\(k.label) · \(k.keyType)", systemImage: h.keyId == k.id ? "checkmark" : "key")
+                    PhosphorLabel(sf: h.keyId == k.id ? "checkmark" : "key", text: "\(k.label) · \(k.keyType)", size: 12)
                 }
             }
             if !model.keys.isEmpty { Divider() }
@@ -236,7 +235,7 @@ struct HostEditor: View {
             }
         } label: {
             HStack(spacing: 10) {
-                Image(systemName: "key.fill").foregroundStyle(Theme.accent)
+                PhosphorIcon(sf: "key.fill", size: 14).foregroundStyle(Theme.accent)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(selected?.label ?? L("Pilih SSH key")).font(.system(size: 13, weight: .medium))
                     if let s = selected {
@@ -244,7 +243,7 @@ struct HostEditor: View {
                     }
                 }
                 Spacer()
-                Image(systemName: "chevron.up.chevron.down").font(.caption).foregroundStyle(.secondary)
+                PhosphorIcon(sf: "chevron.up.chevron.down", size: 10).foregroundStyle(.secondary)
             }
             .padding(.horizontal, 12).padding(.vertical, 10)
             .background(Theme.field, in: RoundedRectangle(cornerRadius: 10))
@@ -261,7 +260,7 @@ struct HostEditor: View {
                 HStack {
                     Text(L("Lanjutan")).font(.system(size: 14, weight: .semibold))
                     Spacer()
-                    Image(systemName: "chevron.right")
+                    PhosphorIcon(sf: "chevron.right", size: 10)
                         .rotationEffect(.degrees(showAdvanced ? 90 : 0))
                         .foregroundStyle(.secondary)
                 }
@@ -380,7 +379,7 @@ struct HostEditor: View {
             Button {
                 withAnimation(.ztermSnappy) { h.env.append(EnvVar(name: "", value: "")) }
             } label: {
-                Label(L("Environment variable"), systemImage: "plus").font(.callout)
+                PhosphorLabel(sf: "plus", text: L("Environment variable"), size: 12).font(.callout)
             }
             .buttonStyle(.plain).foregroundStyle(.secondary)
             .padding(.leading, 4)
@@ -403,7 +402,7 @@ struct HostEditor: View {
                 .overlay(RoundedRectangle(cornerRadius: 9).strokeBorder(active ? Theme.accent : Theme.ink.opacity(0.1), lineWidth: active ? 2 : 1))
                 .overlay(alignment: .topTrailing) {
                     if active {
-                        Image(systemName: "checkmark.circle.fill")
+                        PhosphorIcon(sf: "checkmark.circle.fill", size: 14)
                             .foregroundStyle(Theme.accent, .white)
                             .offset(x: 5, y: -5)
                             .transition(.scale.combined(with: .opacity))
@@ -423,12 +422,11 @@ struct HostEditor: View {
                 ForEach(Theme.cardPalette, id: \.self) { c in
                     let active = h.color.uppercased() == c.uppercased()
                     Circle()
-                        .fill(LinearGradient(colors: [Color(hex: c), Color(hex: c).opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .fill(Color(hex: c))
                         .frame(width: 26, height: 26)
                         .overlay(Circle().strokeBorder(.white.opacity(active ? 0.9 : 0), lineWidth: 2).padding(2))
-                        .overlay { if active { Image(systemName: "checkmark").font(.system(size: 10, weight: .heavy)).foregroundStyle(.black.opacity(0.7)) } }
-                        .scaleEffect(active ? 1.12 : 1)
-                        .shadow(color: Color(hex: c).opacity(active ? 0.6 : 0), radius: 6)
+                        .overlay { if active { PhosphorIcon(sf: "checkmark", size: 10).foregroundStyle(.black.opacity(0.7)) } }
+                        .scaleEffect(active ? 1.08 : 1)
                         .onTapGesture { withAnimation(.ztermSnappy) { h.color = c } }
                 }
             }
@@ -472,7 +470,7 @@ struct FieldRow<Content: View>: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: icon).foregroundStyle(.secondary).frame(width: 18)
+            PhosphorIcon(sf: icon, size: 14).foregroundStyle(.secondary).frame(width: 18)
             content()
         }
         .font(.system(size: 13))
@@ -526,22 +524,20 @@ struct CardPreview: View {
         let c = Color(hex: host.color)
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .fill(LinearGradient(colors: [c, c.opacity(0.65)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .overlay(Image(systemName: "server.rack").font(.system(size: 16, weight: .bold)).foregroundStyle(.black.opacity(0.7)))
+                .fill(c)
+                .overlay(PhosphorIcon(sf: "server.rack", size: 16).foregroundStyle(.black.opacity(0.7)))
                 .frame(width: 40, height: 40)
-                .shadow(color: c.opacity(0.5), radius: 8)
             VStack(alignment: .leading, spacing: 2) {
                 Text(host.title.isEmpty ? L("Nama host") : host.title).font(.system(size: 13, weight: .semibold))
                 Text("\(host.username)@••••••••").font(.system(size: 11, design: .monospaced)).foregroundStyle(.secondary)
             }
             Spacer()
-            Image(systemName: "bolt.fill").font(.system(size: 11, weight: .bold)).foregroundStyle(c)
+            PhosphorIcon(sf: "bolt.fill", size: 11).foregroundStyle(c)
                 .frame(width: 26, height: 26).background(c.opacity(0.15), in: Circle())
         }
         .padding(12)
-        .background(LinearGradient(colors: [c.opacity(0.16), Theme.card], startPoint: .top, endPoint: .bottom),
-                    in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(c.opacity(0.45)))
+        .background(Theme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(c.opacity(0.35)))
         .animation(.ztermSnappy, value: host.color)
     }
 }

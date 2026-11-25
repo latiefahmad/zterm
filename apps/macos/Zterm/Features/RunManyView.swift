@@ -158,7 +158,7 @@ struct RunManyView: View {
                 if !model.snippets.isEmpty {
                     Menu {
                         ForEach(model.snippets, id: \.id) { s in Button(s.label) { run.command = s.command } }
-                    } label: { Label(L("Snippet"), systemImage: "curlybraces") }
+                    } label: { PhosphorLabel(sf: "curlybraces", text: L("Snippet"), size: 12) }
                     .menuStyle(.borderlessButton).fixedSize()
                 }
                 Picker(L("Batas waktu"), selection: $run.timeout) {
@@ -184,8 +184,7 @@ struct RunManyView: View {
             .frame(height: 72)
             .background(Theme.field, in: RoundedRectangle(cornerRadius: 10))
             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.ink.opacity(0.08)))
-            Label(L("Berjalan tanpa terminal interaktif. Perintah yang menunggu input (mis. sudo dengan password) akan berhenti di batas waktu — pakai user root atau sudo -n."),
-                  systemImage: "info.circle")
+            PhosphorLabel(sf: "info.circle", text: L("Berjalan tanpa terminal interaktif. Perintah yang menunggu input (mis. sudo dengan password) akan berhenti di batas waktu — pakai user root atau sudo -n."), size: 12)
                 .font(.caption).foregroundStyle(.secondary)
         }
     }
@@ -221,7 +220,7 @@ struct RunManyView: View {
             if on { run.targets.remove(h.id) } else { run.targets.insert(h.id) }
         } label: {
             HStack(spacing: 7) {
-                Image(systemName: on ? "checkmark.circle.fill" : "circle")
+                PhosphorIcon(sf: on ? "checkmark.circle.fill" : "circle", size: 14)
                     .foregroundStyle(on ? Theme.accent : .secondary)
                 Circle().fill(Color(hex: h.color)).frame(width: 7, height: 7)
                 Text(h.title).lineLimit(1)
@@ -250,7 +249,7 @@ struct RunManyView: View {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(run.report(model), forType: .string)
                     model.flash(L("Output semua server disalin"))
-                } label: { Label(L("Salin semua"), systemImage: "doc.on.doc") }
+                } label: { PhosphorLabel(sf: "doc.on.doc", text: L("Salin semua"), size: 12) }
                 .buttonStyle(.borderless)
                 .disabled(run.running)
             }
@@ -265,7 +264,7 @@ struct RunManyView: View {
 
     private func summary(_ icon: String, _ n: Int, _ text: String, _ color: Color) -> some View {
         HStack(spacing: 4) {
-            Image(systemName: icon).foregroundStyle(color)
+            PhosphorIcon(sf: icon, size: 13).foregroundStyle(color)
             Text("\(n) \(text)").contentTransition(.numericText())
         }
         .font(.system(size: 12, weight: .medium))
@@ -289,7 +288,7 @@ struct RunManyView: View {
                 run.run(model)
             } label: {
                 HStack(spacing: 7) {
-                    if run.running { ProgressView().controlSize(.small) } else { Image(systemName: "play.fill") }
+                    if run.running { ProgressView().controlSize(.small) } else { PhosphorIcon(sf: "play.fill", size: 13) }
                     Text(run.running ? L("Menjalankan…") : L("Jalankan di {} server", run.targets.count))
                 }
             }
@@ -327,7 +326,7 @@ private struct ResultRow: View {
                     if row.status.done, row.durationMs > 0 {
                         Text(duration).font(.system(size: 11, design: .monospaced)).foregroundStyle(.tertiary)
                     }
-                    Image(systemName: "chevron.right").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
+                    PhosphorIcon(sf: "chevron.right", size: 10).foregroundStyle(.tertiary)
                         .rotationEffect(.degrees(open ? 90 : 0))
                 }
                 .contentShape(Rectangle())
@@ -361,11 +360,11 @@ private struct ResultRow: View {
 
     @ViewBuilder private var icon: some View {
         switch row.status {
-        case .waiting: Image(systemName: "clock").foregroundStyle(.tertiary)
+        case .waiting: PhosphorIcon(sf: "clock", size: 14).foregroundStyle(.tertiary)
         case .running: ProgressView().controlSize(.mini)
-        case .ok: Image(systemName: "checkmark.circle.fill").foregroundStyle(tint)
-        case .timeout: Image(systemName: "hourglass").foregroundStyle(tint)
-        default: Image(systemName: "xmark.circle.fill").foregroundStyle(tint)
+        case .ok: PhosphorIcon(sf: "checkmark.circle.fill", size: 14).foregroundStyle(tint)
+        case .timeout: PhosphorIcon(sf: "hourglass", size: 14).foregroundStyle(tint)
+        default: PhosphorIcon(sf: "xmark.circle.fill", size: 14).foregroundStyle(tint)
         }
     }
 

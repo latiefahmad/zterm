@@ -184,7 +184,7 @@ internal sealed class DockerPage : PageBase
     private static Border IconTile(string glyph, bool active) => new()
     {
         Width = 30, Height = 30, CornerRadius = new CornerRadius(8), Background = active ? Theme.Brush(Blue, 0.16) : Theme.Ink(0.06),
-        Child = new FontIcon { Glyph = glyph, FontSize = 13, Foreground = active ? Theme.Brush(Blue) : Theme.Text2 },
+        Child = Ui.Icon(glyph, 13, active ? Theme.Brush(Blue) : Theme.Text2),
     };
 
     private static StackPanel Actions(params UIElement?[] kids) => Ui.Row(2, kids);
@@ -213,7 +213,7 @@ internal sealed class DockerPage : PageBase
         var color = state switch { "running" => Theme.Green, "paused" => Theme.Orange, "restarting" => "#EAB308", _ => "#6B7280" };
         var g = new Grid { Width = size, Height = size };
         g.Children.Add(new Border { CornerRadius = new CornerRadius(size * 0.27), Background = running ? Theme.Brush(Blue, 0.18) : Theme.Ink(0.06) });
-        g.Children.Add(new FontIcon { Glyph = G.Apps, FontSize = size * 0.42, Foreground = running ? Theme.Brush(Blue) : Theme.Text2 });
+        g.Children.Add(Ui.Icon(G.Apps, size * 0.42, running ? Theme.Brush(Blue) : Theme.Text2));
         g.Children.Add(new Border
         {
             Width = size * 0.3, Height = size * 0.3, CornerRadius = new CornerRadius(size * 0.15), Background = Theme.Brush(color),

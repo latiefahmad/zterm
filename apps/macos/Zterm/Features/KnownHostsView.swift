@@ -19,23 +19,24 @@ struct KnownHostsView: View {
             VStack(alignment: .leading, spacing: 22) {
                 PageHeader(title: "Known Hosts", subtitle: L("Fingerprint server yang sudah dipercaya — ~/.ssh/known_hosts")) {
                     SearchField(text: $query, prompt: L("Cari host…"))
-                    Button { reload() } label: { Image(systemName: "arrow.clockwise") }
+                    Button { reload() } label: { PhosphorIcon(name: "arrows-clockwise", size: 14) }
                         .buttonStyle(SecondaryButtonStyle())
                         .help(L("Muat ulang"))
                 }
                 if entries.isEmpty {
-                    EmptyState(icon: "touchid", title: L("Belum ada known host"),
+                    EmptyState(ph: "fingerprint", title: L("Belum ada known host"),
                                text: L("Fingerprint server otomatis tercatat di sini saat pertama kali kamu connect."))
                 } else {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 6) {
                         ForEach(Array(filtered.enumerated()), id: \.element.id) { i, e in
                             HoverCard(padding: 12) {
                                 HStack(spacing: 12) {
-                                    Image(systemName: "touchid")
-                                        .font(.system(size: 18))
-                                        .foregroundStyle(Theme.brandGradient)
-                                        .frame(width: 34, height: 34)
-                                        .background(Theme.ink.opacity(0.06), in: RoundedRectangle(cornerRadius: 9))
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Theme.accent.opacity(0.12))
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(Theme.accent.opacity(0.22))
+                                        PhosphorIcon(name: "fingerprint", size: 17, tint: Theme.accent)
+                                    }
+                                    .frame(width: 34, height: 34)
                                     VStack(alignment: .leading, spacing: 3) {
                                         HStack(spacing: 8) {
                                             Text(e.displayHosts(hidden: hideAddresses)).font(.system(size: 13, weight: .semibold)).lineLimit(1)

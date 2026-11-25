@@ -316,8 +316,7 @@ struct AutocompletePopup: View {
 
     private func row(_ s: Autocomplete.Suggestion, selected: Bool) -> some View {
         HStack(spacing: 9) {
-            Image(systemName: icon(s.kind))
-                .font(.system(size: 10.5, weight: .semibold))
+            PhosphorIcon(sf: icon(s.kind), size: 10.5)
                 .foregroundStyle(kindColor(s.kind))
                 .frame(width: 20, height: 20)
                 .background(kindColor(s.kind).opacity(0.15), in: RoundedRectangle(cornerRadius: 5, style: .continuous))

@@ -43,7 +43,7 @@ internal sealed class DatabasePage : PageBase
 
     private static Border EngineBadge(DbPreset p, double size = 40) => new()
     {
-        Width = size, Height = size, CornerRadius = new CornerRadius(size * 0.26), Background = Theme.TintGradient(p.Color),
+        Width = size, Height = size, CornerRadius = new CornerRadius(size * 0.26), Background = Theme.Brush(p.Color),
         Child = new TextBlock { Text = p.Abbr, FontSize = size * 0.36, FontWeight = FontWeights.Bold, Foreground = Theme.Brush("#FFFFFF"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }
     };
 
@@ -350,7 +350,7 @@ internal sealed class DatabasePage : PageBase
         UIElement content = ws.CurrentTab switch
         {
             DbWorkspace.Tab.Browse => Browse(ws),
-            DbWorkspace.Tab.Structure => ws.Structure is { } s ? new ResultGrid(s, 0, "Kunci", translateHeaders: true) : Loading(ws),
+            DbWorkspace.Tab.Structure => ws.Structure is { } s ? new ResultGrid(s, 0, "Kunci", translateHeaders: true) : LoadingPanel(ws),
             DbWorkspace.Tab.Search => SearchForm(ws),
             DbWorkspace.Tab.Sql => Sql(ws),
             _ => ws.SelectedDb == null ? ServerOverview(ws) : DbOverview(ws),
@@ -361,13 +361,13 @@ internal sealed class DatabasePage : PageBase
         return root;
     }
 
-    private static UIElement Loading(DbWorkspace ws) => ws.Running
+    private static UIElement LoadingPanel(DbWorkspace ws) => ws.Running
         ? new ProgressRing { IsActive = true, Width = 28, Height = 28, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }
         : new Border();
 
     private UIElement Browse(DbWorkspace ws)
     {
-        if (ws.Page is not { } page) return Loading(ws);
+        if (ws.Page is not { } page) return LoadingPanel(ws);
         var shown = (ulong)page.Rows.Length;
         var size = ws.PageSize;
         var total = ws.TotalRows;
@@ -426,7 +426,7 @@ internal sealed class DatabasePage : PageBase
     /// <summary>Tab "Cari" ala phpMyAdmin: satu baris per kolom — operator & nilai — lalu Kirim.</summary>
     private UIElement SearchForm(DbWorkspace ws)
     {
-        if (ws.SearchForm.Count == 0) return Loading(ws);
+        if (ws.SearchForm.Count == 0) return LoadingPanel(ws);
         const string cols = "170,120,170,*";
         var list = Ui.Col(0);
         list.Children.Add(Ui.Columns(cols, 12, Ui.Caps(L.T("Kolom")), Ui.Caps(L.T("Jenis")), Ui.Caps("Operator"), Ui.Caps(L.T("Nilai")))
@@ -535,7 +535,7 @@ internal sealed class DatabasePage : PageBase
     {
         var db = ws.SelectedDb!;
         var tables = ws.DbTables.TryGetValue(db, out var t) ? t : null;
-        if (tables == null) return Loading(ws);
+        if (tables == null) return LoadingPanel(ws);
         var totalRows = tables.Sum(x => (decimal)(x.Rows ?? 0));
         var totalSize = tables.Aggregate(0UL, (a, x) => a + (x.SizeBytes ?? 0));
         var id = new CultureInfo(L10n.English ? "en-US" : "id-ID");

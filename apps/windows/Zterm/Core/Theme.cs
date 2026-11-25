@@ -45,20 +45,6 @@ internal static class Theme
     public static SolidColorBrush Text3 => Ink(Dark ? 0.38 : 0.34);
     public static SolidColorBrush AccentBrush => Brush(Accent);
 
-    public static LinearGradientBrush Gradient(params string[] hexes)
-    {
-        var g = new LinearGradientBrush { StartPoint = new Point(0, 0), EndPoint = new Point(1, 1) };
-        for (int i = 0; i < hexes.Length; i++)
-            g.GradientStops.Add(new GradientStop { Color = Hex(hexes[i]), Offset = hexes.Length == 1 ? 0 : (double)i / (hexes.Length - 1) });
-        return g;
-    }
-
-    /// <summary>Nama lama, kini satu warna: aksen rata tanpa gradien.</summary>
-    public static LinearGradientBrush BrandGradient => Gradient(Accent, Accent);
-
-    /// <summary>Nama lama, kini satu warna: ikon host/menu memakai warna rata.</summary>
-    public static LinearGradientBrush TintGradient(string hex) => Gradient(hex, hex);
-
     public static readonly string[] HostColors = ["#3FD0B4", "#5B9CF5", "#9D7CF2", "#F2A65A", "#F0616D", "#8BD450", "#E879C6", "#94A3B8"];
     public static readonly string[] CardPalette = ["#3FD0B4", "#22C55E", "#84CC16", "#EAB308", "#F2A65A", "#F97316", "#F0616D", "#E11D48",
                                                    "#E879C6", "#C084FC", "#9D7CF2", "#6366F1", "#5B9CF5", "#06B6D4", "#14B8A6", "#94A3B8"];

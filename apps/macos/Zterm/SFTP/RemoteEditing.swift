@@ -109,7 +109,7 @@ struct RemoteEditorView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
-                Image(systemName: fileIcon(doc.name)).font(.system(size: 16)).foregroundStyle(Theme.accent)
+                PhosphorIcon(sf: fileIcon(doc.name), size: 16).foregroundStyle(Theme.accent)
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(spacing: 6) {
                         Text(doc.name).font(.system(size: 14, weight: .semibold))
@@ -122,11 +122,11 @@ struct RemoteEditorView: View {
                     ForEach(RemoteFiles.apps(for: doc.name), id: \.self) { app in
                         Button(RemoteFiles.appName(app)) { openWith(app) }
                     }
-                } label: { Label(L("Buka dengan"), systemImage: "arrow.up.forward.app") }
+                } label: { PhosphorLabel(sf: "arrow.up.forward.app", text: L("Buka dengan"), size: 12) }
                 .menuStyle(.borderlessButton).fixedSize()
                 Button { Task { await model.sftp.saveEditor(doc) } } label: {
                     HStack(spacing: 6) {
-                        if doc.saving { ProgressView().controlSize(.small) } else { Image(systemName: "arrow.up.doc") }
+                        if doc.saving { ProgressView().controlSize(.small) } else { PhosphorIcon(sf: "arrow.up.doc", size: 13) }
                         Text(L("Simpan"))
                     }
                 }
@@ -139,7 +139,7 @@ struct RemoteEditorView: View {
             .padding(.horizontal, 16).padding(.vertical, 12)
             Divider()
             if let e = doc.error {
-                Label(e, systemImage: "exclamationmark.triangle.fill")
+                PhosphorLabel(sf: "exclamationmark.triangle.fill", text: e, size: 12)
                     .font(.system(size: 12)).foregroundStyle(.orange)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16).padding(.vertical, 7)
@@ -284,7 +284,7 @@ struct WatchedFilesBar: View {
         VStack(spacing: 0) {
             Divider()
             HStack(spacing: 8) {
-                Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(Theme.accent)
+                PhosphorIcon(sf: "arrow.triangle.2.circlepath", size: 13).foregroundStyle(Theme.accent)
                 Text(L("Dibuka di aplikasi lain — disimpan otomatis ke server")).font(.system(size: 12, weight: .semibold))
                 Spacer()
             }
@@ -292,14 +292,14 @@ struct WatchedFilesBar: View {
             VStack(spacing: 4) {
                 ForEach(sftp.watched) { w in
                     HStack(spacing: 8) {
-                        Image(systemName: fileIcon(w.localURL.lastPathComponent)).foregroundStyle(.secondary).frame(width: 16)
+                        PhosphorIcon(sf: fileIcon(w.localURL.lastPathComponent), size: 14).foregroundStyle(.secondary).frame(width: 16)
                         Text(w.localURL.lastPathComponent).font(.system(size: 12, weight: .medium)).lineLimit(1)
                         Text(L("di {}", w.appName)).font(.system(size: 11.5)).foregroundStyle(.secondary)
                         Spacer()
                         if w.uploading {
                             ProgressView().controlSize(.mini)
                         } else if let t = w.lastUpload {
-                            Label(L("Tersimpan {}", t.formatted(date: .omitted, time: .shortened)), systemImage: "checkmark.circle.fill")
+                            PhosphorLabel(sf: "checkmark.circle.fill", text: L("Tersimpan {}", t.formatted(date: .omitted, time: .shortened)), size: 12)
                                 .font(.system(size: 11)).foregroundStyle(Color(hex: "#4ADE80"))
                         }
                         Button(L("Berhenti")) { sftp.stopWatching(w) }.buttonStyle(.borderless).font(.caption)

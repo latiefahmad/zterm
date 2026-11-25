@@ -268,7 +268,7 @@ struct FilePane<RowMenu: View, Extra: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 6) {
-                Image(systemName: icon).foregroundStyle(Theme.accent)
+                PhosphorIcon(sf: icon, size: 14).foregroundStyle(Theme.accent)
                 Text(title).font(.system(size: 13, weight: .semibold)).lineLimit(1)
                 Spacer()
                 if loading { ProgressView().controlSize(.small) }
@@ -313,7 +313,7 @@ struct FilePane<RowMenu: View, Extra: View>: View {
             .overlay {
                 if items.isEmpty && !loading {
                     VStack(spacing: 6) {
-                        Image(systemName: "tray").font(.system(size: 26)).foregroundStyle(.tertiary)
+                        PhosphorIcon(sf: "tray", size: 26).foregroundStyle(.tertiary)
                         Text(L("Folder kosong")).foregroundStyle(.secondary)
                         Text(L("Seret file ke sini")).font(.caption).foregroundStyle(.tertiary)
                     }
@@ -327,7 +327,7 @@ struct FilePane<RowMenu: View, Extra: View>: View {
                     .font(.caption).foregroundStyle(.secondary)
                     .contentTransition(.numericText())
                 Spacer()
-                Button(action: onTransfer) { Label(transferTitle, systemImage: transferIcon) }
+                Button(action: onTransfer) { PhosphorLabel(sf: transferIcon, text: transferTitle, size: 12) }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(selection.isEmpty)
             }
@@ -341,9 +341,7 @@ struct FilePane<RowMenu: View, Extra: View>: View {
                     .background(Theme.accent.opacity(0.07), in: RoundedRectangle(cornerRadius: 12))
                     .overlay(
                         VStack(spacing: 8) {
-                            Image(systemName: transferIcon == "arrow.up.circle.fill" ? "arrow.down.doc.fill" : "arrow.up.doc.fill")
-                                .font(.system(size: 30, weight: .semibold))
-                                .symbolEffect(.bounce, options: .repeating)
+                            PhosphorIcon(sf: transferIcon == "arrow.up.circle.fill" ? "arrow.down.doc.fill" : "arrow.up.doc.fill", size: 30)
                             Text(dropHint).font(.headline)
                         }
                         .foregroundStyle(Theme.accent)
@@ -406,11 +404,9 @@ struct FileRow: View {
 
     var body: some View {
         HStack(spacing: 9) {
-            Image(systemName: item.isDir ? (dropHover ? "folder.fill.badge.plus" : "folder.fill") : fileIcon(item.name))
-                .font(.system(size: 14))
+            PhosphorIcon(sf: item.isDir ? (dropHover ? "folder.fill.badge.plus" : "folder.fill") : fileIcon(item.name), size: 14)
                 .foregroundStyle(item.isDir ? Theme.accent2 : .secondary)
                 .frame(width: 18)
-                .contentTransition(.symbolEffect(.replace))
             Text(item.name).font(.system(size: 12.5)).lineLimit(1).truncationMode(.middle)
             Spacer(minLength: 8)
             Text(item.isDir ? "—" : item.size.byteString)
@@ -464,7 +460,7 @@ struct DragPreview: View {
     let count: Int
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: item.isDir ? "folder.fill" : fileIcon(item.name)).foregroundStyle(Theme.accent)
+            PhosphorIcon(sf: item.isDir ? "folder.fill" : fileIcon(item.name), size: 13).foregroundStyle(Theme.accent)
             Text(count > 1 ? L("{} item", count) : item.name).font(.system(size: 12, weight: .semibold)).lineLimit(1)
         }
         .padding(.horizontal, 12).padding(.vertical, 8)

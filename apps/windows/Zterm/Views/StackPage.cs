@@ -144,8 +144,10 @@ internal sealed class StackPage : PageBase
 
         var icon = new Border
         {
-            Width = 48, Height = 48, CornerRadius = new CornerRadius(13), Background = Theme.BrandGradient,
-            Child = new FontIcon { Glyph = G.Globe, FontSize = 22, Foreground = Theme.Brush("#000000", 0.72) }
+            Width = 48, Height = 48, CornerRadius = new CornerRadius(13),
+            Background = Theme.Brush(Theme.Accent, 0.12), BorderBrush = Theme.Brush(Theme.Accent, 0.26),
+            BorderThickness = new Thickness(1),
+            Child = Ph.Icon("globe", 22, Theme.AccentBrush)
         };
         var title = Ui.Col(3, Ui.Row(10, Ui.Text("Web server", 18, FontWeights.Bold), Dot(running)),
             Ui.Text(running ? L.T("{} + PHP di localhost:{}", serverName, st.WebPort) : L.T("Apache atau Nginx dengan PHP — untuk Laravel, WordPress, dan proyek PHP lain"), 12, fg: Theme.Text2));

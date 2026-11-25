@@ -21,16 +21,18 @@ struct LogsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 PageHeader(title: L("Logs"), subtitle: L("Riwayat sesi SSH di semua perangkat yang tersinkron")) {
-                    Button(role: .destructive) { confirmClear = true } label: { Label(L("Bersihkan"), systemImage: "trash") }
+                    Button(role: .destructive) { confirmClear = true } label: {
+                        PhosphorLabel(text: L("Bersihkan"), icon: "trash", size: 12)
+                    }
                         .buttonStyle(SecondaryButtonStyle())
                         .disabled(model.logs.isEmpty)
                 }
                 if model.logs.isEmpty {
-                    EmptyState(icon: "clock", title: L("Belum ada riwayat"), text: L("Setiap sesi SSH yang kamu buka akan tercatat di sini."))
+                    EmptyState(ph: "clock", title: L("Belum ada riwayat"), text: L("Setiap sesi SSH yang kamu buka akan tercatat di sini."))
                 } else {
                     ForEach(grouped, id: \.0) { day, logs in
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(day.uppercased()).font(.system(size: 11, weight: .semibold)).tracking(1).foregroundStyle(.secondary)
+                            Text(day.uppercased()).font(.system(size: 10.5, weight: .semibold)).tracking(1.1).foregroundStyle(.secondary)
                             VStack(spacing: 6) {
                                 ForEach(Array(logs.enumerated()), id: \.element.id) { i, l in
                                     LogRow(log: l, hidden: hideAddresses).staggerIn(i, base: 0)
@@ -58,7 +60,7 @@ struct LogRow: View {
     private var status: (String, Color) {
         guard log.endedAt != nil else {
             let live = model.sessions.contains { $0.host.id == log.hostId && $0.status != .connecting }
-            return live ? (L("Berjalan"), Color(hex: "#4ADE80")) : (L("Terputus"), .gray)
+            return live ? (L("Berjalan"), Theme.green) : (L("Terputus"), .gray)
         }
         switch log.exitCode {
         case .some(0): return (L("Selesai"), Theme.accent)

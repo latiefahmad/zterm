@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Foto profil Google, atau inisial di lingkaran gradien.
+/// Foto profil Google, atau inisial di lingkaran aksen.
 struct Avatar: View {
     let name: String?
     let email: String?
@@ -14,16 +14,16 @@ struct Avatar: View {
 
     var body: some View {
         ZStack {
-            Circle().fill(Theme.brandGradient)
+            Circle().fill(Theme.accent)
             if let picture {
                 AsyncImage(url: picture) { phase in
                     if let img = phase.image { img.resizable().scaledToFill() }
-                    else { Text(initial).font(.system(size: size * 0.42, weight: .bold, design: .rounded)).foregroundStyle(.black.opacity(0.7)) }
+                    else { Text(initial).font(.system(size: size * 0.42, weight: .bold, design: .rounded)).foregroundStyle(.black.opacity(0.72)) }
                 }
             } else if email != nil {
-                Text(initial).font(.system(size: size * 0.42, weight: .bold, design: .rounded)).foregroundStyle(.black.opacity(0.7))
+                Text(initial).font(.system(size: size * 0.42, weight: .bold, design: .rounded)).foregroundStyle(.black.opacity(0.72))
             } else {
-                Image(systemName: "person.fill").font(.system(size: size * 0.42, weight: .bold)).foregroundStyle(.black.opacity(0.7))
+                PhosphorIcon(name: "user", size: size * 0.44, tint: .black.opacity(0.7))
             }
         }
         .frame(width: size, height: size)
@@ -36,13 +36,13 @@ struct AccountView: View {
     @State private var confirm: SignOutKind?
     @State private var connecting = false
     @State private var biometric = BiometricUnlock.hasStoredKey
-    @State private var ring = false
 
     enum SignOutKind: Identifiable { case keep, wipe; var id: Int { hashValue } }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
+                PageHeader(title: L("Akun"), subtitle: L("Sinkronisasi, keamanan, dan data vault di perangkat ini"))
                 profileCard.staggerIn(0, base: 0.02)
                 HStack(alignment: .top, spacing: 18) {
                     VStack(spacing: 18) {
@@ -75,30 +75,24 @@ struct AccountView: View {
     // MARK: Kartu profil
 
     private var profileCard: some View {
-        HStack(spacing: 20) {
-            ZStack {
-                Circle()
-                    .stroke(Theme.brandGradient, lineWidth: 3)
-                    .frame(width: 96, height: 96)
-                    .rotationEffect(.degrees(ring ? 360 : 0))
-                    .animation(.linear(duration: 8).repeatForever(autoreverses: false), value: ring)
-                Avatar(name: model.profileName, email: model.accountEmail, picture: model.profilePicture, size: 84)
-            }
-            .onAppear { ring = true }
+        HStack(spacing: 18) {
+            Avatar(name: model.profileName, email: model.accountEmail, picture: model.profilePicture, size: 76)
+                .overlay(Circle().strokeBorder(Theme.cardStroke, lineWidth: 1))
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text(model.profileName ?? (model.accountEmail == nil ? L("Tanpa akun") : model.accountEmail!.components(separatedBy: "@")[0]))
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .font(.system(size: 22, weight: .semibold))
                     .lineLimit(1)
                 if let email = model.accountEmail {
-                    Label(email, systemImage: "envelope.fill").font(.callout).foregroundStyle(.secondary).textSelection(.enabled)
+                    PhosphorLabel(text: email, icon: "envelope-simple", size: 12, tint: .secondary)
+                        .font(.system(size: 12.5)).textSelection(.enabled)
                     HStack(spacing: 6) {
                         Badge(text: "GOOGLE", color: Theme.accent2)
                         Badge(text: L("SYNC DRIVE"), color: Theme.accent)
                     }
                 } else {
                     Text(L("Data hanya tersimpan di Mac ini. Hubungkan Google untuk sync antar perangkat."))
-                        .font(.callout).foregroundStyle(.secondary)
+                        .font(.system(size: 12.5)).foregroundStyle(.secondary)
                 }
             }
             Spacer()
@@ -115,26 +109,21 @@ struct AccountView: View {
                 .disabled(connecting)
             }
         }
-        .padding(22)
-        .background {
-            ZStack {
-                Theme.card
-                LinearGradient(colors: [Theme.accent.opacity(0.14), Theme.accent3.opacity(0.08), .clear],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        }
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.cardStroke))
+        .padding(20)
+        .background(Theme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.cardStroke))
     }
 
     // MARK: Sync
 
     private var syncCard: some View {
-        AccountCard(title: L("Sinkronisasi"), icon: "arrow.triangle.2.circlepath", tint: Theme.accent) {
+        AccountCard(title: L("Sinkronisasi"), icon: "cloud-arrow-up", tint: Theme.accent) {
             HStack(spacing: 12) {
-                SyncIcon(state: model.sync)
-                    .frame(width: 34, height: 34)
-                    .background(Theme.brandGradient, in: Circle())
+                ZStack {
+                    Circle().fill(Theme.accent.opacity(0.13))
+                    SyncIcon(state: model.sync, size: 15, tint: Theme.accent)
+                }
+                .frame(width: 34, height: 34)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(syncTitle).font(.system(size: 14, weight: .semibold))
                     Text(syncSubtitle).font(.caption).foregroundStyle(.secondary).lineLimit(2)
@@ -142,7 +131,9 @@ struct AccountView: View {
                 Spacer()
             }
             if model.accountEmail != nil {
-                Button { model.syncNow() } label: { Label(L("Sinkronkan sekarang"), systemImage: "arrow.clockwise") }
+                Button { model.syncNow() } label: {
+                    PhosphorLabel(text: L("Sinkronkan sekarang"), icon: "arrows-clockwise", size: 12)
+                }
                     .buttonStyle(SecondaryButtonStyle(wide: true))
                     .disabled(model.sync == .syncing)
             }
@@ -175,12 +166,12 @@ struct AccountView: View {
     // MARK: Data
 
     private var dataCard: some View {
-        AccountCard(title: L("Data di vault"), icon: "shippingbox.fill", tint: Theme.accent2) {
+        AccountCard(title: L("Data di vault"), icon: "package", tint: Theme.accent2) {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                Stat(value: model.hosts.count, label: L("Host"), icon: "server.rack", tint: Section.hosts.tint)
-                Stat(value: model.keys.count, label: L("SSH key"), icon: "key.horizontal.fill", tint: Section.keychain.tint)
-                Stat(value: model.snippets.count, label: L("Snippet"), icon: "curlybraces", tint: Section.snippets.tint)
-                Stat(value: model.forwards.count, label: L("Forwarding"), icon: "arrow.right.arrow.left", tint: Section.forwarding.tint)
+                Stat(value: model.hosts.count, label: L("Host"), icon: "hard-drives", tint: Section.hosts.tint)
+                Stat(value: model.keys.count, label: L("SSH key"), icon: "key", tint: Section.keychain.tint)
+                Stat(value: model.snippets.count, label: L("Snippet"), icon: "brackets-curly", tint: Section.snippets.tint)
+                Stat(value: model.forwards.count, label: L("Forwarding"), icon: "arrows-left-right", tint: Section.forwarding.tint)
             }
             InfoLine(label: L("Riwayat sesi"), value: L("{} catatan", model.logs.count))
         }
@@ -189,7 +180,7 @@ struct AccountView: View {
     // MARK: Keamanan
 
     private var securityCard: some View {
-        AccountCard(title: L("Keamanan"), icon: "lock.shield.fill", tint: Color(hex: "#F59E0B")) {
+        AccountCard(title: L("Keamanan"), icon: "shield-check", tint: Theme.orange) {
             Toggle(isOn: Binding(get: { biometric }, set: { on in
                 if on { model.enableBiometric() } else { BiometricUnlock.forget() }
                 biometric = BiometricUnlock.hasStoredKey
@@ -201,7 +192,9 @@ struct AccountView: View {
             }
             .toggleStyle(.switch)
             .tint(Theme.accent)
-            Button { model.lock() } label: { Label(L("Kunci vault sekarang  ⇧⌘L"), systemImage: "lock.fill") }
+            Button { model.lock() } label: {
+                PhosphorLabel(text: L("Kunci vault sekarang  ⇧⌘L"), icon: "lock-simple", size: 12)
+            }
                 .buttonStyle(SecondaryButtonStyle(wide: true))
         }
     }
@@ -209,15 +202,19 @@ struct AccountView: View {
     // MARK: Keluar
 
     private var signOutCard: some View {
-        AccountCard(title: L("Keluar"), icon: "rectangle.portrait.and.arrow.right", tint: Color(hex: "#EF4444")) {
+        AccountCard(title: L("Keluar"), icon: "sign-out", tint: Theme.red) {
             Text(L("Keluar memutus login Google dan mengunci vault. Pilih hapus jika Mac ini bukan milikmu."))
                 .font(.caption).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            Button { confirm = .keep } label: { Label(L("Keluar"), systemImage: "rectangle.portrait.and.arrow.right") }
+            Button { confirm = .keep } label: {
+                PhosphorLabel(text: L("Keluar"), icon: "sign-out", size: 12)
+            }
                 .buttonStyle(SecondaryButtonStyle(wide: true))
-            Button { confirm = .wipe } label: { Label(L("Keluar & hapus data dari Mac ini"), systemImage: "trash") }
+            Button { confirm = .wipe } label: {
+                PhosphorLabel(text: L("Keluar & hapus data dari Mac ini"), icon: "trash", size: 12,
+                              tint: Theme.red)
+            }
                 .buttonStyle(SecondaryButtonStyle(wide: true))
-                .foregroundStyle(.red)
         }
     }
 
@@ -239,11 +236,11 @@ private struct AccountCard<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 22, height: 22)
-                    .background(tint.gradient, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous).fill(tint.opacity(0.13))
+                    PhosphorIcon(name: icon, size: 12, tint: tint)
+                }
+                .frame(width: 23, height: 23)
                 Text(title).font(.system(size: 14, weight: .semibold))
             }
             content()
@@ -261,7 +258,7 @@ private struct Stat: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: icon).foregroundStyle(tint).frame(width: 18)
+            PhosphorIcon(name: icon, size: 16, tint: tint).frame(width: 18)
             VStack(alignment: .leading, spacing: 0) {
                 Text("\(value)").font(.system(size: 20, weight: .bold, design: .rounded)).contentTransition(.numericText())
                 Text(label).font(.caption).foregroundStyle(.secondary)
@@ -269,7 +266,7 @@ private struct Stat: View {
             Spacer(minLength: 0)
         }
         .padding(10)
-        .background(Theme.field, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(Theme.field, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
     }
 }
 
