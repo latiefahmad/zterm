@@ -26,13 +26,11 @@
   var toTop = document.getElementById("toTop");
   if (!toTop) return;
 
-  var footer = document.querySelector(".site-footer");
   var returning = false;
 
   function update() {
     if (returning && window.scrollY <= 600) returning = false;
-    var footerVisible = footer ? footer.getBoundingClientRect().top < window.innerHeight - 40 : false;
-    var nextHidden = returning || !(window.scrollY > 600 && !footerVisible);
+    var nextHidden = returning || window.scrollY <= 600;
     if (toTop.hidden !== nextHidden) toTop.hidden = nextHidden;
   }
 
