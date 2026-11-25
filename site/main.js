@@ -423,6 +423,7 @@
     themeBtn.addEventListener("click", function () {
       applyTheme(root.dataset.theme === "dark" ? "light" : "dark");
     });
+    window.ztermThemeBound = true;
   }
 
   var ua = navigator.userAgent;

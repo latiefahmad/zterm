@@ -1,41 +1,173 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Syarat Layanan: Zterm</title>
-  <link rel="canonical" href="https://latief.id/zterm/terms.html" />
-  <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png" />
+  <meta name="description" content="Syarat layanan Zterm: penggunaan aplikasi, tanggung jawab data dan keamanan, batas jaminan, serta kontak." />
   <meta name="robots" content="index, follow" />
-  <style>
-    :root { --bg:#0e1116; --panel:#151a21; --line:#262e3a; --fg:#e6edf3; --muted:#8b96a5; --accent:#3fd0b4; }
-    body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.7 Inter, system-ui, sans-serif; }
-    .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
-    a { color: var(--accent); }
-    h1 { font-size: 32px; margin: 24px 0 4px; }
-    h2 { font-size: 20px; margin-top: 32px; }
-    .muted { color: var(--muted); font-size: 14px; }
-    code { background: var(--panel); border:1px solid var(--line); border-radius:4px; padding:1px 6px; font-size:14px; }
-  </style>
+  <link rel="canonical" href="https://latief.id/zterm/terms.html" />
+  <meta name="theme-color" content="#f2ede3" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <script>
+    try {
+      var savedTheme = localStorage.getItem("theme") || localStorage.getItem("zterm-theme");
+      if (savedTheme === "dark" || savedTheme === "light") {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="wrap">
-  <a href="./">← Zterm</a>
-  <h1>Syarat Layanan</h1>
-  <p class="muted">Terakhir diperbarui: 19 November 2026</p>
 
-  <p>Dengan memakai Zterm, kamu menyetujui syarat berikut.</p>
-  <h2>Penggunaan</h2>
-  <p>Zterm disediakan gratis untuk mengelola dan mengakses server melalui SSH. Kamu bertanggung jawab atas server yang kamu akses dan memastikan kamu berhak mengaksesnya.</p>
-  <h2>Data dan keamanan</h2>
-  <p>Semua data disimpan terenkripsi dengan master password-mu. Master password tidak bisa dipulihkan; jika lupa, data di vault tidak bisa dibuka. Simpan master password di tempat yang aman.</p>
-  <h2>Tanpa jaminan</h2>
-  <p>Aplikasi disediakan “sebagaimana adanya” tanpa jaminan apa pun. Pengembang tidak bertanggung jawab atas kehilangan data, gangguan layanan, atau kerugian yang timbul dari penggunaan aplikasi.</p>
-  <h2>Perubahan</h2>
-  <p>Syarat ini dapat diperbarui sewaktu-waktu. Versi terbaru selalu tersedia di halaman ini.</p>
-  <h2>Kontak</h2>
-  <p><a href="https://github.com/latiefahmad/zterm/issues">Buka issue di GitHub</a> · <a href="https://github.com/latiefahmad">Latief Ahmad</a></p>
-</div>
+<a class="skip-link" href="#main">Lewati ke konten</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="./" aria-label="Zterm, panduan lapangan">
+      <img class="brand-mark" src="assets/brand/favicon.svg" alt="" width="28" height="28" />
+      <span class="brand-text">
+        <span class="brand-name">Zterm</span>
+        <span class="brand-edition">Panduan lapangan</span>
+      </span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Navigasi utama">
+      <a href="./">Panduan</a>
+      <a href="team.html">Tim</a>
+      <a href="privacy.html">Privasi</a>
+      <a href="terms.html" aria-current="page">Syarat</a>
+    </nav>
+
+    <div class="header-tools">
+      <button type="button" class="icon-button" id="themeBtn" aria-label="Aktifkan tema gelap" aria-pressed="false">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4a8.5 8.5 0 1 0 11.5 11.5Z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <details class="mobile-menu">
+        <summary>Menu</summary>
+        <nav class="mobile-nav" aria-label="Navigasi seluler">
+          <a href="./">Panduan</a>
+          <a href="team.html">Tim</a>
+          <a href="privacy.html">Privasi</a>
+          <a href="terms.html" aria-current="page">Syarat</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <section class="legal-hero" aria-labelledby="legal-title">
+    <div class="wrap legal-hero-inner">
+      <div class="legal-intro">
+        <p class="kicker"><span>Lembar kebijakan</span><span>Syarat</span></p>
+        <h1 class="legal-title" id="legal-title">Syarat <em>layanan</em>.</h1>
+        <p class="legal-lead">Dengan memakai Zterm, kamu menyetujui syarat berikut.</p>
+        <p class="legal-meta">Terakhir diperbarui 19 November 2026 / Berlaku untuk Zterm 1.0.1</p>
+      </div>
+
+      <aside class="plate legal-plate" aria-labelledby="toc-title">
+        <div class="plate-bar"><span>Plate 01</span><span>Isi dokumen</span></div>
+        <div class="legal-plate-body">
+          <h2 id="toc-title">Lima bagian</h2>
+          <ol class="legal-toc">
+            <li><a href="#penggunaan"><span>01</span><span>Penggunaan</span></a></li>
+            <li><a href="#data"><span>02</span><span>Data dan keamanan</span></a></li>
+            <li><a href="#jaminan"><span>03</span><span>Tanpa jaminan</span></a></li>
+            <li><a href="#perubahan"><span>04</span><span>Perubahan</span></a></li>
+            <li><a href="#kontak"><span>05</span><span>Kontak</span></a></li>
+          </ol>
+          <p class="legal-plate-foot">Gratis / MIT / tanpa jaminan</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="legal-body" aria-labelledby="legal-body-title">
+    <div class="wrap">
+      <div class="legal-body-head">
+        <p class="chapter-label"><span>Dokumen</span><span>01 / 05</span></p>
+        <div>
+          <h2 class="sr-only" id="legal-body-title">Isi syarat layanan</h2>
+          <p class="legal-body-deck">Ketentuan pemakaian, tanggung jawab data, dan batas jaminan. Simpan master password-mu: data terenkripsi tidak bisa dipulihkan tanpa itu.</p>
+        </div>
+      </div>
+
+      <div class="legal-sections">
+        <section class="legal-section" id="penggunaan" aria-labelledby="penggunaan-title">
+          <p class="legal-no">01</p>
+          <div class="legal-copy">
+            <h2 id="penggunaan-title">Penggunaan</h2>
+            <p>Zterm disediakan gratis untuk mengelola dan mengakses server melalui SSH. Kamu bertanggung jawab atas server yang kamu akses dan memastikan kamu berhak mengaksesnya.</p>
+          </div>
+        </section>
+
+        <section class="legal-section" id="data" aria-labelledby="data-title">
+          <p class="legal-no">02</p>
+          <div class="legal-copy">
+            <h2 id="data-title">Data dan keamanan</h2>
+            <p>Semua data disimpan terenkripsi dengan master password-mu. Master password tidak bisa dipulihkan; jika lupa, data di vault tidak bisa dibuka. Simpan master password di tempat yang aman.</p>
+          </div>
+        </section>
+
+        <section class="legal-section" id="jaminan" aria-labelledby="jaminan-title">
+          <p class="legal-no">03</p>
+          <div class="legal-copy">
+            <h2 id="jaminan-title">Tanpa jaminan</h2>
+            <p>Aplikasi disediakan “sebagaimana adanya” tanpa jaminan apa pun. Pengembang tidak bertanggung jawab atas kehilangan data, gangguan layanan, atau kerugian yang timbul dari penggunaan aplikasi.</p>
+          </div>
+        </section>
+
+        <section class="legal-section" id="perubahan" aria-labelledby="perubahan-title">
+          <p class="legal-no">04</p>
+          <div class="legal-copy">
+            <h2 id="perubahan-title">Perubahan</h2>
+            <p>Syarat ini dapat diperbarui sewaktu-waktu. Versi terbaru selalu tersedia di halaman ini.</p>
+          </div>
+        </section>
+
+        <section class="legal-section" id="kontak" aria-labelledby="kontak-title">
+          <p class="legal-no">05</p>
+          <div class="legal-copy">
+            <h2 id="kontak-title">Kontak</h2>
+            <p><a href="https://github.com/latiefahmad/zterm/issues">Buka issue di GitHub</a> · <a href="https://github.com/latiefahmad">Latief Ahmad</a></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span class="footer-brand">Zterm</span>
+    <span class="footer-tagline">Panduan lapangan, edisi 1.0.1</span>
+    <nav class="footer-nav" aria-label="Tautan footer">
+      <a href="https://github.com/latiefahmad/zterm">GitHub</a>
+      <a href="https://github.com/latiefahmad/zterm/releases">Rilis</a>
+      <a href="privacy.html">Privasi</a>
+      <a href="terms.html" aria-current="page">Syarat</a>
+    </nav>
+    <p class="footer-legal">© 2026 Latief Ahmad. MIT.</p>
+  </div>
+</footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="Kembali ke atas" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  <span>Ke atas</span>
+</button>
+
+<script src="site-ui.js" defer></script>
 </body>
 </html>
