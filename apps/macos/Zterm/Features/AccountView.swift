@@ -42,7 +42,7 @@ struct AccountView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
-                PageHeader(title: L("Akun"), subtitle: L("Sinkronisasi, keamanan, dan data vault di perangkat ini"))
+                PageHeader(title: L("Akun"), subtitle: L("Sinkronisasi, keamanan, dan data vault di perangkat ini")) { EmptyView() }
                 profileCard.staggerIn(0, base: 0.02)
                 HStack(alignment: .top, spacing: 18) {
                     VStack(spacing: 18) {
