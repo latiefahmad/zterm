@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate data ikon Phosphor Duotone untuk macOS, Windows, dan Linux.
+// Generate data ikon Phosphor Duotone untuk macOS dan Windows (Linux menyusul).
 //
 // Sumber: @phosphor-icons/core (ISC). SVG duotone punya dua path: lapisan
 // sekunder (opacity 0.2) dan garis utama. Skrip ini menormalkan semua perintah
