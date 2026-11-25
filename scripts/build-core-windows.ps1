@@ -31,7 +31,7 @@ Pop-Location
 # Binding C# (uniffi-bindgen-cs harus sesuai versi uniffi di core: 0.32)
 $bindgen = Join-Path $cargoHome "bin\uniffi-bindgen-cs.exe"
 if (-not (Test-Path $bindgen)) {
-    & $cargo install uniffi-bindgen-cs --git https://github.com/NordSecurity/uniffi-bindgen-cs --tag "v0.12.0+v0.32.0"
+    & $cargo install uniffi-bindgen-cs --git https://github.com/NordSecurity/uniffi-bindgen-cs --tag "v0.12.0+v0.32.0" --locked
     if ($LASTEXITCODE -ne 0) { throw "install uniffi-bindgen-cs gagal" }
 }
 $gen = Join-Path $app "Core\Generated"
