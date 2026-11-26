@@ -913,5 +913,7 @@
  "disinkron {}": "synced {}",
  "Hapus known host?": "Delete known host?",
  "Hapus fingerprint": "Delete fingerprint",
- "Hapus semua key": "Delete all keys"
+ "Hapus semua key": "Delete all keys",
+ "Isi password tersimpan": "Fill saved password",
+ "isi password": "fill password"
 }
