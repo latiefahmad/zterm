@@ -6,6 +6,28 @@ Download versi terbaru: [Releases](https://github.com/latiefahmad/zterm/releases
 
 ---
 
+## [1.1.0] - 2026-11-26
+
+Dialog keamanan saat kunci server berubah, plus hapus semua key satu host dari Known Hosts.
+
+### Ditambahkan
+
+- **Host key berubah** - SFTP di macOS dan Windows menampilkan fingerprint lama dan baru berdampingan, dengan aksi **Ganti key** dan pintasan ke Known Hosts
+- **Known Hosts** - hapus semua key untuk satu host sekaligus (termasuk entri ter-hash), dengan konfirmasi eksplisit dan cadangan `known_hosts.old`
+
+### Diubah
+
+- **Core** - `HostKeyChanged` membawa host, port, fingerprint, dan tipe key lama/baru; path `known_hosts` konsisten memakai `HOME` lalu `USERPROFILE`
+- **Keamanan** - Ganti key tidak pernah menjadi tombol default; Batal/Escape tetap menjadi aksi aman
+
+### Platform
+
+- **macOS 15+** - universal (Apple Silicon & Intel)
+- **Windows 10/11** - x64 dan ARM64
+- **Linux (beta)** - x86_64 dan ARM64
+
+[1.1.0]: https://github.com/latiefahmad/zterm/releases/tag/v1.1.0
+
 ## [1.0.1] - 2026-11-25
 
 Pembaruan tampilan untuk macOS, Windows, dan Linux (beta). Seluruh ikon kini memakai Phosphor Duotone, dengan permukaan netral, border tipis, dan status berbentuk badge.
