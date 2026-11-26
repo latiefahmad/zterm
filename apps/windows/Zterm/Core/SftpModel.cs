@@ -11,6 +11,12 @@ namespace Zterm;
 /// <summary>Satu file / folder di panel lokal atau server.</summary>
 internal sealed record FileItem(string Name, string Path, bool IsDir, ulong Size, DateTimeOffset? Modified, uint Permissions);
 
+/// <summary>Konflik host key: fingerprint lama vs baru, untuk dialog "Ganti key".</summary>
+internal sealed record HostKeyConflict(string Host, ushort Port, string OldFingerprint, string NewFingerprint, string OldKeyType, string NewKeyType)
+{
+    public string Address => Port == 22 ? Host : $"{Host}:{Port}";
+}
+
 /// <summary>File server yang dibuka di editor teks bawaan.</summary>
 internal sealed class RemoteEditorDoc
 {
@@ -131,6 +137,9 @@ internal sealed class SftpModel
     public Host? Host { get; private set; }
     public Status State { get; private set; } = Status.Idle;
     public string? FailMessage { get; private set; }
+    /// <summary>Diisi saat koneksi ditolak karena host key berubah; ditampilkan sebagai dialog.</summary>
+    public HostKeyConflict? Conflict { get; private set; }
+    private SshKey? _lastKey;
     public string RemotePath { get; private set; } = "";
     public List<FileItem> RemoteItems { get; private set; } = [];
     public bool RemoteLoading { get; private set; }
@@ -157,6 +166,7 @@ internal sealed class SftpModel
     {
         await Disconnect();
         Host = host;
+        _lastKey = key;
         State = Status.Connecting;
         Raise();
         var target = new SshTarget(host.Hostname, host.Port, host.Username,
@@ -172,12 +182,44 @@ internal sealed class SftpModel
             Raise();
             await OpenRemote(home);
         }
+        catch (CoreException.HostKeyChanged hk)
+        {
+            State = Status.Failed;
+            Conflict = new HostKeyConflict(hk.host, hk.port, hk.oldFingerprint, hk.newFingerprint, hk.oldKeyType, hk.newKeyType);
+            FailMessage = Errors.Text(hk);
+            Raise();
+        }
         catch (Exception e)
         {
             State = Status.Failed;
             FailMessage = Errors.Text(e);
             Raise();
         }
+    }
+
+    /// <summary>Hapus semua key host ini dari known_hosts, lalu coba sambung lagi.</summary>
+    public async Task ReplaceHostKey()
+    {
+        if (Conflict is not { } c || Host is not { } host) return;
+        try
+        {
+            var removed = ZtermCoreMethods.ForgetKnownHost(c.Host, c.Port);
+            _model.Flash(L.T("{} key dihapus", removed));
+        }
+        catch (Exception e)
+        {
+            Error = Errors.Text(e);
+            Raise();
+            return;
+        }
+        Conflict = null;
+        await Connect(host, _lastKey);
+    }
+
+    public void DismissConflict()
+    {
+        Conflict = null;
+        Raise();
     }
 
     public async Task Disconnect()
@@ -193,6 +235,7 @@ internal sealed class SftpModel
         RemotePath = "";
         State = Status.Idle;
         Host = null;
+        Conflict = null;
         Raise();
     }
 

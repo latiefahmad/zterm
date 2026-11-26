@@ -32,7 +32,7 @@ pub use proxy::proxy_stdio;
 pub use remote_run::{run_remote, RemoteRun};
 pub use server_info::{DiskInfo, ServerInfo, ServerMonitor, ServerSample};
 pub use sftp::{RemoteEntry, SftpClient, TransferProgress};
-pub use ssh::SshTarget;
+pub use ssh::{forget_known_host, SshTarget};
 pub use stack::{LocalStack, StackComponent, StackService, StackSettings, StackState};
 pub use team::{MemberStatus, TeamInfo, TeamInvite, TeamMember, TeamStatus};
 pub use vault::{Vault, vault_exists};

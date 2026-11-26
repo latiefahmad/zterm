@@ -36,6 +36,9 @@ struct SftpView: View {
         .sheet(item: Binding(get: { sftp.editor }, set: { sftp.editor = $0 })) { doc in
             RemoteEditorView(doc: doc)
         }
+        .sheet(item: Binding(get: { sftp.hostKeyConflict }, set: { sftp.hostKeyConflict = $0 })) { conflict in
+            HostKeyConflictSheet(conflict: conflict)
+        }
         .overlay(alignment: .bottom) {
             if let n = sftp.notice, sftp.error == nil {
                 PhosphorLabel(sf: "checkmark.circle.fill", text: n, size: 12)
@@ -163,6 +166,73 @@ struct SftpFailed: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/// Dialog konflik host key: bandingkan fingerprint lama & baru sebelum mengganti.
+struct HostKeyConflictSheet: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    let conflict: HostKeyConflict
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 10) {
+                PhosphorIcon(sf: "exclamationmark.triangle.fill", size: 20).foregroundStyle(.orange)
+                Text(L("Kunci server berubah")).font(.title3.bold())
+            }
+            Text(L("Kunci server ini berbeda dari yang tercatat. Bandingkan fingerprint lama dan baru sebelum memutuskan. Jika kamu tidak yakin server memang berganti kunci, batalkan dan periksa server."))
+                .font(.callout).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 12) {
+                Text(conflict.address).font(.system(size: 12, design: .monospaced)).foregroundStyle(.secondary)
+                Divider()
+                fingerprint(L("Fingerprint lama"), type: conflict.oldKeyType, value: conflict.oldFingerprint)
+                Divider()
+                fingerprint(L("Fingerprint baru"), type: conflict.newKeyType, value: conflict.newFingerprint)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.cardStroke))
+            HStack(spacing: 8) {
+                Spacer()
+                Button(L("Batal")) {
+                    model.sftp.hostKeyConflict = nil
+                    dismiss()
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .keyboardShortcut(.cancelAction)
+                Button(L("Buka Known Hosts")) {
+                    model.sftp.hostKeyConflict = nil
+                    dismiss()
+                    model.section = .knownHosts
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                Button(role: .destructive) {
+                    let sftp = model.sftp
+                    model.sftp.hostKeyConflict = nil
+                    dismiss()
+                    Task { await sftp.replaceHostKey(conflict) }
+                } label: {
+                    Text(L("Ganti key")).foregroundStyle(Theme.red)
+                }
+                .buttonStyle(SecondaryButtonStyle())
+            }
+        }
+        .padding(22)
+        .frame(width: 520)
+    }
+
+    private func fingerprint(_ label: String, type: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(type.isEmpty ? label : "\(label) · \(type)")
+                .font(.system(size: 11)).foregroundStyle(.secondary)
+            Text(value.isEmpty ? L("Tidak tercatat") : value)
+                .font(.system(size: 12, design: .monospaced))
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }
 

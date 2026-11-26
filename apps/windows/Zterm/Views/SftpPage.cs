@@ -25,6 +25,7 @@ internal sealed class SftpPage : PageBase
     private readonly Border _picker = new();
     private readonly Grid _editorLayer = new() { Visibility = Visibility.Collapsed };
     private RemoteEditorDoc? _shownDoc;
+    private HostKeyConflict? _conflictShown;
     private TextBlock? _edDirty, _edLines;
     private Button? _edSave;
     private ListView? _localList, _remoteList;
@@ -59,6 +60,50 @@ internal sealed class SftpPage : PageBase
         RenderRemote();
         RenderTransfers();
         RenderEditor();
+        if (S.Conflict is { } conflict && !ReferenceEquals(conflict, _conflictShown))
+        {
+            _conflictShown = conflict;
+            _ = ShowHostKeyConflict(conflict);
+        }
+    }
+
+    /// <summary>Dialog konflik host key: bandingkan fingerprint lama & baru sebelum mengganti.</summary>
+    private async Task ShowHostKeyConflict(HostKeyConflict c)
+    {
+        static UIElement Fingerprint(string label, string keyType, string fingerprint)
+        {
+            var type = string.IsNullOrEmpty(keyType) ? "" : $" · {keyType}";
+            var value = string.IsNullOrEmpty(fingerprint) ? L.T("Tidak tercatat") : fingerprint;
+            return Ui.Col(3,
+                Ui.Text(label + type, 11, fg: Theme.Text2),
+                Ui.Text(value, 12, mono: true).With(t =>
+                {
+                    t.IsTextSelectionEnabled = true;
+                    t.TextWrapping = TextWrapping.Wrap;
+                    t.TextTrimming = TextTrimming.None;
+                }));
+        }
+
+        var body = Ui.Col(14,
+            Ui.Text(L.T("Kunci server ini berbeda dari yang tercatat. Bandingkan fingerprint lama dan baru sebelum memutuskan. Jika kamu tidak yakin server memang berganti kunci, batalkan dan periksa server."), 12.5, wrap: true),
+            Ui.Card(Ui.Col(10,
+                Ui.Text(c.Address, 12, fg: Theme.Text2, mono: true),
+                Ui.Divider(),
+                Fingerprint(L.T("Fingerprint lama"), c.OldKeyType, c.OldFingerprint),
+                Ui.Divider(),
+                Fingerprint(L.T("Fingerprint baru"), c.NewKeyType, c.NewFingerprint)), 14));
+        var d = Ui.Dialog(L.T("Kunci server berubah"), body, L.T("Ganti key"));
+        d.SecondaryButtonText = L.T("Buka Known Hosts");
+        d.DefaultButton = ContentDialogButton.Close;
+        d.PrimaryButtonStyle = Ui.DangerStyle();
+        var result = await d.ShowAsync();
+        if (result == ContentDialogResult.Primary) await S.ReplaceHostKey();
+        else if (result == ContentDialogResult.Secondary)
+        {
+            S.DismissConflict();
+            M.Navigate(Section.KnownHosts);
+        }
+        else S.DismissConflict();
     }
 
     // MARK: Editor teks bawaan

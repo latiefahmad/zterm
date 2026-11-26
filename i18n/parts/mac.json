@@ -910,5 +910,8 @@
  "✓ {} baris terpengaruh": "✓ {} rows affected",
  "✓ {} tersimpan ke server": "✓ {} saved to the server",
  "(dipotong)": "(truncated)",
- "disinkron {}": "synced {}"
+ "disinkron {}": "synced {}",
+ "Hapus known host?": "Delete known host?",
+ "Hapus fingerprint": "Delete fingerprint",
+ "Hapus semua key": "Delete all keys"
 }

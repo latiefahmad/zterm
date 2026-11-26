@@ -21,7 +21,14 @@ pub enum CoreError {
     #[error("Login ditolak server — periksa username, password, atau key")]
     AuthFailed,
     #[error("Kunci server berubah! Bisa jadi server diganti atau ada serangan man-in-the-middle. Hapus host ini di Known Hosts jika memang server berganti.")]
-    HostKeyChanged,
+    HostKeyChanged {
+        host: String,
+        port: u16,
+        old_fingerprint: String,
+        new_fingerprint: String,
+        old_key_type: String,
+        new_key_type: String,
+    },
     #[error("Database: {msg}")]
     Db { msg: String },
     #[error("Transfer dibatalkan")]

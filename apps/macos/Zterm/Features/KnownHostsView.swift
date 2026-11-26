@@ -7,11 +7,34 @@ struct KnownHostsView: View {
     @AppStorage(PrivacyKeys.hideAddresses) private var hideAddresses = true
     @State private var entries: [KnownHost] = []
     @State private var query = ""
-    @State private var toDelete: KnownHost?
+    @State private var deleteMode: DeleteMode?
+
+    private enum DeleteMode: Identifiable {
+        case single(KnownHost)
+        case all(KnownHost)
+
+        var id: String {
+            switch self {
+            case .single(let e): "single-\(e.id)"
+            case .all(let e): "all-\(e.id)"
+            }
+        }
+    }
 
     private var filtered: [KnownHost] {
         let q = query.lowercased()
         return q.isEmpty ? entries : entries.filter { $0.hosts.lowercased().contains(q) || $0.keyType.lowercased().contains(q) }
+    }
+
+    private var deleteTitle: String {
+        guard let mode = deleteMode else { return L("Hapus known host?") }
+        switch mode {
+        case .single:
+            return L("Hapus fingerprint ini?")
+        case .all(let e):
+            if let hp = e.firstHost { return L("Hapus semua key untuk {}?", hp.host) }
+            return L("Hapus semua key untuk host ini")
+        }
     }
 
     var body: some View {
@@ -49,7 +72,26 @@ struct KnownHostsView: View {
                                             .textSelection(.enabled)
                                     }
                                     Spacer()
-                                    IconButton(symbol: "trash", help: L("Hapus dari known hosts"), tint: .red) { toDelete = e }
+                                    HStack(spacing: 2) {
+                                        if e.firstHost != nil {
+                                            Menu {
+                                                Button(L("Hapus semua key untuk host ini"), role: .destructive) {
+                                                    deleteMode = .all(e)
+                                                }
+                                            } label: {
+                                                PhosphorIcon(sf: "ellipsis", size: 13, tint: .secondary)
+                                                    .frame(width: 26, height: 26)
+                                                    .contentShape(Rectangle())
+                                            }
+                                            .menuStyle(.borderlessButton)
+                                            .menuIndicator(.hidden)
+                                            .fixedSize()
+                                            .help(L("Lainnya"))
+                                        }
+                                        IconButton(symbol: "trash", help: L("Hapus dari known hosts"), tint: .red) {
+                                            deleteMode = .single(e)
+                                        }
+                                    }
                                 }
                             }
                             .staggerIn(i, base: 0)
@@ -60,11 +102,22 @@ struct KnownHostsView: View {
             .padding(28)
         }
         .onAppear(perform: reload)
-        .confirmationDialog(L("Hapus fingerprint ini?"), isPresented: Binding(get: { toDelete != nil }, set: { if !$0 { toDelete = nil } }),
-                            presenting: toDelete) { e in
-            Button(L("Hapus"), role: .destructive) { delete(e) }
-        } message: { _ in
-            Text(L("Saat connect berikutnya, fingerprint server akan dicatat ulang. Hapus hanya jika kamu yakin server memang berganti kunci."))
+        .confirmationDialog(deleteTitle,
+                            isPresented: Binding(get: { deleteMode != nil }, set: { if !$0 { deleteMode = nil } }),
+                            presenting: deleteMode) { mode in
+            switch mode {
+            case .single(let e):
+                Button(L("Hapus fingerprint"), role: .destructive) { delete(e) }
+            case .all(let e):
+                Button(L("Hapus semua key"), role: .destructive) { deleteAll(e) }
+            }
+        } message: { mode in
+            switch mode {
+            case .single:
+                Text(L("Saat connect berikutnya, fingerprint server akan dicatat ulang. Hapus hanya jika kamu yakin server memang berganti kunci."))
+            case .all(let e):
+                Text(L("Semua key untuk {} di known_hosts akan dihapus, lalu server dipercaya lagi saat connect berikutnya. Hapus hanya jika kamu yakin server memang berganti kunci.", e.firstHost?.host ?? e.hosts))
+            }
         }
     }
 
@@ -76,6 +129,17 @@ struct KnownHostsView: View {
         do {
             try KnownHostsFile.remove(lineAt: e.line)
             model.flash(L("Fingerprint dihapus"))
+        } catch {
+            model.flash(Lmsg(error.localizedDescription))
+        }
+        reload()
+    }
+
+    private func deleteAll(_ e: KnownHost) {
+        guard let hp = e.firstHost else { return }
+        do {
+            let removed = try forgetKnownHost(host: hp.host, port: hp.port)
+            model.flash(L("{} key dihapus", Int(removed)))
         } catch {
             model.flash(Lmsg(error.localizedDescription))
         }
@@ -98,6 +162,23 @@ struct KnownHost: Identifiable {
     func displayHosts(hidden: Bool) -> String {
         if isHashed { return L("Host ter-hash") }
         return hidden ? hosts.split(separator: ",").map { _ in "••••••" }.joined(separator: ", ") : hosts
+    }
+
+    /// Host & port pertama pada pola known_hosts (nil untuk entri ter-hash).
+    var firstHost: (host: String, port: UInt16)? {
+        guard !isHashed else { return nil }
+        for raw in hosts.split(separator: ",") {
+            let part = raw.trimmingCharacters(in: .whitespaces)
+            guard !part.isEmpty, !part.hasPrefix("!"), !part.contains("*"), !part.contains("?") else { continue }
+            if part.hasPrefix("["), let close = part.firstIndex(of: "]") {
+                let host = String(part[part.index(after: part.startIndex)..<close])
+                let rest = part[part.index(after: close)...]
+                let port = rest.hasPrefix(":") ? UInt16(rest.dropFirst()) ?? 22 : 22
+                return (host, port)
+            }
+            return (part, 22)
+        }
+        return nil
     }
 }
 

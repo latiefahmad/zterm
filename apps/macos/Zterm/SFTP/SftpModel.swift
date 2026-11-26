@@ -64,6 +64,19 @@ final class ProgressBridge: TransferProgress, @unchecked Sendable {
     func isCancelled() -> Bool { lock.lock(); defer { lock.unlock() }; return cancelled }
 }
 
+/// Konflik host key: fingerprint lama vs baru, untuk dialog "Ganti key".
+struct HostKeyConflict: Identifiable {
+    let id = UUID()
+    let host: String
+    let port: UInt16
+    let oldFingerprint: String
+    let newFingerprint: String
+    let oldKeyType: String
+    let newKeyType: String
+
+    var address: String { port == 22 ? host : "\(host):\(port)" }
+}
+
 @MainActor
 @Observable
 final class SftpModel {
@@ -71,6 +84,8 @@ final class SftpModel {
 
     var host: Host?
     var status: Status = .idle
+    /// Diisi saat koneksi ditolak karena host key berubah; ditampilkan sebagai sheet.
+    var hostKeyConflict: HostKeyConflict?
     var remotePath = ""
     var remoteItems: [FileItem] = []
     var remoteLoading = false
@@ -94,6 +109,7 @@ final class SftpModel {
     @ObservationIgnored private var client: SftpClient?
     @ObservationIgnored private var bridges: [UUID: ProgressBridge] = [:]
     @ObservationIgnored private var watchTimer: Timer?
+    @ObservationIgnored private var lastKey: SshKey?
 
     init() { reloadLocal() }
 
@@ -102,6 +118,7 @@ final class SftpModel {
     func connect(_ host: Host, key: SshKey?) async {
         await disconnect()
         self.host = host
+        lastKey = key
         withAnimation(.zterm) { status = .connecting }
         let target = SshTarget(
             hostname: host.hostname, port: host.port, username: host.username,
@@ -116,8 +133,27 @@ final class SftpModel {
             withAnimation(.zterm) { status = .connected }
             await openRemote(home)
         } catch {
+            if let core = error as? CoreError,
+               case let .HostKeyChanged(host, port, oldFingerprint, newFingerprint, oldKeyType, newKeyType) = core {
+                hostKeyConflict = HostKeyConflict(host: host, port: port, oldFingerprint: oldFingerprint,
+                                                  newFingerprint: newFingerprint, oldKeyType: oldKeyType, newKeyType: newKeyType)
+            }
             withAnimation(.zterm) { status = .failed(error.ztermMessage) }
         }
+    }
+
+    /// Hapus semua key host ini dari known_hosts, lalu coba sambung lagi.
+    func replaceHostKey(_ conflict: HostKeyConflict) async {
+        guard let host else { return }
+        do {
+            let removed = try forgetKnownHost(host: conflict.host, port: conflict.port)
+            showNotice(L("{} key dihapus", Int(removed)))
+        } catch {
+            flashError(error)
+            return
+        }
+        hostKeyConflict = nil
+        await connect(host, key: lastKey)
     }
 
     func disconnect() async {
@@ -131,6 +167,7 @@ final class SftpModel {
         client = nil
         remoteItems = []
         remotePath = ""
+        hostKeyConflict = nil
         status = .idle
     }
 

@@ -110,7 +110,7 @@ internal static class Errors
         CoreException.Ssh s => L.T("Koneksi SSH gagal: {}", L.Msg(s.msg)),
         CoreException.Proxy px => "Proxy: " + L.Msg(px.msg),
         CoreException.AuthFailed => L.T("Login ditolak server — periksa username, password, atau key"),
-        CoreException.HostKeyChanged => L.T("Kunci server berubah! Bisa jadi server diganti atau ada serangan man-in-the-middle. Hapus host ini di Known Hosts jika memang server berganti."),
+        CoreException.HostKeyChanged hk => L.T("Kunci server berubah! Bisa jadi server diganti atau ada serangan man-in-the-middle. Hapus host ini di Known Hosts jika memang server berganti."),
         CoreException.Db d => "Database: " + L.Msg(d.msg),
         CoreException.Cancelled => L.T("Transfer dibatalkan"),
         CoreException.Io io => L.T("Gagal membaca/menulis file: {}", L.Msg(io.msg)),
@@ -180,11 +180,42 @@ internal sealed record KnownHost(int Line, string Hosts, string KeyType, string 
     public bool IsHashed => Hosts.StartsWith("|1|");
     public string ShortType => KeyType.Replace("ssh-", "").Replace("ecdsa-sha2-", "").ToUpperInvariant();
     public string Display(bool hidden) => IsHashed ? L.T("Host ter-hash") : hidden ? string.Join(", ", Hosts.Split(',').Select(_ => "••••••")) : Hosts;
+
+    /// <summary>Host & port pertama pada pola known_hosts (null untuk entri ter-hash).</summary>
+    public (string Host, ushort Port)? FirstHost()
+    {
+        if (IsHashed) return null;
+        foreach (var raw in Hosts.Split(','))
+        {
+            var part = raw.Trim();
+            if (part.Length == 0 || part.StartsWith('!') || part.Contains('*') || part.Contains('?')) continue;
+            if (part.StartsWith('['))
+            {
+                var close = part.IndexOf(']');
+                if (close < 0) continue;
+                var host = part[1..close];
+                var rest = part[(close + 1)..];
+                var port = rest.StartsWith(':') && ushort.TryParse(rest[1..], out var p) ? p : (ushort)22;
+                return (host, port);
+            }
+            return (part, 22);
+        }
+        return null;
+    }
 }
 
 internal static class KnownHostsFile
 {
-    public static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ssh", "known_hosts");
+    public static string FilePath
+    {
+        get
+        {
+            // Sama dengan zterm-core: HOME lebih dulu, lalu USERPROFILE.
+            var home = Environment.GetEnvironmentVariable("HOME");
+            if (string.IsNullOrEmpty(home)) home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            return Path.Combine(home, ".ssh", "known_hosts");
+        }
+    }
 
     public static List<KnownHost> Read()
     {

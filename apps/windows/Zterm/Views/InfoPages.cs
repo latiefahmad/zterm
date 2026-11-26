@@ -50,11 +50,35 @@ internal sealed class KnownHostsPage : PageBase
                 Ui.Text(e.Fingerprint, 11, fg: Theme.Text2, mono: true).With(t => { t.IsTextSelectionEnabled = true; t.TextTrimming = TextTrimming.CharacterEllipsis; }));
             var del = Ui.IconBtn(G.Delete, L.T("Hapus dari known hosts"), async () =>
             {
-                if (!await Ui.Confirm(L.T("Hapus fingerprint ini?"), L.T("Saat connect berikutnya, fingerprint server akan dicatat ulang. Hapus hanya jika kamu yakin server memang berganti kunci."))) return;
+                if (!await Ui.Confirm(L.T("Hapus fingerprint ini?"), L.T("Saat connect berikutnya, fingerprint server akan dicatat ulang. Hapus hanya jika kamu yakin server memang berganti kunci."), L.T("Hapus fingerprint"))) return;
                 try { KnownHostsFile.Remove(e.Line); M.Flash(L.T("Fingerprint dihapus")); } catch (Exception ex) { M.Flash(L.Msg(ex.Message)); }
                 Render();
             }, Theme.Brush("#E5484D"));
-            var card = Ui.HoverCard(Ui.Columns("Auto,*,Auto", 12, icon, info, del), 12);
+            UIElement? more = null;
+            if (e.FirstHost() is { } hp)
+            {
+                var menu = new MenuFlyout();
+                var all = new MenuFlyoutItem { Text = L.T("Hapus semua key untuk host ini") };
+                all.Click += async (_, _) =>
+                {
+                    if (!await Ui.Confirm(L.T("Hapus semua key untuk {}?", hp.Host),
+                            L.T("Semua key untuk {} di known_hosts akan dihapus, lalu server dipercaya lagi saat connect berikutnya. Hapus hanya jika kamu yakin server memang berganti kunci.", hp.Host),
+                            L.T("Hapus semua key"))) return;
+                    try
+                    {
+                        var removed = ZtermCoreMethods.ForgetKnownHost(hp.Host, hp.Port);
+                        M.Flash(L.T("{} key dihapus", removed));
+                    }
+                    catch (Exception ex) { M.Flash(L.Msg(ex.Message)); }
+                    Render();
+                };
+                menu.Items.Add(all);
+                var moreBtn = Ui.IconBtn(G.More, L.T("Lainnya"), () => { });
+                moreBtn.Flyout = menu;
+                more = moreBtn;
+            }
+            var actions = Ui.Row(2, more, del);
+            var card = Ui.HoverCard(Ui.Columns("Auto,*,Auto", 12, icon, info, actions), 12);
             _list.Children.Add(card);
             Ui.StaggerIn(card, i);
         }
