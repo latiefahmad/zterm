@@ -65,7 +65,8 @@ final class TerminalSession: Identifiable {
         autocomplete.snippets = { [weak model] in model?.snippets ?? [] }
         // Password sudo = password login host yang tersimpan (bukan untuk terminal lokal)
         autocomplete.secret = { [weak self] in
-            guard let self, !self.isLocal, let pw = self.host.password, !pw.isEmpty, !self.host.username.isEmpty else { return nil }
+            guard let self, !self.isLocal, self.host.auth == .password,
+                  let pw = self.host.password, !pw.isEmpty, !self.host.username.isEmpty else { return nil }
             return (self.host.username, pw)
         }
         v.onOutput = { [weak ac = autocomplete] in ac?.outputArrived() }

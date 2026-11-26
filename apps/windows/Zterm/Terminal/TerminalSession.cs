@@ -163,7 +163,7 @@ internal sealed class TerminalSession
     });
 
     /// <summary>User yang password sudo-nya tersimpan (= password login host), null untuk terminal lokal / tanpa password.</summary>
-    private string? SudoUser => !IsLocal && !string.IsNullOrEmpty(Host.Password) && !string.IsNullOrEmpty(Host.Username) ? Host.Username : null;
+    private string? SudoUser => !IsLocal && Host.Auth == AuthMethod.Password && !string.IsNullOrEmpty(Host.Password) && !string.IsNullOrEmpty(Host.Username) ? Host.Username : null;
 
     private async Task PasteAsync()
     {
