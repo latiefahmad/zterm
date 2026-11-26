@@ -27,7 +27,7 @@
     "hero.plate.label": "Plate 01",
     "hero.plate.title": "Hosts + terminal",
     "hero.sketch.aria": "Zterm interface illustration: host list and SSH terminal",
-    "hero.caption": "Interface illustration. The data shown is sample data, not a screenshot.",
+    "hero.caption": "*Interface illustration. The data shown is sample data, not a screenshot.",
 
     "facts.aria": "Product summary",
     "facts.platform.k": "Platform",
@@ -84,7 +84,7 @@
     "ch01.plate.label": "Plate 02",
     "ch01.plate.title": "Host editor",
     "ch01.aria": "Zterm host editor illustration",
-    "ch01.caption": "Interface illustration. The data shown is sample data.",
+    "ch01.caption": "*Interface illustration. The data shown is sample data, not a screenshot.",
 
     "ch02.label": "Chapter 02",
     "ch02.name": "Dashboard",
@@ -111,7 +111,7 @@
     "ch02.plate.label": "Plate 03",
     "ch02.plate.title": "Dashboard + services",
     "ch02.aria": "Zterm server dashboard illustration with CPU, RAM, and disk charts",
-    "ch02.caption": "Interface illustration. The data shown is sample data.",
+    "ch02.caption": "*Interface illustration. The data shown is sample data, not a screenshot.",
 
     "ch03.label": "Chapter 03",
     "ch03.name": "Databases",
@@ -140,7 +140,7 @@
     "ch03.plate.label": "Plate 04",
     "ch03.plate.title": "Database + backup",
     "ch03.aria": "Zterm database illustration with a table, search, and backups",
-    "ch03.caption": "Interface illustration. The data shown is sample data.",
+    "ch03.caption": "*Interface illustration. The data shown is sample data, not a screenshot.",
 
     "ch04.label": "Chapter 04",
     "ch04.name": "SFTP",
@@ -165,7 +165,7 @@
     "ch04.plate.label": "Plate 05",
     "ch04.plate.title": "SFTP + editor",
     "ch04.aria": "Zterm two-pane SFTP and file editor illustration",
-    "ch04.caption": "Interface illustration. The data shown is sample data.",
+    "ch04.caption": "*Interface illustration. The data shown is sample data, not a screenshot.",
 
     "ch05.label": "Chapter 05",
     "ch05.name": "Docker",
@@ -192,7 +192,7 @@
     "ch05.plate.label": "Plate 06",
     "ch05.plate.title": "Docker + local server",
     "ch05.aria": "Zterm Docker and local server illustration",
-    "ch05.caption": "Interface illustration. The data shown is sample data.",
+    "ch05.caption": "*Interface illustration. The data shown is sample data, not a screenshot.",
 
     "ch06.label": "Chapter 06",
     "ch06.name": "Teams",
@@ -215,7 +215,7 @@
     "ch06.plate.label": "Plate 07",
     "ch06.plate.title": "Team + sync",
     "ch06.aria": "Zterm team and sync illustration",
-    "ch06.caption": "Interface illustration. The data shown is sample data.",
+    "ch06.caption": "*Interface illustration. The data shown is sample data, not a screenshot.",
 
     "ch07.label": "Chapter 07",
     "ch07.name": "Security",
@@ -233,7 +233,7 @@
     "ch07.04.v": "Only the appdata folder and team files created through Zterm. Google cannot read the encrypted contents.",
     "ch07.05.k": "Open source",
     "ch07.05.v": "MIT license. The source is on GitHub for anyone to inspect.",
-    "ch07.note": "The app is not notarized by Apple and not signed with a Windows certificate. How to open it is covered in the Install chapter.",
+    "ch07.note": "*The app is not notarized by Apple and not signed with a Windows certificate. How to open it is covered in the Install chapter.",
 
     "ch08.label": "Chapter 08",
     "ch08.name": "Install",
