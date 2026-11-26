@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="id" data-theme="light">
+<html lang="id" data-theme="light" class="i18n-boot">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Zterm: SSH Client Gratis untuk Mac, Windows &amp; Linux</title>
-<meta name="description" content="Zterm adalah SSH client native gratis untuk macOS, Windows, dan Linux. Kelola host, terminal, SFTP, Docker, database, dan backup dari satu aplikasi. Tanpa akun, tanpa server perantara." />
-<meta name="keywords" content="SSH client Mac, SFTP Mac, terminal SSH, aplikasi SSH gratis, alternatif Termius, SSH key manager, port forwarding, macOS, SSH client Windows, SFTP Windows, phpMyAdmin desktop, terminal Windows, SSH client Linux, server monitoring, Docker GUI, backup database" />
+<title>Zterm: Free SSH Client for Mac, Windows &amp; Linux</title>
+<meta name="description" content="Zterm is a free native SSH client for macOS, Windows, and Linux. Manage hosts, terminals, SFTP, Docker, databases, and backups from one app. No account, no relay server." />
+<meta name="keywords" content="SSH client Mac, SFTP Mac, SSH terminal, free SSH app, Termius alternative, SSH key manager, port forwarding, macOS, SSH client Windows, SFTP Windows, desktop phpMyAdmin, Windows terminal, SSH client Linux, server monitoring, Docker GUI, database backup" />
 <meta name="author" content="Latief Ahmad" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="https://latief.id/zterm/" />
@@ -20,18 +20,18 @@
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Zterm" />
-<meta property="og:locale" content="id_ID" />
-<meta property="og:locale:alternate" content="en_US" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="id_ID" />
 <meta property="og:url" content="https://latief.id/zterm/" />
-<meta property="og:title" content="Zterm: SSH Client Gratis untuk Mac, Windows &amp; Linux" />
-<meta property="og:description" content="Semua servermu, satu terminal. Host, SSH, SFTP, Docker, database, dan backup untuk Mac, Windows, dan Linux. Gratis, tanpa iklan." />
+<meta property="og:title" content="Zterm: Free SSH Client for Mac, Windows &amp; Linux" />
+<meta property="og:description" content="All your servers, one terminal. Hosts, SSH, SFTP, Docker, databases, and backups for Mac, Windows, and Linux. Free, no ads." />
 <meta property="og:image" content="https://latief.id/zterm/assets/brand/og.jpg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Logo Zterm dan tulisan Semua servermu, satu terminal." />
+<meta property="og:image:alt" content="Zterm logo with the tagline All your servers, one terminal." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Zterm: SSH Client Gratis untuk Mac, Windows &amp; Linux" />
-<meta name="twitter:description" content="Semua servermu, satu terminal. Gratis, tanpa iklan, tanpa server perantara." />
+<meta name="twitter:title" content="Zterm: Free SSH Client for Mac, Windows &amp; Linux" />
+<meta name="twitter:description" content="All your servers, one terminal. Free, no ads, no relay server." />
 <meta name="twitter:image" content="https://latief.id/zterm/assets/brand/og.jpg" />
 
 <script type="application/ld+json">
@@ -41,7 +41,8 @@
   "name": "Zterm",
   "operatingSystem": "macOS 15+, Windows 10, Windows 11, Linux",
   "applicationCategory": "DeveloperApplication",
-  "description": "SSH client native untuk macOS, Windows, dan Linux dengan SFTP, keychain SSH, port forwarding, snippet, Docker, database, backup, dan sinkronisasi terenkripsi lewat Google Drive.",
+  "description": "Native SSH client for macOS, Windows, and Linux with SFTP, SSH keychain, port forwarding, snippets, Docker, databases, backups, and encrypted sync via Google Drive.",
+  "inLanguage": "en",
   "url": "https://latief.id/zterm/",
   "downloadUrl": "https://github.com/latiefahmad/zterm/releases/latest",
   "image": "https://latief.id/zterm/assets/brand/icon-512.png",
@@ -49,7 +50,7 @@
   "license": "https://opensource.org/licenses/MIT",
   "author": { "@type": "Person", "name": "Latief Ahmad" },
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" },
-  "featureList": ["SSH multi-host", "SFTP drag and drop", "Editor file SFTP", "Database ala phpMyAdmin", "Proxy SOCKS5 dan HTTP", "Terminal lokal", "Info server dan grafik live", "Keychain SSH Ed25519", "Port forwarding", "Snippets", "Tim dan berbagi host terenkripsi", "Server lokal", "Docker dan Compose", "Sync Google Drive", "Touch ID", "Windows Hello"]
+  "featureList": ["Multi-host SSH", "SFTP drag and drop", "SFTP file editor", "phpMyAdmin-style database", "SOCKS5 and HTTP proxy", "Local terminal", "Server info and live graphs", "Ed25519 SSH keychain", "Port forwarding", "Snippets", "Encrypted teams and host sharing", "Local server", "Docker and Compose", "Google Drive sync", "Touch ID", "Windows Hello"]
 }
 </script>
 
@@ -63,7 +64,15 @@
       document.documentElement.dataset.theme = savedTheme;
     }
   } catch (e) {}
+  // Tampilkan halaman lagi bila main.js gagal dimuat.
+  setTimeout(function () {
+    document.documentElement.classList.remove("i18n-boot");
+  }, 2000);
 </script>
+<style>
+  html.i18n-boot body { visibility: hidden; }
+</style>
+<noscript><style>html.i18n-boot body { visibility: visible; }</style></noscript>
 <link rel="stylesheet" href="styles.css?v=2" />
 </head>
 <body>
@@ -88,10 +97,10 @@
     </nav>
 
     <div class="header-tools">
-      <span class="version-badge" id="ver">1.0.1</span>
+      <span class="version-badge" id="ver">1.1.1</span>
       <div class="lang-switch" role="group" aria-label="Bahasa" data-i18n-aria="lang.aria">
-        <button type="button" data-lang="id" class="is-on" aria-pressed="true">ID</button>
-        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-lang="id" aria-pressed="false">ID</button>
+        <button type="button" data-lang="en" class="is-on" aria-pressed="true">EN</button>
       </div>
       <button type="button" class="icon-button" id="themeBtn" aria-label="Aktifkan tema gelap" aria-pressed="false">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4a8.5 8.5 0 1 0 11.5 11.5Z"/></svg>
@@ -117,7 +126,7 @@
   <section class="hero" id="top" aria-labelledby="hero-title">
     <div class="wrap hero-inner">
       <div class="hero-copy">
-        <p class="kicker"><span data-i18n="hero.kicker.edition">Edisi 1.0.1</span><span data-i18n="hero.kicker.date">November 2026</span></p>
+        <p class="kicker"><span data-i18n="hero.kicker.edition">Edisi 1.1.1</span><span data-i18n="hero.kicker.date">November 2026</span></p>
         <h1 class="hero-title" id="hero-title" data-i18n="hero.title">Semua servermu,<br /><em>satu terminal.</em></h1>
         <p class="hero-lead" data-i18n="hero.lead">SSH client native untuk macOS, Windows, dan Linux. Host, terminal, SFTP, Docker, database, dan backup dalam satu aplikasi. Zterm tidak memakai akun atau server perantara.</p>
         <div class="hero-actions">
@@ -497,7 +506,7 @@
       <p class="chapter-label"><span data-i18n="ch08.label">Bab 08</span><span data-i18n="ch08.name">Install</span></p>
       <div>
         <h2 class="chapter-title" id="install-title" data-i18n="ch08.title">Pilih platform, lalu mulai.</h2>
-        <p class="chapter-deck" data-i18n="ch08.deck">Versi 1.0.1 tersedia untuk macOS, Windows, dan Linux beta. Semua build memakai inti Rust yang sama.</p>
+        <p class="chapter-deck" data-i18n="ch08.deck">Versi 1.1.1 tersedia untuk macOS, Windows, dan Linux beta. Semua build memakai inti Rust yang sama.</p>
       </div>
     </header>
     <div class="install-layout">
@@ -554,7 +563,7 @@
       </div>
 
       <aside class="release-ledger" aria-labelledby="release-title">
-        <h3 id="release-title"><span data-i18n="install.release.label">Rilis terbaru</span> <span id="relVer">1.0.1</span></h3>
+        <h3 id="release-title"><span data-i18n="install.release.label">Rilis terbaru</span> <span id="relVer">1.1.1</span></h3>
         <dl>
           <div><dt>macOS</dt><dd><span class="sizeMac">DMG</span> / macOS 15+</dd></div>
           <div><dt>Windows</dt><dd><span class="sizeWin">EXE</span> / Windows 10 dan 11</dd></div>
@@ -612,7 +621,7 @@
   <span>Ke atas</span>
 </button>
 
-<script src="main.js?v=3" defer></script>
+<script src="main.js?v=4" defer></script>
 <script src="site-ui.js?v=2" defer></script>
 </body>
 </html>

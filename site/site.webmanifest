@@ -1,8 +1,8 @@
 {
   "name": "Zterm",
   "short_name": "Zterm",
-  "description": "SSH client & SFTP native untuk macOS, Windows & Linux",
-  "lang": "id",
+  "description": "Native SSH client & SFTP for macOS, Windows & Linux",
+  "lang": "en",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f2ede3",
