@@ -556,10 +556,10 @@ final class AppModel {
         let progress: (Double) -> Void = { [weak self] p in
             Task { @MainActor in
                 guard let self, self.updateAcceptingProgress else { return }
+                self.updateProgress = min(max(p, 0), 1)
                 let pct = min(99, Int((p * 100).rounded()))
                 if pct == self.updatePercent { return }
                 self.updatePercent = pct
-                self.updateProgress = p
                 self.updateStatus = pct > 0
                     ? L("Mengunduh pembaruan… {}%", pct)
                     : L("Mengunduh pembaruan…")
@@ -589,6 +589,9 @@ final class AppModel {
             sessions.forEach { $0.terminate() }
             tunnels.stopAll()
             NSApplication.shared.terminate(nil)
+            // Jaring pengaman: kalau terminate tertahan, paksa keluar supaya
+            // helper bisa mengganti bundle tanpa menunggu PID selamanya.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { exit(0) }
         } catch {
             updateAcceptingProgress = false
             updateBusy = false

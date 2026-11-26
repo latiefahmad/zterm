@@ -5,7 +5,7 @@
 ; Dipasang per user (tanpa admin) di %LOCALAPPDATA%\Programs\Zterm.
 
 #ifndef AppVersion
-  #define AppVersion "1.1.0"
+  #define AppVersion "1.1.1"
 #endif
 #ifndef Arch
   #define Arch "x64"
@@ -79,7 +79,10 @@ Root: HKCU; Subkey: "Software\Classes\{#OAuthScheme}"; ValueType: string; ValueN
 Root: HKCU; Subkey: "Software\Classes\{#OAuthScheme}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Zterm.exe"" ""%1"""
 
 [Run]
+; Instalasi normal: tampilkan centang "Jalankan Zterm" di halaman terakhir.
 Filename: "{app}\Zterm.exe"; Description: "{cm:LaunchProgram,Zterm}"; Flags: nowait postinstall skipifsilent
+; Update senyap dari dalam app: buka Zterm lagi setelah pemasangan selesai.
+Filename: "{app}\Zterm.exe"; Flags: nowait skipifnotsilent
 
 [UninstallDelete]
 ; Hanya file sementara; vault & pengaturan di %APPDATA%\Zterm tetap aman

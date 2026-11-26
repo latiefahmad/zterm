@@ -6,6 +6,22 @@ Download versi terbaru: [Releases](https://github.com/latiefahmad/zterm/releases
 
 ---
 
+## [1.1.1] - 2026-11-26
+
+Pembaruan otomatis kini benar-benar memasang versi baru dan membuka Zterm kembali, dengan progress unduhan yang halus.
+
+### Diperbaiki
+
+- **Progress unduhan** - laporan progress dibatasi dan bilah dianimasikan, sehingga tidak lagi terasa patah-patah; sidebar dan halaman Tentang tidak digambar ulang setiap potongan data
+- **Pasang otomatis (Windows)** - installer dijalankan langsung dengan mode senyap, menutup sisa proses Zterm, memasang, lalu membuka Zterm lagi lewat entri `[Run]`; tidak lagi bergantung pada helper `.cmd` yang bisa menunggu proses induk selamanya
+- **Pasang otomatis (macOS)** - helper menunggu proses dengan batas waktu, mencatat langkah pemasangan ke `update.log`, dan tetap membuka Zterm lagi bila penggantian bundle gagal
+
+### Catatan
+
+- Pengguna versi 1.1.0 atau lebih lama perlu memasang 1.1.1 secara manual satu kali; pembaruan otomatis berikutnya sudah memakai alur baru.
+
+[1.1.1]: https://github.com/latiefahmad/zterm/releases/tag/v1.1.1
+
 ## [1.1.0] - 2026-11-26
 
 Dialog keamanan saat kunci server berubah, plus hapus semua key satu host dari Known Hosts.

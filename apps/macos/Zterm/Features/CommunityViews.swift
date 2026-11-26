@@ -139,6 +139,7 @@ struct UpdateStatus: View {
                         .progressViewStyle(.linear)
                         .tint(Theme.accent)
                         .frame(maxWidth: 220)
+                        .animation(.easeOut(duration: 0.2), value: model.updateProgress)
                     Text(model.updateStatus ?? L("Mengunduh pembaruan…"))
                         .font(.caption).foregroundStyle(.secondary)
                 }

@@ -58,6 +58,8 @@ internal sealed class ShellPage : Grid
     };
     private readonly Action<string> _onChange;
     private Section? _shownSection;
+    private UpdateBar? _updateBar;
+    private TextBlock? _updateStatus;
     private bool _shownHome = true;
 
     public ShellPage()
@@ -118,6 +120,10 @@ internal sealed class ShellPage : Grid
             case "theme": Retheme(); break;
             case "nav": RenderSidebar(); RenderTabs(); RenderContent(); break;
             case "data": case "sync": case "update": RenderSidebar(); RenderTabs(); break;
+            case "update-progress":
+                _updateBar?.SetTarget(M.UpdateProgress);
+                if (_updateStatus != null) _updateStatus.Text = M.UpdateStatus ?? L.T("Mengunduh pembaruan…");
+                break;
             case "sessions": SyncTerminals(); RenderTabs(); RenderContent(); M.SyncServerStats(); RenderServerPanel(); break;
             case "serverinfo": RenderTabs(); RenderServerPanel(); break;
             case "session": RenderTabs(); break;
@@ -131,6 +137,8 @@ internal sealed class ShellPage : Grid
 
     private void RenderSidebar()
     {
+        _updateBar = null;
+        _updateStatus = null;
         var logo = new Image { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri("ms-appx:///Assets/logo.png")), Width = 34, Height = 34 };
         var version = new Border
         {
@@ -229,8 +237,10 @@ internal sealed class ShellPage : Grid
         var body = Ui.Col(8, top, Ui.Secondary(L.T("Kamu memakai {}.", Config.Version), 11));
         if (M.UpdateBusy)
         {
-            body.Children.Add(UpdateUI.Bar(M));
-            body.Children.Add(Ui.Secondary(M.UpdateStatus ?? L.T("Mengunduh pembaruan…"), 11, true));
+            _updateBar = new UpdateBar(M.UpdateProgress);
+            _updateStatus = Ui.Secondary(M.UpdateStatus ?? L.T("Mengunduh pembaruan…"), 11, true);
+            body.Children.Add(_updateBar);
+            body.Children.Add(_updateStatus);
         }
         else
         {

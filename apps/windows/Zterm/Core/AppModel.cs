@@ -468,7 +468,7 @@ internal sealed class AppModel
         Raise("update");
     }
 
-    /// <summary>Unduh installer, jalankan helper pemasangan, lalu tutup app. Helper membuka Zterm lagi setelah selesai.</summary>
+    /// <summary>Unduh installer, jalankan pemasangan senyap, lalu tutup app. Installer membuka Zterm lagi setelah selesai.</summary>
     public async Task InstallUpdateAsync()
     {
         if (Update is not { } u || UpdateBusy) return;
@@ -478,39 +478,43 @@ internal sealed class AppModel
         UpdateStatus = L.T("Mengunduh pembaruan…");
         Raise("update");
 
-        var started = Stopwatch.StartNew();
-        long lastPaint = -1;
         var downloading = true;
         var progress = new Progress<double>(p =>
         {
-            _dq.TryEnqueue(() =>
-            {
-                // Abaikan laporan setelah unduhan selesai: status sudah beralih ke "menyiapkan".
-                if (!downloading || p >= 0.999) return;
-                UpdateProgress = p;
-                UpdateStatus = L.T("Mengunduh pembaruan… {}%", (int)Math.Round(p * 100));
-                if (started.ElapsedMilliseconds - lastPaint < 160) return;
-                lastPaint = started.ElapsedMilliseconds;
-                Raise("update");
-            });
+            // Progress<T> sudah kembali ke UI thread. Laporan dari UpdateInstaller
+            // dibatasi ~12/detik supaya antrean DispatcherQueue tidak membanjir.
+            if (!downloading) return;
+            UpdateProgress = p;
+            UpdateStatus = L.T("Mengunduh pembaruan… {}%", (int)Math.Round(p * 100));
+            Raise("update-progress");
         });
 
         try
         {
-            var installer = await UpdateInstaller.DownloadAsync(u, progress);
+            // Jalankan unduhan + hash di thread pool; UI hanya menerima laporan progress.
+            var installer = await Task.Run(() => UpdateInstaller.DownloadAsync(u, progress));
             downloading = false;
             UpdateProgress = 1;
             UpdateStatus = L.T("Menyiapkan pembaruan…");
-            Raise("update");
-            await Task.Delay(350);
+            Raise("update-progress");
+            await Task.Delay(300);
 
             UpdateStatus = L.T("Zterm akan ditutup dan dibuka ulang.");
-            Raise("update");
-            await Task.Delay(700);
+            Raise("update-progress");
+            await Task.Delay(250);
 
-            UpdateInstaller.Launch(installer);
+            // Tutup sesi lebih dulu supaya file Zterm.exe tidak terkunci saat installer
+            // menggantinya. Installer juga memakai CloseApplications=force sebagai cadangan.
             try { foreach (var s in Sessions) s.Terminate(); } catch { }
             try { Tunnels.StopAll(); } catch { }
+            try { Stack.Stack?.StopAll(); } catch { }
+
+            // Installer memasang, lalu membuka Zterm lagi lewat [Run] di Zterm.iss.
+            UpdateInstaller.Launch(installer);
+
+            // Jaring pengaman: kalau Application.Exit() tertahan, proses tetap berakhir
+            // sehingga file Zterm.exe tidak terkunci saat installer menggantinya.
+            _ = Task.Run(async () => { await Task.Delay(2500); Environment.Exit(0); });
             Application.Current.Exit();
         }
         catch (Exception e)

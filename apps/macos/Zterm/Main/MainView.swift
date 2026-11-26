@@ -624,6 +624,7 @@ struct UpdateCard: View {
                 ProgressView(value: min(max(model.updateProgress, 0), 1))
                     .progressViewStyle(.linear)
                     .tint(Theme.accent)
+                    .animation(.easeOut(duration: 0.2), value: model.updateProgress)
                 Text(model.updateStatus ?? L("Mengunduh pembaruan…"))
                     .font(.system(size: 11)).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -11,7 +11,8 @@ namespace Zterm;
 
 /// <summary>
 /// Mengunduh installer dari aset GitHub Release, memeriksa checksum bila tersedia,
-/// lalu menjalankan helper yang menunggu Zterm keluar, memasang, dan membuka Zterm lagi.
+/// lalu menjalankan installer secara senyap. Installer menutup Zterm yang masih berjalan,
+/// memasang versi baru, dan membuka Zterm lagi lewat entri [Run] di Zterm.iss.
 /// </summary>
 internal static class UpdateInstaller
 {
@@ -44,6 +45,8 @@ internal static class UpdateInstaller
             {
                 var buffer = new byte[1 << 16];
                 long read = 0;
+                long lastReport = -1000;
+                var clock = Stopwatch.StartNew();
                 using var sha = SHA256.Create();
                 int n;
                 while ((n = await src.ReadAsync(buffer.AsMemory(), ct)) > 0)
@@ -51,13 +54,24 @@ internal static class UpdateInstaller
                     await dst.WriteAsync(buffer.AsMemory(0, n), ct);
                     sha.TransformBlock(buffer, 0, n, null, 0);
                     read += n;
-                    if (total > 0) progress?.Report(Math.Clamp((double)read / total, 0, 1));
+                    if (total > 0)
+                    {
+                        // Jangan banjiri UI dengan satu laporan per potongan 64 KB.
+                        // Cukup ~12 laporan/detik; bilah progress menghaluskan sisanya.
+                        var now = clock.ElapsedMilliseconds;
+                        if (read >= total || now - lastReport >= 80)
+                        {
+                            lastReport = now;
+                            progress?.Report(Math.Clamp((double)read / total, 0, 1));
+                        }
+                    }
                 }
                 sha.TransformFinalBlock([], 0, 0);
                 actual = Convert.ToHexString(sha.Hash ?? []).ToLowerInvariant();
                 await dst.FlushAsync(ct);
                 if (update.Size > 0 && read != update.Size)
                     throw new InvalidOperationException(L.T("Paket pembaruan tidak valid"));
+                progress?.Report(1);
             }
 
             if (update.Digest is { Length: > 7 } expected &&
@@ -75,43 +89,27 @@ internal static class UpdateInstaller
         }
     }
 
-    /// <summary>Jalankan helper .cmd yang menunggu proses ini keluar, memasang, lalu membuka ulang.</summary>
+    /// <summary>
+    /// Jalankan installer secara senyap. Inno Setup menutup Zterm yang masih memakai file lama
+    /// (CloseApplications=force), memasang, lalu membuka Zterm lagi karena entri [Run] juga
+    /// dijalankan saat mode senyap. Tidak ada helper .cmd yang harus bertahan setelah app keluar.
+    /// </summary>
     public static void Launch(string installerPath)
     {
-        var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var installed = Path.Combine(local, "Programs", "Zterm", "Zterm.exe");
-        var appPath = File.Exists(installed) ? installed : Environment.ProcessPath;
-        if (string.IsNullOrEmpty(appPath))
-            throw new InvalidOperationException(L.T("Lokasi Zterm tidak ditemukan"));
-
-        var script = Path.Combine(Path.GetTempPath(), $"zterm-update-{Guid.NewGuid():N}.cmd");
         var logDir = Path.Combine(Config.LocalDir, "updates");
         Directory.CreateDirectory(logDir);
         var log = Path.Combine(logDir, $"install-{DateTime.Now:yyyyMMdd-HHmmss}.log");
-        File.WriteAllText(script, HelperScript.ReplaceLineEndings("\r\n"));
 
-        var psi = new ProcessStartInfo("cmd.exe")
+        var psi = new ProcessStartInfo(installerPath)
         {
             UseShellExecute = false,
             CreateNoWindow = true,
             WindowStyle = ProcessWindowStyle.Hidden,
-            WorkingDirectory = Path.GetTempPath(),
+            WorkingDirectory = Path.GetDirectoryName(installerPath) ?? Path.GetTempPath(),
+            // Tanpa /SUPPRESSMSGBOXES supaya kegagalan pemasangan terlihat, bukan senyap.
+            Arguments = "/VERYSILENT /NORESTART /CLOSEAPPLICATIONS /FORCECLOSEAPPLICATIONS /LOG=\"" + log + "\"",
         };
-        psi.ArgumentList.Add("/c");
-        psi.ArgumentList.Add(script);
-        psi.ArgumentList.Add(Environment.ProcessId.ToString());
-        psi.ArgumentList.Add(installerPath);
-        psi.ArgumentList.Add(appPath!);
-        psi.ArgumentList.Add(log);
-        try
-        {
-            Process.Start(psi);
-        }
-        catch
-        {
-            try { File.Delete(script); } catch { }
-            throw;
-        }
+        Process.Start(psi);
     }
 
     private static void Cleanup(string dir)
@@ -123,25 +121,4 @@ internal static class UpdateInstaller
         }
         catch { }
     }
-
-    private const string HelperScript = """
-@echo off
-setlocal
-set "PID=%~1"
-set "INSTALLER=%~2"
-set "APP=%~3"
-set "LOG=%~4"
-
-:wait
-tasklist /FI "PID eq %PID%" /NH 2>nul | find "%PID%" >nul
-if not errorlevel 1 (
-    ping -n 2 127.0.0.1 >nul
-    goto wait
-)
-
-start "" /wait "%INSTALLER%" /VERYSILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART /LOG="%LOG%"
-if exist "%APP%" start "" "%APP%"
-del "%~f0" >nul 2>&1
-endlocal
-""";
 }

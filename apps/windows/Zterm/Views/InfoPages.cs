@@ -317,6 +317,8 @@ internal sealed class UpdatePanel : Grid
     private readonly AppModel M = App.Model;
     private readonly Action<string> _onChange;
     private bool _subscribed;
+    private UpdateBar? _bar;
+    private TextBlock? _status;
 
     public UpdatePanel()
     {
@@ -344,11 +346,18 @@ internal sealed class UpdatePanel : Grid
     private void OnChange(string what)
     {
         if (what == "update") Render();
+        else if (what == "update-progress")
+        {
+            _bar?.SetTarget(M.UpdateProgress);
+            if (_status != null) _status.Text = M.UpdateStatus ?? L.T("Mengunduh pembaruan…");
+        }
     }
 
     private void Render()
     {
         Children.Clear();
+        _bar = null;
+        _status = null;
         if (M.Update is not { } u)
         {
             var latest = Ui.Row(10,
@@ -364,8 +373,10 @@ internal sealed class UpdatePanel : Grid
             Ui.Row(10, Ui.Icon(G.Sparkle, 14, Theme.AccentBrush), Ui.Text(L.T("Versi {} tersedia", u.Version), 13, FontWeights.SemiBold)));
         if (M.UpdateBusy)
         {
-            content.Children.Add(UpdateUI.Bar(M));
-            content.Children.Add(Ui.Secondary(M.UpdateStatus ?? L.T("Mengunduh pembaruan…"), 12, true));
+            _bar = new UpdateBar(M.UpdateProgress);
+            _status = Ui.Secondary(M.UpdateStatus ?? L.T("Mengunduh pembaruan…"), 12, true);
+            content.Children.Add(_bar);
+            content.Children.Add(_status);
         }
         else
         {

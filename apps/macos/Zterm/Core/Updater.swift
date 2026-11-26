@@ -64,6 +64,7 @@ private final class UpdateDownloader: NSObject, URLSessionDownloadDelegate, @unc
     private var progress: ((Double) -> Void)?
     private var session: URLSession?
     private var finished = false
+    private var lastReport: CFAbsoluteTime = 0
 
     func download(from url: URL, to destination: URL, progress: @escaping (Double) -> Void) async throws -> URL {
         try await withCheckedThrowingContinuation { (cont: CheckedContinuation<URL, Error>) in
@@ -81,6 +82,11 @@ private final class UpdateDownloader: NSObject, URLSessionDownloadDelegate, @unc
                     totalBytesExpectedToWrite: Int64) {
         guard totalBytesExpectedToWrite > 0 else { return }
         let value = min(1, Double(totalBytesWritten) / Double(totalBytesExpectedToWrite))
+        // Batasi ~12 laporan/detik; delegate bisa dipanggil ribuan kali dan
+        // membanjiri main queue kalau setiap potongan diteruskan.
+        let now = CFAbsoluteTimeGetCurrent()
+        if value < 1, now - lastReport < 0.08 { return }
+        lastReport = now
         DispatchQueue.main.async { [weak self] in self?.progress?(value) }
     }
 
@@ -230,6 +236,10 @@ enum UpdateInstaller {
     /// Helper menunggu Zterm keluar, mengganti bundle, lalu membuka Zterm lagi.
     static func launch(_ plan: InstallPlan) throws {
         let script = plan.work.appendingPathComponent("update.sh")
+        let log = Config.appSupport
+            .appendingPathComponent("updates", isDirectory: true)
+            .appendingPathComponent("update.log")
+        try? FileManager.default.createDirectory(at: log.deletingLastPathComponent(), withIntermediateDirectories: true)
         let text = """
         #!/bin/bash
         set -u
@@ -237,17 +247,37 @@ enum UpdateInstaller {
         STAGE="$2"
         PID="$3"
         WORK="$4"
-        while kill -0 "$PID" 2>/dev/null; do /bin/sleep 0.3; done
+        LOG="$5"
+
+        log() { /bin/echo "[$(/bin/date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG"; }
+
+        log "waiting for pid $PID"
+        i=0
+        while /bin/kill -0 "$PID" 2>/dev/null; do
+          i=$((i+1))
+          if [ "$i" -ge 50 ]; then
+            log "pid $PID still alive after 15s; killing"
+            /bin/kill -9 "$PID" 2>/dev/null || true
+            /bin/sleep 0.5
+            break
+          fi
+          /bin/sleep 0.3
+        done
+        log "pid $PID exited"
+
         OLD="${TARGET}.zterm-old-$$"
         if ! /bin/mv "$TARGET" "$OLD"; then
+          log "failed to move $TARGET"
           /usr/bin/open "$TARGET"
           exit 1
         fi
         if /usr/bin/ditto "$STAGE" "$TARGET"; then
           /usr/bin/xattr -dr com.apple.quarantine "$TARGET" 2>/dev/null || true
           /bin/rm -rf "$OLD"
+          log "installed; opening $TARGET"
           /usr/bin/open "$TARGET"
         else
+          log "ditto failed; restoring old bundle"
           /bin/rm -rf "$TARGET"
           /bin/mv "$OLD" "$TARGET"
           /usr/bin/open "$TARGET"
@@ -261,7 +291,7 @@ enum UpdateInstaller {
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/bin/bash")
         p.arguments = [script.path, plan.target.path, plan.staged.path,
-                       String(ProcessInfo.processInfo.processIdentifier), plan.work.path]
+                       String(ProcessInfo.processInfo.processIdentifier), plan.work.path, log.path]
         p.standardOutput = FileHandle.nullDevice
         p.standardError = FileHandle.nullDevice
         try p.run()

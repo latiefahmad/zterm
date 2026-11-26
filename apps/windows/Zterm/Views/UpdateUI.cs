@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -28,12 +29,52 @@ internal static class UpdateUI
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
         await model.InstallUpdateAsync();
     }
+}
 
-    public static ProgressBar Bar(AppModel model) => new()
+/// <summary>
+/// Bilah progress yang bergerak halus menuju nilai terakhir. Laporan unduhan datang
+/// ~12 kali/detik; timer 60 fps meredam lompatan supaya tidak terlihat patah-patah.
+/// </summary>
+internal sealed class UpdateBar : ProgressBar
+{
+    private readonly DispatcherQueueTimer _timer;
+    private double _target;
+
+    public UpdateBar(double fraction)
     {
-        Minimum = 0, Maximum = 100,
-        Value = Math.Clamp(model.UpdateProgress, 0, 1) * 100,
-        Height = 4, CornerRadius = new CornerRadius(2),
-        Foreground = Theme.AccentBrush, Background = Theme.Ink(0.08),
-    };
+        Minimum = 0;
+        Maximum = 100;
+        Height = 4;
+        CornerRadius = new CornerRadius(2);
+        Foreground = Theme.AccentBrush;
+        Background = Theme.Ink(0.08);
+
+        var shown = Math.Clamp(fraction, 0, 1) * 100;
+        Value = shown;
+        _target = shown;
+
+        _timer = DispatcherQueue.GetForCurrentThread().CreateTimer();
+        _timer.Interval = TimeSpan.FromMilliseconds(16);
+        _timer.IsRepeating = true;
+        _timer.Tick += (_, _) => Step();
+        Unloaded += (_, _) => _timer.Stop();
+    }
+
+    public void SetTarget(double fraction)
+    {
+        _target = Math.Clamp(fraction, 0, 1) * 100;
+        if (!_timer.IsRunning) _timer.Start();
+    }
+
+    private void Step()
+    {
+        var diff = _target - Value;
+        if (Math.Abs(diff) <= 0.1)
+        {
+            Value = _target;
+            _timer.Stop();
+            return;
+        }
+        Value += diff * 0.2;
+    }
 }
