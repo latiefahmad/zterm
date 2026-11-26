@@ -6,6 +6,22 @@ Download versi terbaru: [Releases](https://github.com/latiefahmad/zterm/releases
 
 ---
 
+## [1.2.0] - 2026-11-27
+
+Password login host yang tersimpan kini bisa diisi langsung saat prompt sudo, tanpa mengetik ulang dan tanpa membocorkannya ke riwayat atau sesi lain.
+
+### Ditambahkan
+
+- **Isi password sudo (macOS & Windows)** - saat prompt `[sudo] password for <user>:` atau `[sudo] kata sandi untuk <user>:` muncul untuk user host yang tersimpan, Zterm menawarkan password login host; tekan Tab atau klik untuk mengisi, Esc untuk menutup
+- **Tidak pernah otomatis** - tawaran hanya muncul untuk user host yang cocok, tidak ditawarkan untuk `su` atau prompt login SSH biasa, dan password tidak masuk riwayat perintah maupun broadcast
+- **Ikut pengaturan Autocomplete** - tawaran hanya muncul saat saran perintah terminal diaktifkan
+
+### Catatan
+
+- Yang diisi adalah password login host. Jika password sudo berbeda, ketik manual seperti biasa.
+
+[1.2.0]: https://github.com/latiefahmad/zterm/releases/tag/v1.2.0
+
 ## [1.1.1] - 2026-11-26
 
 Pembaruan otomatis kini benar-benar memasang versi baru dan membuka Zterm kembali, dengan progress unduhan yang halus.

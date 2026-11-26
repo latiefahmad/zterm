@@ -5,7 +5,7 @@
 ; Dipasang per user (tanpa admin) di %LOCALAPPDATA%\Programs\Zterm.
 
 #ifndef AppVersion
-  #define AppVersion "1.1.1"
+  #define AppVersion "1.2.0"
 #endif
 #ifndef Arch
   #define Arch "x64"

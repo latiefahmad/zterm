@@ -17,7 +17,7 @@
     "nav.menu": "Menu",
     "header.github": "GitHub",
 
-    "hero.kicker.edition": "Edition 1.1.1",
+    "hero.kicker.edition": "Edition 1.2.0",
     "hero.kicker.date": "November 2026",
     "hero.title": "All your servers,<br /><em>one terminal.</em>",
     "hero.lead": "A native SSH client for macOS, Windows, and Linux. Hosts, terminal, SFTP, Docker, databases, and backups in one app. Zterm uses no account and no relay server.",
@@ -238,7 +238,7 @@
     "ch08.label": "Chapter 08",
     "ch08.name": "Install",
     "ch08.title": "Pick a platform, then start.",
-    "ch08.deck": "Version 1.1.1 is available for macOS, Windows, and Linux beta. Every build uses the same Rust core.",
+    "ch08.deck": "Version 1.2.0 is available for macOS, Windows, and Linux beta. Every build uses the same Rust core.",
     "install.tabs.aria": "Operating system",
     "install.mac.h": "How to install on Mac",
     "install.mac.1": "Download the <b>.dmg</b>, open it, and drag <b>Zterm</b> into Applications.",
@@ -289,7 +289,7 @@
     "faq.9.q": "Is there an English version?",
     "faq.9.a": "Yes. The app is available in Indonesian and English. The language follows the system, or you can pick one from the Bahasa / Language menu. Error messages from servers are translated too.",
 
-    "footer.tagline": "Field manual, edition 1.1.1",
+    "footer.tagline": "Field manual, edition 1.2.0",
     "footer.aria": "Footer links",
     "footer.releases": "Releases",
     "footer.issues": "Report a bug",
@@ -338,7 +338,7 @@
   var ID = {};
   var ID_ARIA = {};
   var lang = "id";
-  var latestVersion = "1.1.1";
+  var latestVersion = "1.2.0";
 
   document.querySelectorAll("[data-i18n]").forEach(function (el) {
     ID[el.dataset.i18n] = el.innerHTML;
