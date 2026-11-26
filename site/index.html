@@ -76,7 +76,6 @@
       <img class="brand-mark" src="assets/brand/favicon.svg" alt="" width="28" height="28" />
       <span class="brand-text">
         <span class="brand-name">Zterm</span>
-        <span class="brand-edition" data-i18n="brand.edition">Panduan lapangan</span>
       </span>
     </a>
 
@@ -134,10 +133,10 @@
           <div class="sketch-split">
             <div class="sketch-side">
               <div class="sketch-head"><span class="sketch-title">Hosts</span><span class="sketch-sub">5 server</span></div>
-              <div class="host-row"><span class="host-name">api-prod</span><span class="state state-on">online</span><span class="host-meta">root@10.0.0.12</span></div>
-              <div class="host-row"><span class="host-name">web-1</span><span class="state state-on">online</span><span class="host-meta">root@10.0.0.21</span></div>
-              <div class="host-row"><span class="host-name">db-primary</span><span class="state state-warn">disk 91%</span><span class="host-meta">root@10.0.0.41</span></div>
-              <div class="host-row"><span class="host-name">backup</span><span class="state state-idle">idle</span><span class="host-meta">deploy@10.0.0.30</span></div>
+              <div class="host-row"><span class="host-name">api-prod</span><span class="state state-on">online</span><span class="host-meta">root@10.0.0.20</span></div>
+              <div class="host-row"><span class="host-name">web-prod</span><span class="state state-on">online</span><span class="host-meta">root@10.0.0.55</span></div>
+              <div class="host-row"><span class="host-name">db-primary</span><span class="state state-warn">disk 91%</span><span class="host-meta">root@10.0.0.88</span></div>
+              <div class="host-row"><span class="host-name">backup</span><span class="state state-idle">idle</span><span class="host-meta">deploy@10.0.0.99</span></div>
             </div>
             <div class="sketch-main">
               <div class="terminal">
@@ -150,13 +149,13 @@
                   <p class="terminal-line"><span class="prompt">root@api-prod</span>:~$ <span class="dim">_</span></p>
                 </div>
               </div>
-              <div class="metric-row"><span class="metric-name">CPU</span><span class="meter"><i style="--w:42%"></i></span><span class="metric-value">42%</span><span class="metric-state state-on">sehat</span></div>
-              <div class="metric-row"><span class="metric-name">RAM</span><span class="meter"><i style="--w:39%"></i></span><span class="metric-value">3.1 GB</span><span class="metric-state state-on">sehat</span></div>
+              <div class="metric-row"><span class="metric-name">CPU</span><span class="meter"><i style="--w:31%"></i></span><span class="metric-value">31%</span><span class="metric-state state-on">sehat</span></div>
+              <div class="metric-row"><span class="metric-name">RAM</span><span class="meter"><i style="--w:39%"></i></span><span class="metric-value">2.0 GB</span><span class="metric-state state-on">sehat</span></div>
               <div class="metric-row"><span class="metric-name">Disk</span><span class="meter"><i class="is-warn" style="--w:91%"></i></span><span class="metric-value">91%</span><span class="metric-state state-warn">kritis</span></div>
             </div>
           </div>
         </div>
-        <figcaption class="plate-caption" data-i18n="hero.caption">Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
+        <figcaption class="plate-caption" data-i18n="hero.caption">*Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
       </figure>
     </div>
   </section>
@@ -220,7 +219,7 @@
           <div class="sketch-main">
             <div class="sketch-head"><span class="sketch-title">api-prod</span><span class="sketch-sub">SSH / port 22</span></div>
             <div class="tabs-sketch"><span class="tab-sketch on">Umum</span><span class="tab-sketch">Autentikasi</span><span class="tab-sketch">Lanjutan</span><span class="tab-sketch">Proxy</span></div>
-            <div class="local-row"><span>Host</span><span>10.0.0.12</span></div>
+            <div class="local-row"><span>Host</span><span>10.0.0.20</span></div>
             <div class="local-row"><span>User</span><span>root</span></div>
             <div class="local-row"><span>Autentikasi</span><span>SSH key</span></div>
             <div class="local-row"><span>Jump host</span><span>bastion.internal</span></div>
@@ -235,7 +234,7 @@
             <div class="note-inline">Tunnel: local 5432 ke db:5432, status aktif.</div>
           </div>
         </div>
-        <figcaption class="plate-caption" data-i18n="ch01.caption">Ilustrasi antarmuka. Data di dalamnya contoh.</figcaption>
+        <figcaption class="plate-caption" data-i18n="ch01.caption">*Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
       </figure>
     </div>
   </section>
@@ -268,8 +267,8 @@
         <div class="sketch" role="img" aria-label="Ilustrasi dashboard server Zterm dengan grafik CPU, RAM, dan disk" data-i18n-aria="ch02.aria">
           <div class="sketch-main">
             <div class="sketch-head"><span class="sketch-title">Dashboard</span><span class="sketch-sub">5 server / 2 peringatan</span></div>
-            <div class="metric-row"><span class="metric-name">api-prod</span><span class="meter"><i style="--w:42%"></i></span><span class="metric-value">CPU 42%</span><span class="metric-state state-on">sehat</span></div>
-            <div class="metric-row"><span class="metric-name">web-1</span><span class="meter"><i class="is-warn" style="--w:78%"></i></span><span class="metric-value">CPU 78%</span><span class="metric-state state-warn">tinggi</span></div>
+            <div class="metric-row"><span class="metric-name">api-prod</span><span class="meter"><i style="--w:31%"></i></span><span class="metric-value">CPU 31%</span><span class="metric-state state-on">sehat</span></div>
+            <div class="metric-row"><span class="metric-name">web-prod</span><span class="meter"><i class="is-warn" style="--w:78%"></i></span><span class="metric-value">CPU 78%</span><span class="metric-state state-warn">tinggi</span></div>
             <div class="metric-row"><span class="metric-name">db-primary</span><span class="meter"><i class="is-warn" style="--w:91%"></i></span><span class="metric-value">disk 91%</span><span class="metric-state state-warn">kritis</span></div>
             <div class="metric-row"><span class="metric-name">backup</span><span class="meter"><i style="--w:12%"></i></span><span class="metric-value">CPU 12%</span><span class="metric-state state-on">sehat</span></div>
             <div class="sketch-head" style="margin-top:14px"><span class="sketch-title">Services</span><span class="sketch-sub">api-prod</span></div>
@@ -285,7 +284,7 @@
             </div>
           </div>
         </div>
-        <figcaption class="plate-caption" data-i18n="ch02.caption">Ilustrasi antarmuka. Data di dalamnya contoh.</figcaption>
+        <figcaption class="plate-caption" data-i18n="ch02.caption">*Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
       </figure>
     </div>
   </section>
@@ -323,15 +322,15 @@
             <div class="search-row"><span class="search-cell">email</span><span class="search-cell">LIKE %@example.com%</span><span class="search-cell">Kirim</span></div>
             <div class="data-table">
               <div class="data-head"><span>id</span><span>nama</span><span>email</span><span>dibuat</span></div>
-              <div class="data-row"><span class="id">1024</span><span>Akun 1024</span><span class="email">akun1024@example.com</span><span>2026-11-20</span></div>
-              <div class="data-row"><span class="id">1025</span><span>Akun 1025</span><span class="email">akun1025@example.com</span><span>2026-11-21</span></div>
-              <div class="data-row"><span class="id">1026</span><span>Akun 1026</span><span class="email">akun1026@example.com</span><span>2026-11-24</span></div>
+              <div class="data-row"><span class="id">1121</span><span>Acc-1121</span><span class="email">user1121@example.com</span><span>2026-10-10</span></div>
+              <div class="data-row"><span class="id">1122</span><span>Acc-1122</span><span class="email">user1122@example.com</span><span>2026-10-18</span></div>
+              <div class="data-row"><span class="id">1123</span><span>Acc-1123</span><span class="email">user1123@example.com</span><span>2026-10-24</span></div>
             </div>
-            <div class="local-row" style="margin-top:12px"><span>Backup harian 02.30</span><span>7 terakhir</span></div>
+            <div class="local-row" style="margin-top:12px"><span>Backup harian 01.30</span><span>7 terakhir</span></div>
             <div class="local-row"><span>Google Drive</span><span class="state state-on">aktif</span></div>
           </div>
         </div>
-        <figcaption class="plate-caption" data-i18n="ch03.caption">Ilustrasi antarmuka. Data di dalamnya contoh.</figcaption>
+        <figcaption class="plate-caption" data-i18n="ch03.caption">*Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
       </figure>
     </div>
   </section>
@@ -364,7 +363,7 @@
           <div class="sketch-main">
             <div class="sketch-head"><span class="sketch-title">SFTP</span><span class="sketch-sub">2 transfer</span></div>
             <div class="file-grid">
-              <div class="file-pane"><div class="file-pane-title">MACBOOK / ~/Projects</div><div class="file-row">app/</div><div class="file-row">deploy.sh</div><div class="file-row">.env.example</div><div class="file-row">README.md</div></div>
+              <div class="file-pane"><div class="file-pane-title">Windows / ~/Projects</div><div class="file-row">app/</div><div class="file-row">deploy.sh</div><div class="file-row">.env.example</div><div class="file-row">README.md</div></div>
               <div class="file-pane"><div class="file-pane-title">API-PROD / /var/www</div><div class="file-row">app/</div><div class="file-row">releases/</div><div class="file-row">shared/</div><div class="file-row">current</div></div>
             </div>
             <div class="transfer-row"><span class="transfer-name">deploy.sh ke /var/www/app</span><span class="meter"><i style="--w:72%"></i></span><span>72%</span></div>
@@ -378,7 +377,7 @@
             <div class="note-inline">Simpan dengan Cmd/Ctrl+S. Line ending CRLF/LF tetap dijaga.</div>
           </div>
         </div>
-        <figcaption class="plate-caption" data-i18n="ch04.caption">Ilustrasi antarmuka. Data di dalamnya contoh.</figcaption>
+        <figcaption class="plate-caption" data-i18n="ch04.caption">*Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
       </figure>
     </div>
   </section>
@@ -422,7 +421,7 @@
             <div class="local-row"><span>MongoDB 8</span><span>:27017 / berhenti</span></div>
           </div>
         </div>
-        <figcaption class="plate-caption" data-i18n="ch05.caption">Ilustrasi antarmuka. Data di dalamnya contoh.</figcaption>
+        <figcaption class="plate-caption" data-i18n="ch05.caption">*Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
       </figure>
     </div>
   </section>
@@ -454,9 +453,9 @@
           <div class="sketch-main">
             <div class="sketch-head"><span class="sketch-title">Tim Produksi</span><span class="sketch-sub">4 anggota / 6 host</span></div>
             <div class="member-row"><span class="member-name">Admin</span><span class="member-role">pemilik</span></div>
-            <div class="member-row"><span class="member-name">anggota@example.com</span><span class="member-role">anggota</span></div>
-            <div class="member-row"><span class="member-name">rekan@example.com</span><span class="member-role">anggota</span></div>
-            <div class="local-row" style="margin-top:10px"><span>Host dibagikan</span><span>api-prod, web-1, db-primary</span></div>
+            <div class="member-row"><span class="member-name">anggota1@example.com</span><span class="member-role">anggota</span></div>
+            <div class="member-row"><span class="member-name">anggota2@example.com</span><span class="member-role">anggota</span></div>
+            <div class="local-row" style="margin-top:10px"><span>Host dibagikan</span><span>api-prod, web-prod, db-primary</span></div>
             <div class="sync-box">
               <div class="sync-row"><span>Vault</span><span>terenkripsi</span></div>
               <div class="sync-row"><span>Google Drive</span><span>appdata</span></div>
@@ -464,7 +463,7 @@
             </div>
           </div>
         </div>
-        <figcaption class="plate-caption" data-i18n="ch06.caption">Ilustrasi antarmuka. Data di dalamnya contoh.</figcaption>
+        <figcaption class="plate-caption" data-i18n="ch06.caption">*Ilustrasi antarmuka. Data di dalamnya contoh, bukan tangkapan layar.</figcaption>
       </figure>
     </div>
   </section>
@@ -490,7 +489,7 @@
         <li><div><h3 data-i18n="ch07.05.k">Sumber terbuka</h3><p data-i18n="ch07.05.v">Lisensi MIT. Kode sumber tersedia di GitHub untuk diperiksa siapa saja.</p></div></li>
       </ol>
     </div>
-    <p class="security-note" data-i18n="ch07.note">App belum dinotarisasi Apple dan belum ditandatangani sertifikat Windows. Langkah membuka app ada di bab Install.</p>
+    <p class="security-note" data-i18n="ch07.note">*App belum sertifikasi Apple dan belum ditandatangani sertifikat Windows. Langkah membuka app ada di bab Install.</p>
   </section>
 
   <section class="chapter wrap" id="install" aria-labelledby="install-title">
@@ -597,7 +596,6 @@
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <span class="footer-brand">Zterm</span>
-    <span class="footer-tagline" data-i18n="footer.tagline">Panduan lapangan, edisi 1.0.1</span>
     <nav class="footer-nav" aria-label="Tautan footer" data-i18n-aria="footer.aria">
       <a href="https://github.com/latiefahmad/zterm">GitHub</a>
       <a href="https://github.com/latiefahmad/zterm/releases" data-i18n="footer.releases">Rilis</a>
