@@ -378,6 +378,14 @@ internal sealed class UpdatePanel : Grid
             content.Children.Add(_bar);
             content.Children.Add(_status);
         }
+        else if (M.UpdateError is { Length: > 0 } error)
+        {
+            content.Children.Add(Ui.Secondary(error, 12, true));
+            content.Children.Add(Ui.Row(8,
+                Ui.Primary(L.T("Unduh manual"), G.Download, () => Ui.Open(u.Page)),
+                Ui.Secondary(L.T("Coba lagi"), null, () => _ = UpdateUI.StartAsync(M, u)),
+                Ui.Secondary(L.T("Catatan rilis"), null, () => Ui.Open(u.Page))));
+        }
         else
         {
             content.Children.Add(Ui.Row(8,

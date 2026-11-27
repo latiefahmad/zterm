@@ -17,8 +17,8 @@ Versi **Linux** masih beta — lihat [Linux (beta)](#linux-beta).
 [![Unduhan](https://img.shields.io/github/downloads/latiefahmad/zterm/total?label=unduhan&color=9D7CF2)](https://github.com/latiefahmad/zterm/releases)
 
 [**⬇ Download untuk Mac**](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-macOS.dmg) &nbsp;·&nbsp;
-[**⬇ Download untuk Windows**](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-Windows-x64-Setup.exe) &nbsp;·&nbsp;
-[Windows ARM64](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-Windows-arm64-Setup.exe) &nbsp;·&nbsp;
+[**⬇ Download untuk Windows**](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-win-x64.exe) &nbsp;·&nbsp;
+[Windows ARM64](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-win-arm64.exe) &nbsp;·&nbsp;
 [**⬇ Linux (AppImage, beta)**](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-Linux-x86_64.AppImage) &nbsp;·&nbsp;
 [Website](https://latief.id/zterm/)
 
@@ -164,9 +164,11 @@ MySQL, MariaDB, PostgreSQL, SQL Server, SQLite, Redis, MongoDB, ClickHouse, plus
 
 **Windows 10 / 11** (x64 & ARM64)
 
-1. Download [`Setup.exe` x64](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-Windows-x64-Setup.exe) — atau [ARM64](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-Windows-arm64-Setup.exe) untuk PC ARM seperti Snapdragon.
+1. Download [`Zterm-win-x64.exe`](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-win-x64.exe) — atau [`Zterm-win-arm64.exe`](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-win-arm64.exe) untuk PC ARM seperti Snapdragon.
 2. Kalau muncul **Windows protected your PC**, klik **More info → Run anyway**.
 3. Ikuti installer (tanpa hak admin), lalu buka **Zterm** dari Start Menu.
+
+> **Windows 1.1.1 / 1.2.0:** pasang 1.2.1 secara manual satu kali. Tombol update di versi lama crash sebelum mengunduh; setelah 1.2.1, pembaruan berikutnya otomatis.
 
 ### Linux (beta)
 

@@ -301,6 +301,17 @@ internal static class UpdateChecker
         _ => null,
     };
 
+    /// <summary>
+    /// Nama aset lama: Zterm-1.2.0-Windows-x64-Setup.exe.
+    /// Nama baru (migrasi 1.2.1): Zterm-win-x64.exe.
+    /// Keduanya dikenali supaya 1.2.1 bisa update ke rilis berikutnya.
+    /// </summary>
+    private static bool MatchesArch(string name, string arch) =>
+        name.Contains($"Windows-{arch}-", StringComparison.OrdinalIgnoreCase) ||
+        name.Contains($"Windows-{arch}.", StringComparison.OrdinalIgnoreCase) ||
+        name.Contains($"win-{arch}-", StringComparison.OrdinalIgnoreCase) ||
+        name.Contains($"win-{arch}.", StringComparison.OrdinalIgnoreCase);
+
     public static async Task<AvailableUpdate?> Check()
     {
         var req = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/latiefahmad/zterm/releases/latest");
@@ -321,12 +332,10 @@ internal static class UpdateChecker
         foreach (var a in r.GetProperty("assets").EnumerateArray())
         {
             var name = a.GetProperty("name").GetString() ?? "";
-            if (!name.Contains("Windows", StringComparison.OrdinalIgnoreCase) ||
+            if (!name.Contains("Zterm", StringComparison.OrdinalIgnoreCase) ||
                 !name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) continue;
             windows.Add(a);
-            if (arch != null &&
-                (name.Contains($"Windows-{arch}-", StringComparison.OrdinalIgnoreCase) ||
-                 name.Contains($"Windows-{arch}.", StringComparison.OrdinalIgnoreCase)))
+            if (arch != null && MatchesArch(name, arch))
             {
                 picked = a;
                 break;

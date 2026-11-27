@@ -24,9 +24,17 @@ internal static class UpdateUI
             Ui.Secondary(L.T("Kamu memakai {}.", Config.Version), 12, true));
         content.MaxWidth = 440;
 
-        var dialog = Ui.Dialog(L.T("Update Zterm ke {}?", update.Version), content,
-            L.T("Update sekarang"), L.T("Nanti"));
-        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+        try
+        {
+            var dialog = Ui.Dialog(L.T("Update Zterm ke {}?", update.Version), content,
+                L.T("Update sekarang"), L.T("Nanti"));
+            if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+        }
+        catch (Exception e)
+        {
+            UpdateLog.Write("Dialog update gagal: " + e);
+            return;
+        }
         await model.InstallUpdateAsync();
     }
 }
@@ -34,24 +42,34 @@ internal static class UpdateUI
 /// <summary>
 /// Bilah progress yang bergerak halus menuju nilai terakhir. Laporan unduhan datang
 /// ~12 kali/detik; timer 60 fps meredam lompatan supaya tidak terlihat patah-patah.
+///
+/// Sengaja komposisi (Grid + ProgressBar biasa), bukan subclass ProgressBar: WinUI 3
+/// gagal menerapkan style default ProgressBar ke subclass managed dan melempar
+/// COMException 0x800F1000 sebelum unduhan sempat dimulai.
 /// </summary>
-internal sealed class UpdateBar : ProgressBar
+internal sealed class UpdateBar : Grid
 {
+    private readonly ProgressBar _bar;
     private readonly DispatcherQueueTimer _timer;
     private double _target;
 
     public UpdateBar(double fraction)
     {
-        Minimum = 0;
-        Maximum = 100;
-        Height = 4;
-        CornerRadius = new CornerRadius(2);
-        Foreground = Theme.AccentBrush;
-        Background = Theme.Ink(0.08);
+        _bar = new ProgressBar
+        {
+            Minimum = 0,
+            Maximum = 100,
+            Height = 4,
+            CornerRadius = new CornerRadius(2),
+            Foreground = Theme.AccentBrush,
+            Background = Theme.Ink(0.08),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
 
         var shown = Math.Clamp(fraction, 0, 1) * 100;
-        Value = shown;
+        _bar.Value = shown;
         _target = shown;
+        Children.Add(_bar);
 
         _timer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _timer.Interval = TimeSpan.FromMilliseconds(16);
@@ -68,13 +86,13 @@ internal sealed class UpdateBar : ProgressBar
 
     private void Step()
     {
-        var diff = _target - Value;
+        var diff = _target - _bar.Value;
         if (Math.Abs(diff) <= 0.1)
         {
-            Value = _target;
+            _bar.Value = _target;
             _timer.Stop();
             return;
         }
-        Value += diff * 0.2;
+        _bar.Value += diff * 0.2;
     }
 }

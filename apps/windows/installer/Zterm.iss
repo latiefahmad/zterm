@@ -5,7 +5,7 @@
 ; Dipasang per user (tanpa admin) di %LOCALAPPDATA%\Programs\Zterm.
 
 #ifndef AppVersion
-  #define AppVersion "1.2.0"
+  #define AppVersion "1.2.1"
 #endif
 #ifndef Arch
   #define Arch "x64"
@@ -87,3 +87,26 @@ Filename: "{app}\Zterm.exe"; Flags: nowait skipifnotsilent
 [UninstallDelete]
 ; Hanya file sementara; vault & pengaturan di %APPDATA%\Zterm tetap aman
 Type: filesandordirs; Name: "{localappdata}\Zterm\session-keys"
+
+[Code]
+// Tulis penanda bila 1.2.1 dipasang di atas 1.1.1/1.2.0. App membacanya sekali untuk
+// menjelaskan bahwa pemasangan manual ini memperbaiki tombol update yang crash.
+function InitializeSetup(): Boolean;
+var
+  PrevVersion: String;
+  Marker: String;
+begin
+  Result := True;
+  if RegQueryStringValue(HKCU64,
+       'Software\Microsoft\Windows\CurrentVersion\Uninstall\{6E1C9B9A-4D7B-4F0E-9C5A-D71E5E11A001}_is1',
+       'DisplayVersion', PrevVersion) and (PrevVersion <> '') then
+  begin
+    // Hanya 1.1.1 dan 1.2.0 yang memakai UpdateBar subclass yang crash.
+    if (PrevVersion = '1.1.1') or (PrevVersion = '1.2.0') then
+    begin
+      Marker := ExpandConstant('{localappdata}\Zterm\update-migrated-121');
+      ForceDirectories(ExtractFileDir(Marker));
+      SaveStringToFile(Marker, PrevVersion, False);
+    end;
+  end;
+end;

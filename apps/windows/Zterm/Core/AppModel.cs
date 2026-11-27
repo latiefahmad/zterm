@@ -127,6 +127,7 @@ internal sealed class AppModel
     public bool UpdateBusy { get; private set; }
     public double UpdateProgress { get; private set; }
     public string? UpdateStatus { get; private set; }
+    public string? UpdateError { get; private set; }
 
     public TunnelManager Tunnels { get; } = new();
     public SftpModel Sftp { get; }
@@ -168,6 +169,21 @@ internal sealed class AppModel
     }
 
     public void Raise(string what) => Changed?.Invoke(what);
+
+    /// <summary>
+    /// Raise untuk alur update: kegagalan render UI tidak boleh membatalkan unduhan.
+    /// </summary>
+    private void SafeRaise(string what)
+    {
+        try { Raise(what); }
+        catch (Exception e) { UpdateLog.Write("UI error saat raise '" + what + "': " + e); }
+    }
+
+    private void SafeFlash(string message)
+    {
+        try { Flash(message); }
+        catch (Exception e) { UpdateLog.Write("UI error saat flash: " + e); }
+    }
 
     // MARK: Tampilan
 
@@ -451,12 +467,14 @@ internal sealed class AppModel
         {
             var u = await UpdateChecker.Check();
             Update = u;
+            UpdateError = null;
             if (u != null) UpdateDismissed = false;
-            Raise("update");
+            SafeRaise("update");
             if (manual && u == null) Flash(L.T("Zterm {} sudah versi terbaru", Config.Version));
         }
-        catch
+        catch (Exception e)
         {
+            UpdateLog.Write("Gagal memeriksa pembaruan: " + e);
             if (manual) Flash(L.T("Gagal memeriksa pembaruan"));
         }
     }
@@ -465,7 +483,8 @@ internal sealed class AppModel
     public void DismissUpdate()
     {
         UpdateDismissed = true;
-        Raise("update");
+        UpdateError = null;
+        SafeRaise("update");
     }
 
     /// <summary>Unduh installer, jalankan pemasangan senyap, lalu tutup app. Installer membuka Zterm lagi setelah selesai.</summary>
@@ -474,9 +493,11 @@ internal sealed class AppModel
         if (Update is not { } u || UpdateBusy) return;
         UpdateBusy = true;
         UpdateDismissed = false;
+        UpdateError = null;
         UpdateProgress = 0;
         UpdateStatus = L.T("Mengunduh pembaruan…");
-        Raise("update");
+        UpdateLog.Write($"Mulai update ke {u.Version} ({u.AssetName ?? "tanpa aset"}).");
+        SafeRaise("update");
 
         var downloading = true;
         var progress = new Progress<double>(p =>
@@ -486,7 +507,7 @@ internal sealed class AppModel
             if (!downloading) return;
             UpdateProgress = p;
             UpdateStatus = L.T("Mengunduh pembaruan… {}%", (int)Math.Round(p * 100));
-            Raise("update-progress");
+            SafeRaise("update-progress");
         });
 
         try
@@ -494,13 +515,14 @@ internal sealed class AppModel
             // Jalankan unduhan + hash di thread pool; UI hanya menerima laporan progress.
             var installer = await Task.Run(() => UpdateInstaller.DownloadAsync(u, progress));
             downloading = false;
+            UpdateLog.Write($"Unduhan selesai: {installer}");
             UpdateProgress = 1;
             UpdateStatus = L.T("Menyiapkan pembaruan…");
-            Raise("update-progress");
+            SafeRaise("update-progress");
             await Task.Delay(300);
 
             UpdateStatus = L.T("Zterm akan ditutup dan dibuka ulang.");
-            Raise("update-progress");
+            SafeRaise("update-progress");
             await Task.Delay(250);
 
             // Tutup sesi lebih dulu supaya file Zterm.exe tidak terkunci saat installer
@@ -511,11 +533,13 @@ internal sealed class AppModel
 
             // Installer memasang, lalu membuka Zterm lagi lewat [Run] di Zterm.iss.
             UpdateInstaller.Launch(installer);
+            UpdateLog.Write("Installer diluncurkan; app akan ditutup.");
 
             // Jaring pengaman: kalau Application.Exit() tertahan, proses tetap berakhir
             // sehingga file Zterm.exe tidak terkunci saat installer menggantinya.
             _ = Task.Run(async () => { await Task.Delay(2500); Environment.Exit(0); });
-            Application.Current.Exit();
+            try { Application.Current.Exit(); }
+            catch (Exception e) { UpdateLog.Write("Application.Exit error: " + e); }
         }
         catch (Exception e)
         {
@@ -523,8 +547,10 @@ internal sealed class AppModel
             UpdateBusy = false;
             UpdateProgress = 0;
             UpdateStatus = null;
-            Raise("update");
-            Flash(L.T("Gagal memasang pembaruan: {}", Errors.Text(e)));
+            UpdateError = L.T("Gagal memasang pembaruan: {}", Errors.Text(e));
+            UpdateLog.Write("Update gagal: " + e);
+            SafeRaise("update");
+            SafeFlash(UpdateError);
         }
     }
 

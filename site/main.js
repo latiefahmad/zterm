@@ -17,7 +17,7 @@
     "nav.menu": "Menu",
     "header.github": "GitHub",
 
-    "hero.kicker.edition": "Edition 1.2.0",
+    "hero.kicker.edition": "Edition 1.2.1",
     "hero.kicker.date": "November 2026",
     "hero.title": "All your servers,<br /><em>one terminal.</em>",
     "hero.lead": "A native SSH client for macOS, Windows, and Linux. Hosts, terminal, SFTP, Docker, databases, and backups in one app. Zterm uses no account and no relay server.",
@@ -238,7 +238,7 @@
     "ch08.label": "Chapter 08",
     "ch08.name": "Install",
     "ch08.title": "Pick a platform, then start.",
-    "ch08.deck": "Version 1.2.0 is available for macOS, Windows, and Linux beta. Every build uses the same Rust core.",
+    "ch08.deck": "Version 1.2.1 is available for macOS, Windows, and Linux beta. Every build uses the same Rust core.",
     "install.tabs.aria": "Operating system",
     "install.mac.h": "How to install on Mac",
     "install.mac.1": "Download the <b>.dmg</b>, open it, and drag <b>Zterm</b> into Applications.",
@@ -247,11 +247,12 @@
     "install.mac.dl": "Download the macOS DMG",
     "install.mac.note": "The DMG contains a universal build for Apple Silicon and Intel. macOS 15 or later.",
     "install.win.h": "How to install on Windows",
-    "install.win.1": "Download <b>Setup.exe</b>: the <b>x64</b> build for most PCs, or <b>ARM64</b> for ARM PCs such as Snapdragon.",
+    "install.win.1": "Download <b>Zterm-win-x64.exe</b> for most PCs, or <b>Zterm-win-arm64.exe</b> for ARM PCs such as Snapdragon.",
     "install.win.2": "The app is not signed with a paid certificate. If <b>Windows protected your PC</b> appears, click <b>More info &gt; Run anyway</b>.",
     "install.win.3": "Follow the installer. Admin rights are not required. When it finishes, open <b>Zterm</b> from the Start menu.",
-    "install.win.dl": "Download Setup x64",
-    "install.win.arm": "Download Setup ARM64",
+    "install.win.dl": "Download x64",
+    "install.win.arm": "Download ARM64",
+    "install.win.migration": "<b>Windows 1.1.1 / 1.2.0:</b> install 1.2.1 manually once. The update button in those versions crashes before downloading. After 1.2.1, future updates are automatic.",
     "install.win.note": "Windows 10 and 11. Remove it any time from Settings > Apps. Your vault and settings stay safe.",
     "install.linux.h": "How to install on Linux (beta)",
     "install.linux.1": "Download the <b>AppImage</b>: <b>x86_64</b> for most PCs, or <b>aarch64</b> for ARM PCs or laptops.",
@@ -289,7 +290,7 @@
     "faq.9.q": "Is there an English version?",
     "faq.9.a": "Yes. The app is available in Indonesian and English. The language follows the system, or you can pick one from the Bahasa / Language menu. Error messages from servers are translated too.",
 
-    "footer.tagline": "Field manual, edition 1.2.0",
+    "footer.tagline": "Field manual, edition 1.2.1",
     "footer.aria": "Footer links",
     "footer.releases": "Releases",
     "footer.issues": "Report a bug",
@@ -338,7 +339,7 @@
   var ID = {};
   var ID_ARIA = {};
   var lang = "id";
-  var latestVersion = "1.2.0";
+  var latestVersion = "1.2.1";
 
   document.querySelectorAll("[data-i18n]").forEach(function (el) {
     ID[el.dataset.i18n] = el.innerHTML;
@@ -433,8 +434,8 @@
   var DIRECT = "https://github.com/latiefahmad/zterm/releases/latest/download/";
   var DL = {
     mac: DIRECT + "Zterm-macOS.dmg",
-    win: DIRECT + "Zterm-Windows-x64-Setup.exe",
-    winArm: DIRECT + "Zterm-Windows-arm64-Setup.exe",
+    win: DIRECT + "Zterm-win-x64.exe",
+    winArm: DIRECT + "Zterm-win-arm64.exe",
     linux: DIRECT + "Zterm-Linux-x86_64.AppImage",
     linuxArm: DIRECT + "Zterm-Linux-aarch64.AppImage"
   };
@@ -550,7 +551,7 @@
       };
       var assets = release.assets || [];
       var dmg = assets.filter(function (a) { return /\.dmg$/i.test(a.name); })[0];
-      var exe = assets.filter(function (a) { return /Windows-x64-Setup\.exe$/i.test(a.name); })[0];
+      var exe = assets.filter(function (a) { return /win-x64\.exe$/i.test(a.name); })[0];
       var appImage = assets.filter(function (a) { return /Linux-x86_64\.AppImage$/i.test(a.name); })[0];
       document.querySelectorAll(".sizeMac").forEach(function (el) {
         if (dmg) el.textContent = "DMG " + size(dmg);

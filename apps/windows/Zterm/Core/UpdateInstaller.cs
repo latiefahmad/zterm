@@ -26,6 +26,7 @@ internal static class UpdateInstaller
         var dir = Path.Combine(Config.LocalDir, "updates");
         Directory.CreateDirectory(dir);
         Cleanup(dir);
+        UpdateLog.Write($"Mulai unduh {name} ({update.Size} bytes) dari {url}");
 
         var safeName = string.Concat(name.Select(ch => Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch));
         var dest = Path.Combine(dir, safeName);
@@ -80,10 +81,12 @@ internal static class UpdateInstaller
                 throw new InvalidOperationException(L.T("Checksum pembaruan tidak cocok"));
 
             File.Move(part, dest, true);
+            UpdateLog.Write($"Unduhan tersimpan: {dest} (sha256 {actual})");
             return dest;
         }
-        catch
+        catch (Exception e)
         {
+            UpdateLog.Write("Unduh gagal: " + e);
             try { File.Delete(part); } catch { }
             throw;
         }
@@ -109,6 +112,7 @@ internal static class UpdateInstaller
             // Tanpa /SUPPRESSMSGBOXES supaya kegagalan pemasangan terlihat, bukan senyap.
             Arguments = "/VERYSILENT /NORESTART /CLOSEAPPLICATIONS /FORCECLOSEAPPLICATIONS /LOG=\"" + log + "\"",
         };
+        UpdateLog.Write($"Menjalankan installer: {installerPath} (log: {log})");
         Process.Start(psi);
     }
 

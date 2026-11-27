@@ -139,12 +139,14 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - name: Salinan nama tetap (link download langsung di website)
+      - name: Siapkan aset Windows dengan nama baru (migrasi 1.1.1/1.2.0)
         run: |
           cd dist
           cp *-macOS.dmg Zterm-macOS.dmg
-          cp *-Windows-x64-Setup.exe Zterm-Windows-x64-Setup.exe
-          cp *-Windows-arm64-Setup.exe Zterm-Windows-arm64-Setup.exe
+          # Jangan pakai nama yang mengandung "Windows": checker lama di 1.1.1/1.2.0
+          # akan menganggapnya sebagai aset yang bisa dipasang lalu crash sebelum unduh.
+          mv *-Windows-x64-Setup.exe Zterm-win-x64.exe
+          mv *-Windows-arm64-Setup.exe Zterm-win-arm64.exe
 
       - name: Siapkan body rilis dari CHANGELOG
         run: |
@@ -154,7 +156,8 @@ jobs:
           ## Download
 
           - **macOS** (Apple Silicon & Intel): `Zterm-macOS.dmg`
-          - **Windows 10/11**: `Zterm-Windows-x64-Setup.exe` untuk PC biasa, `Zterm-Windows-arm64-Setup.exe` untuk PC ARM (mis. Snapdragon)
+          - **Windows 10/11**: `Zterm-win-x64.exe` untuk PC biasa, `Zterm-win-arm64.exe` untuk PC ARM (mis. Snapdragon)
+            - **Pengguna Windows 1.1.1/1.2.0:** pasang 1.2.1 secara manual satu kali. Tombol update di versi lama crash sebelum mengunduh; setelah 1.2.1, pembaruan berikutnya otomatis.
           - **Linux (beta)**: `Zterm-Linux-x86_64.AppImage` atau `Zterm-Linux-aarch64.AppImage` — `chmod +x` lalu jalankan (glibc 2.39+, mis. Ubuntu 24.04 / Fedora 40)
 
           App belum ditandatangani sertifikat berbayar — lihat panduan "Install" di website untuk cara membukanya.
@@ -168,5 +171,5 @@ jobs:
           body_path: release-notes.md
           files: |
             dist/*.dmg
-            dist/*-Setup.exe
+            dist/Zterm-win-*.exe
             dist/*.AppImage

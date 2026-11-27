@@ -6,6 +6,32 @@ Download versi terbaru: [Releases](https://github.com/latiefahmad/zterm/releases
 
 ---
 
+## [1.2.1] - 2026-11-27
+
+Memperbaiki pembaruan otomatis Windows yang crash sebelum mengunduh.
+
+> **PENTING — Windows 1.1.1 / 1.2.0**
+>
+> Tombol update di versi tersebut crash sebelum mengunduh. Pasang 1.2.1 secara manual **satu kali**:
+>
+> - **x64:** [Zterm-win-x64.exe](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-win-x64.exe)
+> - **ARM64:** [Zterm-win-arm64.exe](https://github.com/latiefahmad/zterm/releases/latest/download/Zterm-win-arm64.exe)
+>
+> Setelah 1.2.1 terpasang, pembaruan berikutnya berjalan otomatis.
+
+### Diperbaiki
+
+- **Update Windows** - bilah progress tidak lagi memicu crash WinUI; unduhan, pemasangan senyap, dan pembukaan ulang Zterm berjalan normal
+- **Ketahanan update** - kegagalan render UI tidak membatalkan unduhan; status direset, error dicatat ke `updates/update.log`, dan tersedia tombol **Unduh manual** / **Coba lagi**
+- **Migrasi aset Windows** - aset 1.2.1 bernama `Zterm-win-x64.exe` dan `Zterm-win-arm64.exe`; checker lama tidak lagi mencoba memasang lewat jalur yang rusak dan membuka halaman rilis
+
+### Catatan
+
+- **Windows 1.1.1/1.2.0** perlu memasang 1.2.1 secara manual satu kali. Ini tidak bisa dihindari karena updater yang rusak sudah terpasang di versi tersebut.
+- Setelah 1.2.1, pembaruan berikutnya otomatis dan Zterm dibuka ulang setelah pemasangan.
+
+[1.2.1]: https://github.com/latiefahmad/zterm/releases/tag/v1.2.1
+
 ## [1.2.0] - 2026-11-27
 
 Password login host yang tersimpan kini bisa diisi langsung saat prompt sudo, tanpa mengetik ulang dan tanpa membocorkannya ke riwayat atau sesi lain.

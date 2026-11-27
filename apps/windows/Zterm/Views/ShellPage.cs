@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.UI;
 using Microsoft.UI.Text;
@@ -88,9 +89,35 @@ internal sealed class ShellPage : Grid
         M.Changed += _onChange;
         Retheme();
         SyncTerminals();
+        Loaded += (_, _) => ShowUpdateFixedNotice();
     }
 
     public void Detach() => M.Changed -= _onChange;
+
+    /// <summary>
+    /// Sekali saja setelah 1.2.1 terpasang di atas 1.1.1/1.2.0: jelaskan bahwa update
+    /// manual ini memperbaiki pembaruan otomatis. Penanda ditulis installer saat mendeteksi
+    /// versi lama, jadi pengguna baru tidak melihat dialog ini.
+    /// </summary>
+    private async void ShowUpdateFixedNotice()
+    {
+        const string key = "update.fixedNotice121";
+        if (Settings.Bool(key, false)) return;
+        var marker = Path.Combine(Config.LocalDir, "update-migrated-121");
+        if (!File.Exists(marker)) return;
+        Settings.Set(key, true);
+        try { File.Delete(marker); } catch { }
+        try
+        {
+            var content = Ui.Col(10,
+                Ui.Secondary(L.T("Mulai 1.2.1, tombol update Windows berfungsi lagi: Zterm mengunduh, memasang, lalu membuka ulang sendiri. Pemasangan manual ini diperlukan sekali karena versi lama belum bisa memperbarui dirinya."), 13, true));
+            content.MaxWidth = 440;
+            var dialog = Ui.Dialog(L.T("Pembaruan otomatis sudah aktif"), content,
+                L.T("Mengerti"), L.T("Lihat catatan rilis"));
+            if (await dialog.ShowAsync() == ContentDialogResult.None) Ui.Open(Config.Releases);
+        }
+        catch (Exception e) { UpdateLog.Write("Dialog update-fixed gagal: " + e); }
+    }
 
     /// <summary>Gambar ulang semua bagian (mis. setelah ganti tema terang/gelap). View terminal tidak dibuat ulang.</summary>
     public void Retheme()
@@ -232,6 +259,8 @@ internal sealed class ShellPage : Grid
 
     private UIElement UpdateCard(AvailableUpdate u)
     {
+        _updateBar = null;
+        _updateStatus = null;
         var close = M.UpdateBusy ? null : Ui.IconBtn(G.Close, L.T("Nanti"), M.DismissUpdate, size: 9);
         var top = Ui.Columns("Auto,*,Auto", 6, Ui.Icon(G.Sparkle, 13, Theme.AccentBrush), Ui.Text(L.T("Versi {} tersedia", u.Version), 12, FontWeights.SemiBold), close);
         var body = Ui.Col(8, top, Ui.Secondary(L.T("Kamu memakai {}.", Config.Version), 11));
@@ -241,6 +270,14 @@ internal sealed class ShellPage : Grid
             _updateStatus = Ui.Secondary(M.UpdateStatus ?? L.T("Mengunduh pembaruan…"), 11, true);
             body.Children.Add(_updateBar);
             body.Children.Add(_updateStatus);
+        }
+        else if (M.UpdateError is { Length: > 0 } error)
+        {
+            body.Children.Add(Ui.Secondary(error, 11, true));
+            body.Children.Add(Ui.Col(6,
+                Ui.Primary(L.T("Unduh manual"), null, () => Ui.Open(u.Page)),
+                Ui.Secondary(L.T("Coba lagi"), null, () => _ = UpdateUI.StartAsync(M, u))));
+            body.Children.Add(Ui.Plain(Ui.Text(L.T("Catatan rilis"), 10, fg: Theme.AccentBrush), () => Ui.Open(u.Page), new Thickness(0, 2, 0, 0)));
         }
         else
         {
