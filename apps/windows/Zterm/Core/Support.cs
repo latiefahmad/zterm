@@ -18,6 +18,7 @@ internal static class Config
     public const string GitHub = "https://github.com/latiefahmad/zterm";
     public const string Issues = "https://github.com/latiefahmad/zterm/issues";
     public const string Releases = "https://github.com/latiefahmad/zterm/releases";
+    public const string Donate = "https://saweria.co/latiefahmad";
     public const string Privacy = "https://latief.id/zterm/privacy.html";
     public const string Terms = "https://latief.id/zterm/terms.html";
 

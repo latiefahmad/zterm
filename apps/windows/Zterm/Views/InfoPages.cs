@@ -271,8 +271,8 @@ internal sealed class AboutPage : PageBase
     protected override void Render()
     {
         Children.Clear();
-        var logo = new Image { Source = new BitmapImage(new Uri("ms-appx:///Assets/logo.png")), Width = 96, Height = 96 };
-        var title = Ui.Text("Zterm", 34, FontWeights.ExtraBold).With(t => t.HorizontalAlignment = HorizontalAlignment.Center);
+        var logo = new Image { Source = new BitmapImage(new Uri("ms-appx:///Assets/logo.png")), Width = 84, Height = 84 };
+        var title = Ui.Text("Zterm", 30, FontWeights.ExtraBold).With(t => t.HorizontalAlignment = HorizontalAlignment.Center);
         var tagline = Ui.Text(L.T("Semua servermu, satu terminal."), 14, fg: Theme.Text2, mono: true).With(t => t.HorizontalAlignment = HorizontalAlignment.Center);
         var badges = Ui.Row(8, Ui.Badge(L.T("VERSI {}", Config.Version)), Ui.Badge($"CORE {uniffi.zterm_core.ZtermCoreMethods.CoreVersion()}", Theme.Accent2), Ui.Badge("MIT", Theme.Accent3));
         badges.HorizontalAlignment = HorizontalAlignment.Center;
@@ -292,16 +292,50 @@ internal sealed class AboutPage : PageBase
             InfoRow(L.T("Inti"), L.T("zterm-core · Rust (vault, sync, keychain)")), InfoRow(L.T("Enkripsi"), "Argon2id + XChaCha20-Poly1305"),
             InfoRow("Terminal", "xterm.js · ConPTY · OpenSSH"), InfoRow("Sync", "Google Drive (appDataFolder), zero-knowledge", true));
         var infoCard = Ui.Card(info, 4).With(c => { c.MaxWidth = 560; c.HorizontalAlignment = HorizontalAlignment.Center; });
-        var legal = Ui.Row(14,
-            Ui.Plain(Ui.Text(L.T("Kebijakan Privasi"), 12, fg: Theme.AccentBrush), () => Ui.Open(Config.Privacy)),
-            Ui.Plain(Ui.Text(L.T("Syarat Layanan"), 12, fg: Theme.AccentBrush), () => Ui.Open(Config.Terms)));
-        legal.HorizontalAlignment = HorizontalAlignment.Center;
-        var copy = Ui.Text(L.T("© 2026 Latief Ahmad · Lisensi MIT"), 11, fg: Theme.Text3).With(t => t.HorizontalAlignment = HorizontalAlignment.Center);
 
-        var col = Ui.Col(18, logo, title, tagline, badges, desc, links, update, infoCard, legal, copy);
-        col.Padding = new Thickness(0, 24, 0, 24);
+        // Konten diskalakan turun bila jendela pendek, jadi halaman ini selalu utuh
+        // dalam satu layar tanpa ScrollViewer.
+        var col = Ui.Col(14, logo, title, tagline, badges, desc, links, update, infoCard);
+        col.MaxWidth = 600;
+        col.HorizontalAlignment = HorizontalAlignment.Center;
         for (int i = 0; i < col.Children.Count; i++) Ui.StaggerIn(col.Children[i], i);
-        Children.Add(Ui.Scroll(col));
+
+        var fit = new Viewbox
+        {
+            Child = col,
+            Stretch = Stretch.Uniform,
+            StretchDirection = StretchDirection.DownOnly,
+            Margin = new Thickness(28, 8, 28, 4),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+        };
+
+        var legal = Ui.Row(16,
+            Ui.Plain(Ui.Text(L.T("Kebijakan Privasi"), 11.5, fg: Theme.AccentBrush), () => Ui.Open(Config.Privacy)),
+            Ui.Plain(Ui.Text(L.T("Syarat Layanan"), 11.5, fg: Theme.AccentBrush), () => Ui.Open(Config.Terms)));
+        var copy = Ui.Text(L.T("© 2026 Latief Ahmad · Lisensi MIT"), 11, fg: Theme.Text3);
+        var footerLeft = Ui.Col(3, legal, copy);
+
+        // Tombol donasi selalu di pojok kanan bawah halaman.
+        var support = Ui.Primary("Support me", G.Heart, () => Ui.Open(Config.Donate), large: true);
+        support.HorizontalAlignment = HorizontalAlignment.Right;
+        support.VerticalAlignment = VerticalAlignment.Center;
+        ToolTipService.SetToolTip(support, "saweria.co/latiefahmad");
+
+        var footer = new Grid { Padding = new Thickness(28, 6, 28, 16), ColumnSpacing = 18 };
+        footer.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        footer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        footer.Children.Add(footerLeft);
+        Grid.SetColumn(support, 1);
+        footer.Children.Add(support);
+
+        var root = new Grid();
+        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.Children.Add(fit);
+        Grid.SetRow(footer, 1);
+        root.Children.Add(footer);
+        Children.Add(root);
     }
 
     private static UIElement InfoRow(string label, string value, bool last = false) => new Border

@@ -24,6 +24,7 @@ Memperbaiki pembaruan otomatis Windows yang crash sebelum mengunduh.
 - **Update Windows** - bilah progress tidak lagi memicu crash WinUI; unduhan, pemasangan senyap, dan pembukaan ulang Zterm berjalan normal
 - **Ketahanan update** - kegagalan render UI tidak membatalkan unduhan; status direset, error dicatat ke `updates/update.log`, dan tersedia tombol **Unduh manual** / **Coba lagi**
 - **Migrasi aset Windows** - aset 1.2.1 bernama `Zterm-win-x64.exe` dan `Zterm-win-arm64.exe`; checker lama tidak lagi mencoba memasang lewat jalur yang rusak dan membuka halaman rilis
+- **Halaman Tentang** - seluruh konten muat dalam satu layar tanpa scroll dan menyesuaikan ukuran jendela; tombol **Support me** di pojok kanan bawah menuju saweria.co/latiefahmad
 
 ### Catatan
 
