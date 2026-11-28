@@ -712,9 +712,10 @@ fn split_journal_cursor(out: &str) -> (String, String) {
 }
 
 fn split_size_marker(out: &str) -> (String, Option<u64>) {
-    match out.rfind("\n#zterm-size=") {
+    const MARKER: &str = "\n#zterm-size=";
+    match out.rfind(MARKER) {
         Some(i) => {
-            let size = out[i + 12..].trim().parse().ok();
+            let size = out[i + MARKER.len()..].trim().parse().ok();
             (out[..i].to_string(), size)
         }
         None => (out.to_string(), None),

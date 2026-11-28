@@ -17,6 +17,10 @@ Halaman Tentang baru yang ringkas dan konsisten di macOS, Windows, dan Linux.
 - **macOS** - pemilih bahasa dan tombol **Support me** kini berada di footer halaman Tentang
 - **Linux (beta)** - halaman Tentang baru di sidebar; kartu versi menampilkan rilis resmi dan catatan rilis (tanpa tombol update), baris Sync menyebut penyimpanan lokal karena sinkronisasi belum tersedia
 
+### Diperbaiki
+
+- **Penampil log file** - offset log kini maju dengan benar; sebelumnya penanda ukuran gagal dibaca sehingga log file selalu memuat ulang potongan yang sama
+
 ### Platform
 
 - **macOS 15+** - universal (Apple Silicon & Intel)
