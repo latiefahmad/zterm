@@ -6,6 +6,25 @@ Download versi terbaru: [Releases](https://github.com/latiefahmad/zterm/releases
 
 ---
 
+## [1.2.2] - 2026-11-28
+
+Halaman Tentang baru yang ringkas dan konsisten di macOS, Windows, dan Linux.
+
+### Diubah
+
+- **Halaman Tentang** - hero berbingkai terminal dengan logo, versi, badge core, dan status pembaruan; panel **Jelajahi** dan **Di balik layar**; footer berisi tautan privasi, syarat layanan, dan tombol **Support me**
+- **Windows** - seluruh konten tetap muat dalam satu layar tanpa scroll dan diskalakan saat jendela diperkecil; latar grid titik dan sorotan mint senada dengan macOS
+- **macOS** - pemilih bahasa dan tombol **Support me** kini berada di footer halaman Tentang
+- **Linux (beta)** - halaman Tentang baru di sidebar; kartu versi menampilkan rilis resmi dan catatan rilis (tanpa tombol update), baris Sync menyebut penyimpanan lokal karena sinkronisasi belum tersedia
+
+### Platform
+
+- **macOS 15+** - universal (Apple Silicon & Intel)
+- **Windows 10/11** - x64 dan ARM64
+- **Linux (beta)** - x86_64 dan ARM64
+
+[1.2.2]: https://github.com/latiefahmad/zterm/releases/tag/v1.2.2
+
 ## [1.2.1] - 2026-11-27
 
 Memperbaiki pembaruan otomatis Windows yang crash sebelum mengunduh.

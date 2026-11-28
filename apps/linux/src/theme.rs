@@ -25,6 +25,34 @@ const CSS: &str = r#"
 .zterm-error { color: @error_color; font-size: 12px; }
 .zterm-brand { font-weight: 800; font-size: 15px; letter-spacing: -0.2px; }
 
+/* Tentang: hero berbingkai terminal, panel ringkas, footer. */
+.zterm-term-card { border-radius: 12px; background: alpha(@view_fg_color, .03); border: 1px solid alpha(@view_fg_color, .10); }
+.zterm-term-chrome { min-height: 30px; padding: 0 12px; background: alpha(@view_fg_color, .02); border-bottom: 1px solid alpha(@view_fg_color, .10); border-radius: 12px 12px 0 0; }
+.zterm-term-title { font-family: monospace; font-size: 8.5px; font-weight: 600; letter-spacing: 1.1px; opacity: .45; }
+.zterm-term-watermark { font-family: monospace; font-size: 96px; font-weight: 800; color: alpha(#3FD0B4, .07); }
+.zterm-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; opacity: .48; }
+.zterm-about-title { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+.zterm-prompt { font-family: monospace; font-size: 13px; font-weight: 700; color: #22A890; }
+.zterm-about-tagline { font-family: monospace; font-size: 12.5px; opacity: .62; }
+.zterm-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: alpha(@view_fg_color, .06); }
+.zterm-badge.mint { color: #22A890; background: alpha(#3FD0B4, .14); }
+.zterm-badge.blue { color: #4B87DD; background: alpha(#5B9CF5, .14); }
+.zterm-badge.violet { color: #8A6BE0; background: alpha(#9D7CF2, .14); }
+.zterm-status-card { padding: 8px 10px; border-radius: 10px; background: alpha(@view_fg_color, .03); border: 1px solid alpha(@view_fg_color, .10); }
+.zterm-about-status { font-size: 11.5px; font-weight: 500; }
+.zterm-about-tile { padding: 8px 9px; border-radius: 9px; background: alpha(@view_fg_color, .03); border: 1px solid alpha(@view_fg_color, .10); }
+.zterm-about-tile:hover { background: alpha(@view_fg_color, .065); border-color: alpha(@view_fg_color, .18); }
+.zterm-about-tile-title { font-size: 12.5px; font-weight: 600; }
+.zterm-about-tile-sub { font-size: 10.5px; opacity: .45; }
+.zterm-info-row { padding: 8px 0; border-bottom: 1px solid alpha(@view_fg_color, .08); }
+.zterm-info-row.last { border-bottom: none; }
+.zterm-info-label { font-size: 12px; opacity: .62; }
+.zterm-info-value { font-size: 12px; font-weight: 500; }
+.zterm-support { background: #3FD0B4; color: #06231E; }
+.zterm-support:hover { background: #37BFA7; }
+.zterm-support:active { background: #2FA891; }
+.zterm-link { font-size: 11.5px; }
+
 .zterm-sidebar row { border-radius: 8px; margin: 1px 6px; padding: 6px 8px; }
 .zterm-sidebar row:selected { background: alpha(@accent_bg_color, .16); }
 

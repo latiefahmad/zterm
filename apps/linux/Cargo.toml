@@ -1,6 +1,6 @@
 [package]
 name = "zterm"
-version = "1.2.1"
+version = "1.2.2"
 edition = "2024"
 description = "Zterm untuk Linux (GTK4 + libadwaita + VTE)"
 license = "MIT"

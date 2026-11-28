@@ -4,13 +4,14 @@ use adw::prelude::*;
 use gtk::{gio, glib};
 
 use crate::ctx::{App, Ctx};
-use crate::{hosts, icons, keychain, onboarding, snippets, terminal, theme};
+use crate::{about, hosts, icons, keychain, onboarding, snippets, terminal, theme};
 
 /// Halaman sidebar MVP: (id, judul, ikon Phosphor).
-const SECTIONS: [(&str, &str, &str); 3] = [
+const SECTIONS: [(&str, &str, &str); 4] = [
     ("hosts", "Hosts", "hard-drives"),
     ("keychain", "Keychain", "key"),
     ("snippets", "Snippets", "brackets-curly"),
+    ("about", "Tentang", "info"),
 ];
 
 pub fn build(app: &adw::Application) {
@@ -106,6 +107,7 @@ fn build_main(ctx: &Ctx) -> gtk::Widget {
     ctx.pages.add_named(&hosts::build(ctx), Some("hosts"));
     ctx.pages.add_named(&keychain::build(ctx), Some("keychain"));
     ctx.pages.add_named(&snippets::build(ctx), Some("snippets"));
+    ctx.pages.add_named(&about::build(ctx), Some("about"));
     // Sorot baris sidebar sesuai halaman
     let l = list.clone();
     ctx.pages.connect_visible_child_name_notify(move |s| {

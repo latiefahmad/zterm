@@ -2,6 +2,7 @@
 
 #[macro_use]
 mod i18n;
+mod about;
 mod config;
 mod ctx;
 mod editor;

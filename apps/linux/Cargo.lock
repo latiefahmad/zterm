@@ -6075,7 +6075,7 @@ dependencies = [
 
 [[package]]
 name = "zterm"
-version = "1.2.1"
+version = "1.2.2"
 dependencies = [
  "gtk4",
  "libadwaita",
@@ -6088,7 +6088,7 @@ dependencies = [
 
 [[package]]
 name = "zterm-core"
-version = "1.2.1"
+version = "1.2.2"
 dependencies = [
  "argon2",
  "base64 0.22.1",

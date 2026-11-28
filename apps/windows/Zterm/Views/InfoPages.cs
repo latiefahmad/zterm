@@ -2,11 +2,13 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Foundation;
 using uniffi.zterm_core;
 
 namespace Zterm.Views;
@@ -260,7 +262,7 @@ internal sealed class AccountPage : PageBase
     }
 }
 
-/// <summary>Tentang Zterm.</summary>
+/// <summary>Tentang Zterm — hero berbingkai terminal, dua panel ringkas, footer tetap.</summary>
 internal sealed class AboutPage : PageBase
 {
     public AboutPage() : base()
@@ -271,44 +273,14 @@ internal sealed class AboutPage : PageBase
     protected override void Render()
     {
         Children.Clear();
-        var logo = new Image { Source = new BitmapImage(new Uri("ms-appx:///Assets/logo.png")), Width = 84, Height = 84 };
-        var title = Ui.Text("Zterm", 30, FontWeights.ExtraBold).With(t => t.HorizontalAlignment = HorizontalAlignment.Center);
-        var tagline = Ui.Text(L.T("Semua servermu, satu terminal."), 14, fg: Theme.Text2, mono: true).With(t => t.HorizontalAlignment = HorizontalAlignment.Center);
-        var badges = Ui.Row(8, Ui.Badge(L.T("VERSI {}", Config.Version)), Ui.Badge($"CORE {uniffi.zterm_core.ZtermCoreMethods.CoreVersion()}", Theme.Accent2), Ui.Badge("MIT", Theme.Accent3));
-        badges.HorizontalAlignment = HorizontalAlignment.Center;
-        var desc = Ui.Secondary(L.T("SSH client native untuk Windows & macOS — gratis, tanpa iklan, tanpa server. Host, SSH key, dan snippet dienkripsi di perangkatmu dan tersinkron lewat Google Drive milikmu sendiri."), 13.5, true)
-            .With(t => { t.TextAlignment = TextAlignment.Center; t.MaxWidth = 540; t.HorizontalAlignment = HorizontalAlignment.Center; });
-        var links = Ui.Row(10,
-            Ui.Secondary("Website", G.Globe, () => Ui.Open(Config.Website)),
-            Ui.Secondary("GitHub", G.Code, () => Ui.Open(Config.GitHub)),
-            Ui.Secondary(L.T("Catatan rilis"), G.Sparkle, () => Ui.Open(Config.Releases)),
-            Ui.Secondary(L.T("Laporkan bug"), G.Bug, () => Ui.Open(Config.Issues)));
-        links.HorizontalAlignment = HorizontalAlignment.Center;
 
-        var update = new UpdatePanel { HorizontalAlignment = HorizontalAlignment.Center };
+        // Latar: grid titik + sorotan mint di kiri atas (sama dengan versi macOS).
+        var bg = new Grid { Background = Glow(Theme.Accent, Theme.Dark ? 0.12 : 0.15, new Point(0.18, 0.0)) };
+        bg.Children.Add(new Grid { Background = Glow(Theme.Accent2, Theme.Dark ? 0.06 : 0.08, new Point(0.95, 0.08)) });
+        bg.Children.Add(new DotField());
+        Children.Add(bg);
 
-        var info = Ui.Col(0,
-            InfoRow(L.T("Dibuat oleh"), "Latief Ahmad"), InfoRow(L.T("Antarmuka"), L.T("WinUI 3 (native Windows)")),
-            InfoRow(L.T("Inti"), L.T("zterm-core · Rust (vault, sync, keychain)")), InfoRow(L.T("Enkripsi"), "Argon2id + XChaCha20-Poly1305"),
-            InfoRow("Terminal", "xterm.js · ConPTY · OpenSSH"), InfoRow("Sync", "Google Drive (appDataFolder), zero-knowledge", true));
-        var infoCard = Ui.Card(info, 4).With(c => { c.MaxWidth = 560; c.HorizontalAlignment = HorizontalAlignment.Center; });
-
-        // Konten diskalakan turun bila jendela pendek, jadi halaman ini selalu utuh
-        // dalam satu layar tanpa ScrollViewer.
-        var col = Ui.Col(14, logo, title, tagline, badges, desc, links, update, infoCard);
-        col.MaxWidth = 600;
-        col.HorizontalAlignment = HorizontalAlignment.Center;
-        for (int i = 0; i < col.Children.Count; i++) Ui.StaggerIn(col.Children[i], i);
-
-        var fit = new Viewbox
-        {
-            Child = col,
-            Stretch = Stretch.Uniform,
-            StretchDirection = StretchDirection.DownOnly,
-            Margin = new Thickness(28, 8, 28, 4),
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            VerticalAlignment = VerticalAlignment.Stretch,
-        };
+        var panels = Ui.Columns("*,*", 14, ExplorePanel(), InfoPanel());
 
         var legal = Ui.Row(16,
             Ui.Plain(Ui.Text(L.T("Kebijakan Privasi"), 11.5, fg: Theme.AccentBrush), () => Ui.Open(Config.Privacy)),
@@ -316,36 +288,254 @@ internal sealed class AboutPage : PageBase
         var copy = Ui.Text(L.T("© 2026 Latief Ahmad · Lisensi MIT"), 11, fg: Theme.Text3);
         var footerLeft = Ui.Col(3, legal, copy);
 
-        // Tombol donasi selalu di pojok kanan bawah halaman.
+        // Tombol donasi di kanan footer, sejajar dengan tautan legal.
         var support = Ui.Primary("Support me", G.Heart, () => Ui.Open(Config.Donate), large: true);
         support.HorizontalAlignment = HorizontalAlignment.Right;
         support.VerticalAlignment = VerticalAlignment.Center;
         ToolTipService.SetToolTip(support, "saweria.co/latiefahmad");
 
-        var footer = new Grid { Padding = new Thickness(28, 6, 28, 16), ColumnSpacing = 18 };
-        footer.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        footer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        footer.Children.Add(footerLeft);
+        var footerGrid = new Grid { ColumnSpacing = 18 };
+        footerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        footerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        footerGrid.Children.Add(footerLeft);
         Grid.SetColumn(support, 1);
-        footer.Children.Add(support);
+        footerGrid.Children.Add(support);
+        var footer = new Border
+        {
+            Child = footerGrid, BorderBrush = Theme.Ink(0.06), BorderThickness = new Thickness(0, 1, 0, 0),
+            Padding = new Thickness(0, 10, 0, 0)
+        };
 
-        var root = new Grid();
-        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        root.Children.Add(fit);
-        Grid.SetRow(footer, 1);
-        root.Children.Add(footer);
-        Children.Add(root);
+        var body = Ui.Col(14, Hero(), panels, footer);
+        body.Width = 840;
+        body.HorizontalAlignment = HorizontalAlignment.Center;
+        for (int i = 0; i < body.Children.Count; i++) Ui.StaggerIn(body.Children[i], i);
+
+        // Konten diskalakan turun bila jendela pendek, jadi halaman ini selalu utuh
+        // dalam satu layar tanpa ScrollViewer.
+        var fit = new Viewbox
+        {
+            Child = body,
+            Stretch = Stretch.Uniform,
+            StretchDirection = StretchDirection.DownOnly,
+            Margin = new Thickness(28, 10, 28, 8),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+        };
+        Children.Add(fit);
     }
 
-    private static UIElement InfoRow(string label, string value, bool last = false) => new Border
+    private static RadialGradientBrush Glow(string hex, double opacity, Point center) => new()
     {
-        Padding = new Thickness(14, 11, 14, 11), BorderBrush = Theme.Ink(0.06), BorderThickness = new Thickness(0, 0, 0, last ? 0 : 1),
-        Child = Ui.Columns("140,*", 10, Ui.Text(label, 13, fg: Theme.Text2), Ui.Text(value, 13, FontWeights.Medium))
+        Center = center, RadiusX = 0.95, RadiusY = 0.9,
+        GradientStops =
+        {
+            new GradientStop { Color = Theme.Hex(hex, (byte)Math.Round(255 * opacity)), Offset = 0 },
+            new GradientStop { Color = Colors.Transparent, Offset = 1 },
+        }
     };
+
+    private static FrameworkElement Hero()
+    {
+        var dots = Ui.Row(6, TrafficDot("#FF5F57"), TrafficDot("#FEBC2E"), TrafficDot("#28C840"));
+        var chromeLabel = Ui.Text("ZTERM — ABOUT", 8.5, mono: true, fg: Theme.Text3).With(t => t.CharacterSpacing = 110);
+        var chromeRight = new StackPanel
+        {
+            Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Center, Children = { chromeLabel }
+        };
+        var chrome = new Grid { Height = 31, Padding = new Thickness(12, 0, 12, 0) };
+        chrome.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        chrome.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        chrome.Children.Add(dots);
+        Grid.SetColumn(chromeRight, 1);
+        chrome.Children.Add(chromeRight);
+        var chromeBorder = new Border
+        {
+            Child = chrome, Background = Theme.Ink(0.02), BorderBrush = Theme.CardStroke,
+            BorderThickness = new Thickness(0, 0, 0, 1), CornerRadius = new CornerRadius(12, 12, 0, 0)
+        };
+
+        var logo = new Image
+        {
+            Source = new BitmapImage(new Uri("ms-appx:///Assets/logo.png")),
+            Width = 68, Height = 68, VerticalAlignment = VerticalAlignment.Center
+        };
+
+        var cursor = new Border
+        {
+            Width = 7, Height = 14, CornerRadius = new CornerRadius(1), Background = Theme.AccentBrush,
+            VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(1, 1, 0, 0)
+        };
+        Ui.Pulse(cursor);
+        var tagline = Ui.Row(6,
+            Ui.Text(">", 14, mono: true, fg: Theme.AccentBrush),
+            Ui.Text(L.T("Semua servermu, satu terminal."), 13.5, mono: true, fg: Theme.Text2),
+            cursor);
+
+        var badges = Ui.Row(7,
+            Ui.Badge($"v{Config.Version}"),
+            Ui.Badge($"CORE {uniffi.zterm_core.ZtermCoreMethods.CoreVersion()}", Theme.Accent2),
+            Ui.Badge("MIT", Theme.Accent3),
+            Ui.Caps("WINUI 3 · XTERM.JS · CONPTY").With(t => { t.FontSize = 8.5; t.CharacterSpacing = 90; }));
+
+        var copy = Ui.Col(4,
+            Ui.Caps(L.T("Tentang Zterm")).With(t => { t.FontSize = 9; t.CharacterSpacing = 140; }),
+            Ui.Text("Zterm", 34, FontWeights.ExtraBold),
+            tagline,
+            badges);
+
+        var side = Ui.Col(7, new UpdatePanel(),
+            Ui.Text(L.T("Gratis · tanpa iklan · local-first"), 9.5, fg: Theme.Text3).With(t => t.HorizontalAlignment = HorizontalAlignment.Right));
+        side.Width = 252;
+        side.VerticalAlignment = VerticalAlignment.Center;
+
+        var main = Ui.Columns("Auto,*,Auto", 16, logo, copy, side);
+        main.Margin = new Thickness(18, 14, 18, 16);
+
+        var watermark = Ui.Text(">_", 112, FontWeights.ExtraBold, Theme.Brush(Theme.Accent, 0.07), mono: true)
+            .With(t =>
+            {
+                t.HorizontalAlignment = HorizontalAlignment.Right;
+                t.VerticalAlignment = VerticalAlignment.Bottom;
+                t.Margin = new Thickness(0, 0, 14, 0);
+                t.IsHitTestVisible = false;
+            });
+
+        var inner = new Grid();
+        inner.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        inner.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        Grid.SetRow(watermark, 1);
+        inner.Children.Add(watermark);
+        inner.Children.Add(chromeBorder);
+        Grid.SetRow(main, 1);
+        inner.Children.Add(main);
+
+        return new Border
+        {
+            Child = inner, Background = Theme.Card, BorderBrush = Theme.CardStroke, BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(12)
+        };
+    }
+
+    private static Border TrafficDot(string hex) => new()
+    {
+        Width = 8, Height = 8, CornerRadius = new CornerRadius(4), Background = Theme.Brush(hex)
+    };
+
+    private static FrameworkElement PanelHead(string title, string hint)
+    {
+        var h = Ui.Caps(hint).With(t => { t.FontSize = 9; t.CharacterSpacing = 90; t.HorizontalAlignment = HorizontalAlignment.Right; });
+        return Ui.Columns("*,Auto", 8, Ui.Text(title, 13, FontWeights.SemiBold), h);
+    }
+
+    private static FrameworkElement ExplorePanel()
+    {
+        var grid = new Grid { ColumnSpacing = 8, RowSpacing = 8 };
+        grid.ColumnDefinitions.Add(new ColumnDefinition());
+        grid.ColumnDefinitions.Add(new ColumnDefinition());
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        (string icon, string color, string title, string sub, string url)[] items =
+        [
+            ("globe", Theme.Accent, "Website", "latief.id/zterm", Config.Website),
+            ("file-code", Theme.Accent2, "GitHub", "latiefahmad/zterm", Config.GitHub),
+            ("sparkle", Theme.Accent3, L.T("Catatan rilis"), L.T("Yang baru"), Config.Releases),
+            ("bug", "#F2A65A", L.T("Laporkan bug"), "github issues", Config.Issues),
+        ];
+        for (int i = 0; i < items.Length; i++)
+        {
+            var it = items[i];
+            var tile = Tile(it.icon, it.color, it.title, it.sub, it.url);
+            Grid.SetColumn(tile, i % 2);
+            Grid.SetRow(tile, i / 2);
+            grid.Children.Add(tile);
+        }
+        return Ui.Card(Ui.Col(10, PanelHead(L.T("Jelajahi"), L.T("Buka di browser")), grid), 14);
+    }
+
+    private static Button Tile(string icon, string color, string title, string sub, string url)
+    {
+        var iconBox = new Border
+        {
+            Width = 30, Height = 30, CornerRadius = new CornerRadius(8), Background = Theme.Brush(color, 0.12),
+            Child = Ph.Icon(icon, 14, Theme.Brush(color))
+        };
+        var text = Ui.Col(1, Ui.Text(title, 12.5, FontWeights.SemiBold), Ui.Text(sub, 10.5, fg: Theme.Text3));
+        var b = new Button
+        {
+            Content = Ui.Columns("Auto,*", 9, iconBox, text),
+            Background = Theme.Ink(0.03), BorderBrush = Theme.CardStroke, BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(9), Padding = new Thickness(9, 8, 9, 8),
+            HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            MinWidth = 0, MinHeight = 0
+        };
+        b.Resources["ButtonBackgroundPointerOver"] = Theme.Ink(0.065);
+        b.Resources["ButtonBackgroundPressed"] = Theme.Ink(0.1);
+        ToolTipService.SetToolTip(b, url);
+        b.Click += (_, _) => Ui.Open(url);
+        return b;
+    }
+
+    private static FrameworkElement InfoPanel()
+    {
+        var list = Ui.Col(0,
+            InfoRow("user", L.T("Dibuat oleh"), "Latief Ahmad"),
+            InfoRow("cube", L.T("Inti"), "zterm-core · Rust"),
+            InfoRow("shield-check", L.T("Keamanan"), "Argon2id + XChaCha20"),
+            InfoRow("cloud", "Sync", "Google Drive · zero-knowledge", true));
+        return Ui.Card(Ui.Col(10, PanelHead(L.T("Di balik layar"), "native · rust"), list), 14);
+    }
+
+    private static UIElement InfoRow(string icon, string label, string value, bool last = false)
+    {
+        var iconBox = new Border
+        {
+            Width = 26, Height = 26, CornerRadius = new CornerRadius(7), Background = Theme.Ink(0.04),
+            Child = Ph.Icon(icon, 13, Theme.Text2)
+        };
+        var labelText = Ui.Text(label, 12, fg: Theme.Text2).With(t => t.Width = 74);
+        var valueText = Ui.Text(value, 12, FontWeights.Medium).With(t => t.TextAlignment = TextAlignment.Right);
+        return new Border
+        {
+            Padding = new Thickness(0, 8, 0, 8), BorderBrush = Theme.Ink(0.06),
+            BorderThickness = new Thickness(0, 0, 0, last ? 0 : 1),
+            Child = Ui.Columns("Auto,Auto,*,Auto", 9, iconBox, labelText, null, valueText)
+        };
+    }
 }
 
-/// <summary>Status pembaruan di halaman Tentang; diperbarui sendiri agar progress tidak menggambar ulang seluruh halaman.</summary>
+/// <summary>Grid titik mint yang memudar, digambar sebagai satu Path agar ringan.</summary>
+internal sealed class DotField : Canvas
+{
+    private readonly Microsoft.UI.Xaml.Shapes.Path _path = new() { IsHitTestVisible = false };
+
+    public DotField()
+    {
+        IsHitTestVisible = false;
+        _path.Fill = Theme.Brush(Theme.Accent, Theme.Dark ? 0.09 : 0.13);
+        Children.Add(_path);
+        SizeChanged += (_, e) => Build(e.NewSize.Width, e.NewSize.Height);
+    }
+
+    private void Build(double width, double height)
+    {
+        if (width <= 0 || height <= 0) return;
+        var group = new GeometryGroup();
+        const double gap = 24;
+        const double radius = 1;
+        for (double y = gap / 2; y < height; y += gap)
+        {
+            for (double x = gap / 2; x < width; x += gap)
+            {
+                group.Children.Add(new EllipseGeometry { Center = new Point(x, y), RadiusX = radius, RadiusY = radius });
+            }
+        }
+        _path.Data = group;
+    }
+}
+
+/// <summary>Status pembaruan ringkas di sisi hero; diperbarui sendiri agar progress tidak menggambar ulang seluruh halaman.</summary>
 internal sealed class UpdatePanel : Grid
 {
     private readonly AppModel M = App.Model;
@@ -356,6 +546,8 @@ internal sealed class UpdatePanel : Grid
 
     public UpdatePanel()
     {
+        Width = 252;
+        HorizontalAlignment = HorizontalAlignment.Right;
         _onChange = OnChange;
         Subscribe();
         Unloaded += (_, _) => Unsubscribe();
@@ -392,48 +584,79 @@ internal sealed class UpdatePanel : Grid
         Children.Clear();
         _bar = null;
         _status = null;
-        if (M.Update is not { } u)
+
+        var u = M.Update;
+        var busy = M.UpdateBusy;
+        var error = M.UpdateError is { Length: > 0 } e ? e : null;
+        var ledColor = busy || u == null ? Theme.Accent : error != null ? Theme.Red : Theme.Orange;
+
+        var led = new Border
         {
-            var latest = Ui.Row(10,
-                Ui.Icon(G.Check, 14, Theme.AccentBrush),
-                Ui.Text(L.T("Kamu memakai versi terbaru yang diketahui"), 13),
-                Ui.Secondary(L.T("Periksa"), null, () => _ = M.CheckForUpdates(true)));
-            latest.HorizontalAlignment = HorizontalAlignment.Center;
-            Children.Add(latest);
-            return;
+            Width = 8, Height = 8, CornerRadius = new CornerRadius(4), Background = Theme.Brush(ledColor),
+            VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(0, 3, 0, 0)
+        };
+        if (busy) Ui.Pulse(led);
+
+        var label = Ui.Caps("Update").With(t => { t.FontSize = 8; t.CharacterSpacing = 110; });
+        var title = busy ? L.T("Mengunduh pembaruan…")
+            : u == null ? L.T("Kamu memakai versi terbaru")
+            : L.T("Versi {} tersedia", u.Version);
+        var text = Ui.Col(1, label, Ui.Text(title, 11.5, FontWeights.Medium, wrap: true));
+
+        Button? action = null;
+        if (!busy)
+        {
+            action = u == null
+                ? MiniButton(L.T("Periksa"), null, () => _ = M.CheckForUpdates(true))
+                : error == null
+                    ? MiniButton(L.T("Update"), G.Download, () => _ = UpdateUI.StartAsync(M, u), true)
+                    : MiniButton(L.T("Coba lagi"), G.Refresh, () => _ = UpdateUI.StartAsync(M, u));
         }
 
-        var content = Ui.Col(8,
-            Ui.Row(10, Ui.Icon(G.Sparkle, 14, Theme.AccentBrush), Ui.Text(L.T("Versi {} tersedia", u.Version), 13, FontWeights.SemiBold)));
-        if (M.UpdateBusy)
+        var content = Ui.Col(6, Ui.Columns("Auto,*,Auto", 8, led, text, action));
+        if (busy)
         {
-            _bar = new UpdateBar(M.UpdateProgress);
-            _status = Ui.Secondary(M.UpdateStatus ?? L.T("Mengunduh pembaruan…"), 12, true);
+            _bar = new UpdateBar(M.UpdateProgress) { Height = 4 };
+            _status = Ui.Secondary(M.UpdateStatus ?? L.T("Mengunduh pembaruan…"), 10.5, true);
             content.Children.Add(_bar);
             content.Children.Add(_status);
         }
-        else if (M.UpdateError is { Length: > 0 } error)
+        else if (u != null && error != null)
         {
-            content.Children.Add(Ui.Secondary(error, 12, true));
-            content.Children.Add(Ui.Row(8,
-                Ui.Primary(L.T("Unduh manual"), G.Download, () => Ui.Open(u.Page)),
-                Ui.Secondary(L.T("Coba lagi"), null, () => _ = UpdateUI.StartAsync(M, u)),
-                Ui.Secondary(L.T("Catatan rilis"), null, () => Ui.Open(u.Page))));
+            content.Children.Add(Ui.Text(error, 10.5, fg: Theme.Brush(Theme.Orange), wrap: true));
+            content.Children.Add(Ui.Row(6,
+                MiniButton(L.T("Unduh manual"), G.Download, () => Ui.Open(u.Page)),
+                MiniButton(L.T("Catatan rilis"), null, () => Ui.Open(u.Page))));
         }
-        else
+        else if (u != null)
         {
-            content.Children.Add(Ui.Row(8,
-                Ui.Primary(L.T("Update sekarang"), G.Download, () => _ = UpdateUI.StartAsync(M, u)),
-                Ui.Secondary(L.T("Catatan rilis"), null, () => Ui.Open(u.Page))));
+            content.Children.Add(Ui.Row(6, MiniButton(L.T("Catatan rilis"), null, () => Ui.Open(u.Page))));
         }
 
-        var card = Ui.Card(content, 14).With(c =>
+        Children.Add(new Border
         {
-            c.MaxWidth = 560;
-            c.HorizontalAlignment = HorizontalAlignment.Center;
-            c.Background = Theme.Brush(Theme.Accent, 0.06);
-            c.BorderBrush = Theme.Brush(Theme.Accent, 0.3);
+            Child = content, Background = Theme.Field, BorderBrush = u == null ? Theme.CardStroke : Theme.Brush(ledColor, 0.35),
+            BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(10), Padding = new Thickness(10, 8, 10, 8)
         });
-        Children.Add(card);
+    }
+
+    private static Button MiniButton(string text, string? glyph, Action click, bool primary = false)
+    {
+        var fg = primary ? new SolidColorBrush(Theme.Hex("#06231E")) : Theme.Text;
+        UIElement content = glyph == null
+            ? Ui.Text(text, 11, FontWeights.SemiBold, fg)
+            : Ui.Row(4, Ui.Icon(glyph, 11, fg), Ui.Text(text, 11, FontWeights.SemiBold, fg));
+        var b = new Button
+        {
+            Content = content, Background = primary ? Theme.AccentBrush : Theme.Ink(0.05), Foreground = fg,
+            BorderBrush = Theme.CardStroke, BorderThickness = primary ? new Thickness(0) : new Thickness(1),
+            CornerRadius = new CornerRadius(6), Padding = new Thickness(8, 3, 8, 4), MinWidth = 0, MinHeight = 0
+        };
+        b.Resources["ButtonBackgroundPointerOver"] = primary ? Theme.Brush(Theme.Accent, 0.88) : Theme.Ink(0.09);
+        b.Resources["ButtonBackgroundPressed"] = primary ? Theme.Brush(Theme.Accent, 0.76) : Theme.Ink(0.13);
+        b.Resources["ButtonForegroundPointerOver"] = fg;
+        b.Resources["ButtonForegroundPressed"] = fg;
+        b.Click += (_, _) => click();
+        return b;
     }
 }
